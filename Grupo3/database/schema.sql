@@ -1,0 +1,2 @@
+-- Esquema inicial de la base de datos de Zpot
+-- Tablas previstas: usuario, propietario, conductor, plaza, reserva

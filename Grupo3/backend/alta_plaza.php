@@ -1,0 +1,286 @@
+<?php
+/**
+ * Add parking spot page.
+ * Form to create a PLAZA; ownership (DNI) is set on the server from session.
+ */
+session_start();
+if (!isset($_SESSION['usuario'])) {
+    header('Location: sesion/login.php');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <title>Añadir mi plaza — Zpot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sesion/signup.css">
+    <style>
+        .form-group input[type="number"],
+        .form-group input[type="url"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .form-group input[type="number"]:focus,
+        .form-group input[type="url"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-focus);
+        }
+        .form-group input[type="number"].error,
+        .form-group input[type="url"].error {
+            border-color: var(--error);
+        }
+        .form-group textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            resize: vertical;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-focus);
+        }
+        .form-group textarea.error {
+            border-color: var(--error);
+        }
+        .back-link { display: inline-block; margin-top: 1rem; font-size: 0.9375rem; color: var(--accent); text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="layout">
+        <main class="card">
+            <div class="logo"><a href="index.php">Zpot</a></div>
+            <h1 class="headline">Añadir mi plaza</h1>
+            <p class="support">Publica tu plaza de aparcamiento o garaje. Los campos con asterisco son obligatorios.</p>
+
+            <div id="globalError" class="global-error" role="alert" hidden></div>
+
+            <form id="plazaForm" novalidate>
+                <div class="form-group">
+                    <label for="direccion">Dirección <span aria-hidden="true">*</span></label>
+                    <input type="text" id="direccion" name="direccion" autocomplete="street-address" placeholder="Calle, número, ciudad" required>
+                    <span id="direccionError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="foto">URL de la foto</label>
+                    <input type="url" id="foto" name="foto" autocomplete="off" placeholder="https://...">
+                    <span id="fotoError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <div class="row-two">
+                    <div class="form-group">
+                        <label for="ancho">Ancho (m)</label>
+                        <input type="number" id="ancho" name="ancho" min="0" step="0.01" placeholder="2.5" inputmode="decimal">
+                        <span id="anchoError" class="field-error" aria-live="polite"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="largo">Largo (m)</label>
+                        <input type="number" id="largo" name="largo" min="0" step="0.01" placeholder="5" inputmode="decimal">
+                        <span id="largoError" class="field-error" aria-live="polite"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" placeholder="Detalles del aparcamiento, acceso, seguridad..."></textarea>
+                    <span id="descripcionError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">Precio (€/h)</label>
+                    <input type="number" id="precio" name="precio" min="0" step="0.01" placeholder="4.50" inputmode="decimal">
+                    <span id="precioError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">Publicar plaza</button>
+            </form>
+
+            <a href="app.html" class="back-link">← Volver al mapa</a>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var form = document.getElementById('plazaForm');
+            var submitBtn = document.getElementById('submitBtn');
+            var globalError = document.getElementById('globalError');
+
+            var fields = {
+                direccion:  { el: document.getElementById('direccion'),  err: document.getElementById('direccionError') },
+                foto:       { el: document.getElementById('foto'),       err: document.getElementById('fotoError') },
+                ancho:      { el: document.getElementById('ancho'),     err: document.getElementById('anchoError') },
+                largo:      { el: document.getElementById('largo'),      err: document.getElementById('largoError') },
+                descripcion:{ el: document.getElementById('descripcion'), err: document.getElementById('descripcionError') },
+                precio:     { el: document.getElementById('precio'),    err: document.getElementById('precioError') }
+            };
+
+            function setError(field, message) {
+                var f = fields[field];
+                if (!f) return;
+                f.err.textContent = message || '';
+                f.el.classList.toggle('error', !!message);
+            }
+
+            function clearErrors() {
+                Object.keys(fields).forEach(function (k) {
+                    setError(k, '');
+                });
+                globalError.hidden = true;
+                globalError.textContent = '';
+            }
+
+            function showGlobalError(msg) {
+                globalError.textContent = msg;
+                globalError.hidden = false;
+            }
+
+            function validate() {
+                var valid = true;
+                var direccionVal = (fields.direccion.el.value || '').trim();
+                var fotoVal = (fields.foto.el.value || '').trim();
+                var anchoVal = fields.ancho.el.value;
+                var largoVal = fields.largo.el.value;
+                var precioVal = fields.precio.el.value;
+
+                if (!direccionVal) {
+                    setError('direccion', 'La dirección es obligatoria');
+                    valid = false;
+                } else {
+                    setError('direccion', '');
+                }
+
+                if (fotoVal && !/^https?:\/\/.+/.test(fotoVal)) {
+                    setError('foto', 'Introduce una URL válida');
+                    valid = false;
+                } else {
+                    setError('foto', '');
+                }
+
+                if (anchoVal !== '') {
+                    var anchoNum = parseFloat(anchoVal);
+                    if (isNaN(anchoNum) || anchoNum < 0) {
+                        setError('ancho', 'Debe ser un número ≥ 0');
+                        valid = false;
+                    } else {
+                        setError('ancho', '');
+                    }
+                } else {
+                    setError('ancho', '');
+                }
+
+                if (largoVal !== '') {
+                    var largoNum = parseFloat(largoVal);
+                    if (isNaN(largoNum) || largoNum < 0) {
+                        setError('largo', 'Debe ser un número ≥ 0');
+                        valid = false;
+                    } else {
+                        setError('largo', '');
+                    }
+                } else {
+                    setError('largo', '');
+                }
+
+                if (precioVal !== '') {
+                    var precioNum = parseFloat(precioVal);
+                    if (isNaN(precioNum) || precioNum < 0) {
+                        setError('precio', 'Debe ser un número ≥ 0');
+                        valid = false;
+                    } else {
+                        setError('precio', '');
+                    }
+                } else {
+                    setError('precio', '');
+                }
+
+                return valid;
+            }
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                clearErrors();
+
+                if (!validate()) return;
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Publicando…';
+
+                var payload = {
+                    direccion: (fields.direccion.el.value || '').trim(),
+                    foto: (fields.foto.el.value || '').trim() || null,
+                    ancho: fields.ancho.el.value === '' ? null : fields.ancho.el.value,
+                    largo: fields.largo.el.value === '' ? null : fields.largo.el.value,
+                    descripcion: (fields.descripcion.el.value || '').trim() || null,
+                    precio: fields.precio.el.value === '' ? null : fields.precio.el.value
+                };
+                if (!payload.foto) delete payload.foto;
+                if (payload.ancho === null) delete payload.ancho;
+                if (payload.largo === null) delete payload.largo;
+                if (payload.descripcion === null) delete payload.descripcion;
+                if (payload.precio === null) delete payload.precio;
+
+                fetch('alta_plaza_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                })
+                    .then(function (res) {
+                        return res.json().then(function (data) {
+                            return { ok: res.ok, status: res.status, data: data };
+                        });
+                    })
+                    .then(function (ref) {
+                        var ok = ref.ok, status = ref.status, data = ref.data;
+
+                        if (ok && data.success) {
+                            window.location.href = 'app.html?plaza_created=1';
+                            return;
+                        }
+
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Publicar plaza';
+
+                        if (data.errors && typeof data.errors === 'object') {
+                            Object.keys(data.errors).forEach(function (key) {
+                                if (fields[key]) setError(key, data.errors[key]);
+                            });
+                        }
+                        if (data.error && (!data.errors || Object.keys(data.errors || {}).length === 0)) {
+                            showGlobalError(data.error);
+                        } else if (status >= 500) {
+                            showGlobalError('Error al guardar. Inténtalo de nuevo.');
+                        }
+                    })
+                    .catch(function () {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Publicar plaza';
+                        showGlobalError('Error de conexión. Inténtalo de nuevo.');
+                    });
+            });
+        })();
+    </script>
+</body>
+</html>
