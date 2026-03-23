@@ -4,12 +4,12 @@
 -- Crea: usuario admin, base de datos, tablas y datos de ejemplo (plazas en Málaga)
 -- =============================================================================
 
-CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
+/*CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
 GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost';
 FLUSH PRIVILEGES;
 
 CREATE SCHEMA zpot_bd;
-USE zpot_bd;
+USE zpot_bd;*/
 
 -- -----------------------------------------------------------------------------
 -- Tablas
