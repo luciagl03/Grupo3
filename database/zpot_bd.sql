@@ -82,3 +82,13 @@ INSERT INTO PLAZA (DNI, Direccion, Foto, Ancho, Largo, Descripcion, Precio) VALU
 ('12345678A', 'Calle Carretería 67, Málaga', 'https://picsum.photos/800/600?random=park3', 2.50, 4.90, 'Garaje individual en zona residencial. Silencioso. Ideal para estancias largas.', 3.80),
 ('12345678A', 'Plaza del Siglo 1, Málaga', 'https://picsum.photos/800/600?random=park4', 2.55, 5.00, 'Plaza en edificio histórico. Centro neurálgico. Perfecta para visitar el casco antiguo.', 5.20),
 ('12345678A', 'Calle Nueva 15, Málaga', 'https://picsum.photos/800/600?random=park5', 2.45, 5.15, 'Aparcamiento exterior vigilado. Muy céntrico. A un paso de la calle Larios.', 4.20);
+
+-- -----------------------------------------------------------------------------
+-- Añade columnas de Token y boolenao de confirmación de email.
+-- Token es la clave aleatoria de confirmación.
+-- El booleano indica si se ha confirmado el log in o no
+-- -----------------------------------------------------------------------------
+
+ALTER TABLE USUARIO 
+ADD token VARCHAR(64),
+ADD confirmado TINYINT(1) DEFAULT 0;
