@@ -1,6 +1,8 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
-include("conexion.php");
+include("sesion/conexion.php");
 
 $dni = $_SESSION['dni'];
 
@@ -14,7 +16,7 @@ $sql = "UPDATE USUARIO
         SET Nombre=?, Apellidos=?, Email=?, Telefono=?, Direccion=? 
         WHERE DNI=?";
 
-$stmt = $conn->prepare($sql);
+$stmt = $_conexion->prepare($sql);
 $stmt->bind_param("ssssss", $nombre, $apellidos, $email, $telefono, $direccion, $dni);
 
 $stmt->execute();

@@ -1,11 +1,13 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
-include("conexion.php"); 
+include("sesion/conexion.php"); 
 
 $dni = $_SESSION['dni']; 
 
 $sql = "SELECT * FROM USUARIO WHERE DNI = ?";
-$stmt = $conn->prepare($sql);
+$stmt = $_conexion->prepare($sql);
 $stmt->bind_param("s", $dni);
 $stmt->execute();
 $result = $stmt->get_result();

@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 } else {
                     session_start();
                     $_SESSION["usuario"] = $tmp_email;
+                    $_SESSION["dni"] = $info_usuario["DNI"];
                     header("Location: ../index.php");
                     exit;
                 }
