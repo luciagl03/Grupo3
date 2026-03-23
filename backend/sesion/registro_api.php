@@ -4,6 +4,9 @@
  * Accepts POST JSON: dni, nombre, apellidos, email, contrasena
  * Returns JSON and sets session on success.
  */
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+require __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -82,18 +85,28 @@ try {
         exit;
     }
     $stmt->close();
+    $token = bin2hex(random_bytes(32));     //crea código de confirmación
 
+    //INSERT nuevo
     $hash = password_hash($contrasena, PASSWORD_DEFAULT);
-    $stmt = $_conexion->prepare('INSERT INTO USUARIO (DNI, Nombre, Apellidos, Direccion, Foto, Telefono, Email, Contrasena_encriptada) VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?)');
-    $stmt->bind_param('sssss', $dni, $nombre, $apellidos, $email, $hash);
+    $stmt = $_conexion->prepare('
+                        INSERT INTO USUARIO 
+                        (DNI, Nombre, Apellidos, Direccion, Foto, Telefono, Email, Contrasena_encriptada, token, confirmado) 
+                        VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?, ?, 0)
+                        ');
+
+    $stmt->bind_param('ssssss', $dni, $nombre, $apellidos, $email, $hash, $token);
     $stmt->execute();
     $stmt->close();
 
-    session_start();
-    $_SESSION['usuario'] = $email;
+    require 'enviar_email.php';
+    enviarConfirmacion($email, $token);
 
     http_response_code(201);
-    echo json_encode(['success' => true]);
+    echo json_encode([
+        'success' => true,
+        'message' => 'Revisa tu email para confirmar la cuenta'
+    ]);
 } catch (mysqli_sql_exception $e) {
     if ($_conexion->errno === 1062) {
         http_response_code(409);
