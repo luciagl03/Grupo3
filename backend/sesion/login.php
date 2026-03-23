@@ -32,10 +32,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if (!password_verify($tmp_contrasena, $info_usuario["Contrasena_encriptada"])) {
                 $global_error = "La contraseña no coincide";
             } else {
-                session_start();
-                $_SESSION["usuario"] = $tmp_email;
-                header("Location: ../index.php");
-                exit;
+                if ($info_usuario["confirmado"] == 0) {
+                    $global_error = "Debes confirmar tu email antes de iniciar sesión";
+                } else {
+                    session_start();
+                    $_SESSION["usuario"] = $tmp_email;
+                    header("Location: ../index.php");
+                    exit;
+                }
             }
         }
     }
