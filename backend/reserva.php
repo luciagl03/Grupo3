@@ -11,6 +11,8 @@ if (!isset($_SESSION['usuario'])) {
 }
 $id_plaza = isset($_GET['id_plaza']) ? (int) $_GET['id_plaza'] : 0;
 ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>

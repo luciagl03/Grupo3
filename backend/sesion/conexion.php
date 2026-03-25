@@ -1,10 +1,10 @@
 <?php
-
-    /*$_servidor = "localhost";
+/*
+    $_servidor = "localhost";
     $_usuario = "admin";
     $_contrasena = "admin";
-    $_bd = "zpot_bd";*/
-
+    $_bd = "zpot_bd";
+*/
     $_servidor = "sql200.infinityfree.com";
     $_usuario = "if0_41455738";
     $_contrasena = "dominioZpot2026";

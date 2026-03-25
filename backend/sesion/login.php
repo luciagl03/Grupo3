@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body class="auth-page">
     <div class="layout">
         <main class="card">
-            <div class="logo"><a href="../index.php">Zpot</a></div>
+            <div class="logo"><a href="../index.php"><img src="../../frontend/assets/images/logo.png" alt="Zpot"></a></div>
             <h1 class="headline">Iniciar sesión</h1>
             <p class="support">Entra en tu cuenta para reservar o publicar plazas.</p>
 

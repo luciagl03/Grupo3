@@ -19,29 +19,56 @@ $user = $result->fetch_assoc();
 <head>
     <meta charset="UTF-8">
     <title>Mi perfil</title>
+    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="../frontend/miperfil.css">
 </head>
-<body>
+<body class="profile-page">
 
-<h1>Mi perfil</h1>
+    <div class="layout-container">
+        <header class="profile-header">
+            <a href="index.php" class="back-link">← Volver al mapa</a>
+            <h1>Mi perfil</h1>
+            <p>Gestiona tu información personal de Zpot</p>
+        </header>
 
-<form action="actualizar_perfil.php" method="POST">
-    <label>Nombre:</label>
-    <input type="text" name="nombre" value="<?= $user['Nombre'] ?>"><br>
+        <div class="profile-layout">
+            <main class="profile-card">
+                <form action="actualizar_perfil.php" method="POST" class="profile-form">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" name="nombre" value="<?= htmlspecialchars($user['Nombre'] ?? '') ?>">
+                        </div>
 
-    <label>Apellidos:</label>
-    <input type="text" name="apellidos" value="<?= $user['Apellidos'] ?>"><br>
+                        <div class="form-group">
+                            <label>Apellidos</label>
+                            <input type="text" name="apellidos" value="<?= htmlspecialchars($user['Apellidos'] ?? '') ?>">
+                        </div>
 
-    <label>Email:</label>
-    <input type="email" name="email" value="<?= $user['Email'] ?>"><br>
+                        <div class="form-group full-width">
+                            <label>Correo electrónico</label>
+                            <input type="email" name="email" value="<?= htmlspecialchars($user['Email'] ?? '') ?>">
+                        </div>
 
-    <label>Teléfono:</label>
-    <input type="text" name="telefono" value="<?= $user['Telefono'] ?>"><br>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="text" name="telefono" value="<?= htmlspecialchars($user['Telefono'] ?? '') ?>">
+                        </div>
 
-    <label>Dirección:</label>
-    <input type="text" name="direccion" value="<?= $user['Direccion'] ?>"><br>
+                        <div class="form-group">
+                            <label>Dirección</label>
+                            <input type="text" name="direccion" value="<?= htmlspecialchars($user['Direccion'] ?? '') ?>">
+                        </div>
+                    </div>
 
-    <button type="submit">Guardar cambios</button>
-</form>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save">Guardar cambios</button>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
 
 </body>
 </html>
