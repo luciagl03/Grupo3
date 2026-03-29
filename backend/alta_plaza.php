@@ -19,59 +19,13 @@ if (!isset($_SESSION['usuario'])) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="sesion/signup.css">
-    <style>
-        .form-group input[type="number"],
-        .form-group input[type="url"] {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text);
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        .form-group input[type="number"]:focus,
-        .form-group input[type="url"]:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-focus);
-        }
-        .form-group input[type="number"].error,
-        .form-group input[type="url"].error {
-            border-color: var(--error);
-        }
-        .form-group textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 0.75rem 1rem;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text);
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            resize: vertical;
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-focus);
-        }
-        .form-group textarea.error {
-            border-color: var(--error);
-        }
-        .back-link { display: inline-block; margin-top: 1rem; font-size: 0.9375rem; color: var(--accent); text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
-    </style>
+
+    <link rel="stylesheet" href="../frontend/alta_plaza.css">
 </head>
 <body class="auth-page">
     <div class="layout">
         <main class="card">
-            <div class="logo"><a href="index.php">Zpot</a></div>
+            <div class="logo"><a href="index.php"><img src="../frontend/assets/images/logo.png" alt="Zpot"></a></div>
             <h1 class="headline">Añadir mi plaza</h1>
             <p class="support">Publica tu plaza de aparcamiento o garaje. Los campos con asterisco son obligatorios.</p>
 
