@@ -1,42 +1,36 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require __DIR__ . '/vendor/autoload.php';
 
 function enviarConfirmacion($email, $token) {
+    $to = $email;
+    $subject = "Confirma tu cuenta en Zpot";
 
-    $mail = new PHPMailer(true);
+    $link = "https://zpot.great-site.net/confirmar.php?token=$token";
 
-    try {
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
+    $message = "
+    <html>
+    <head>
+      <title>Confirma tu cuenta en Zpot</title>
+    </head>
+    <body>
+      <h2>Bienvenido a Zpot</h2>
+      <p>Haz click en el siguiente enlace para confirmar tu cuenta:</p>
+      <p><a href='$link'>Confirmar cuenta</a></p>
+    </body>
+    </html>
+    ";
 
-        $mail->Username   = 'AQUI SE PONE NUESTRO GMAIL PARA PRUEBAS';
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
 
-        $mail->Password   = 'HAY QUE CREAR CLAVE APP DE NUESTRO EMAIL'; 
+    // Remitente genérico del servidor InfinityFree
+    $headers .= "From: Zpot <noreply@zpot.great-site.net>\r\n";
+    $headers .= "Reply-To: noreply@zpot.great-site.net\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
 
-        $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
-
-        $mail->setFrom('no-reply@zpot.com', 'Zpot');
-        $mail->addAddress($email);
-
-        $link = "http://localhost/zpot/confirmar.php?token=$token";
-
-        $mail->isHTML(true);
-        $mail->Subject = 'Confirma tu cuenta en Zpot';
-        $mail->Body = "
-            <h2>Bienvenido a Zpot </h2>
-            <p>Haz click en el siguiente enlace para confirmar tu cuenta:</p>
-            <a href='$link'>Confirmar cuenta</a>
-        ";
-
-        $mail->send();
-
-    } catch (Exception $e) {
-        echo "ERROR AL ENVIAR EMAIL: " . $mail->ErrorInfo;
-        exit;
+    // Enviar correo y devolver resultado
+    if(mail($to, $subject, $message, $headers)) {
+        return ['success' => true];
+    } else {
+        return ['success' => false, 'error' => 'No se pudo enviar el email'];
     }
 }
