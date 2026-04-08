@@ -14,115 +14,81 @@ if (!isset($_SESSION['usuario'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#ffffff">
+    
     <title>Añadir mi plaza — Zpot</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="sesion/signup.css">
-    <style>
-        .form-group input[type="number"],
-        .form-group input[type="url"] {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text);
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        .form-group input[type="number"]:focus,
-        .form-group input[type="url"]:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-focus);
-        }
-        .form-group input[type="number"].error,
-        .form-group input[type="url"].error {
-            border-color: var(--error);
-        }
-        .form-group textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 0.75rem 1rem;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text);
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            resize: vertical;
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-focus);
-        }
-        .form-group textarea.error {
-            border-color: var(--error);
-        }
-        .back-link { display: inline-block; margin-top: 1rem; font-size: 0.9375rem; color: var(--accent); text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
-    </style>
+
+    <!-- Iconos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="../frontend/alta_plaza.css">
 </head>
 <body class="auth-page">
     <div class="layout">
         <main class="card">
-            <div class="logo"><a href="index.php">Zpot</a></div>
+            <div class="logo"><a href="index.php"><img src="../frontend/assets/images/logo.png" alt="Zpot"></a></div>
             <h1 class="headline">Añadir mi plaza</h1>
-            <p class="support">Publica tu plaza de aparcamiento o garaje. Los campos con asterisco son obligatorios.</p>
+            <p class="support">Publica tu plaza de aparcamiento o garaje. Los campos con (*) son obligatorios.</p>
 
             <div id="globalError" class="global-error" role="alert" hidden></div>
 
             <form id="plazaForm" novalidate>
                 <div class="form-group">
-                    <label for="direccion">Dirección <span aria-hidden="true">*</span></label>
+                    <label for="direccion"><i data-lucide="map-pin"></i> Dirección <span aria-hidden="true">*</span></label>
                     <input type="text" id="direccion" name="direccion" autocomplete="street-address" placeholder="Calle, número, ciudad" required>
                     <span id="direccionError" class="field-error" aria-live="polite"></span>
                 </div>
 
                 <div class="form-group">
-                    <label for="foto">URL de la foto</label>
+                    <label for="foto"><i data-lucide="image"></i>URL de la foto</label>
                     <input type="url" id="foto" name="foto" autocomplete="off" placeholder="https://...">
                     <span id="fotoError" class="field-error" aria-live="polite"></span>
                 </div>
 
                 <div class="row-two">
                     <div class="form-group">
-                        <label for="ancho">Ancho (m)</label>
+                        <label for="ancho"><i data-lucide="maximize-2"></i>Ancho (m)</label>
                         <input type="number" id="ancho" name="ancho" min="0" step="0.01" placeholder="2.5" inputmode="decimal">
                         <span id="anchoError" class="field-error" aria-live="polite"></span>
                     </div>
                     <div class="form-group">
-                        <label for="largo">Largo (m)</label>
+                        <label for="largo"><i data-lucide="maximize-2"></i>Largo (m)</label>
                         <input type="number" id="largo" name="largo" min="0" step="0.01" placeholder="5" inputmode="decimal">
                         <span id="largoError" class="field-error" aria-live="polite"></span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="descripcion">Descripción</label>
+                    <label for="descripcion"><i data-lucide="align-left"></i>Descripción</label>
                     <textarea id="descripcion" name="descripcion" placeholder="Detalles del aparcamiento, acceso, seguridad..."></textarea>
                     <span id="descripcionError" class="field-error" aria-live="polite"></span>
                 </div>
 
                 <div class="form-group">
-                    <label for="precio">Precio (€/h)</label>
-                    <input type="number" id="precio" name="precio" min="0" step="0.01" placeholder="4.50" inputmode="decimal">
+                    <label for="precio"><i data-lucide="banknote"></i>Precio (€/h)</label>
+                    <div class="input-with-symbol">
+                        <input type="number" id="precio" name="precio" min="0" step="0.01" placeholder="4.50" inputmode="decimal">
+                    </div>
                     <span id="precioError" class="field-error" aria-live="polite"></span>
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="submitBtn">Publicar plaza</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i data-lucide="plus-circle"></i> Publicar plaza
+                </button>
             </form>
 
-            <a href="app.html" class="back-link">← Volver al mapa</a>
+            <div class="back-link-container">
+                <a href="app.html" class="back-link"><i data-lucide="arrow-left"></i> Volver al mapa</a>
+            </div>
         </main>
     </div>
 
     <script>
+        lucide.createIcons();
+
         (function () {
             var form = document.getElementById('plazaForm');
             var submitBtn = document.getElementById('submitBtn');

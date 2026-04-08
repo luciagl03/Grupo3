@@ -1,0 +1,216 @@
+:root {
+    --brand-yellow: #f4dd49;
+    --brand-dark: #3a382f;
+    --brand-grey: #cfccc4;
+    --brand-bg: #f1f0ea;
+    
+    --bg: var(--brand-bg);
+    --card-bg: #ffffff;
+    --text: var(--brand-dark);
+    --text-muted: #706e66; 
+    --border: var(--brand-grey);
+    --accent: var(--brand-yellow);
+    --error: #d32f2f;
+    --radius: 12px;
+    --shadow: 0 10px 25px -5px rgba(58, 56, 47, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    color: var(--text);
+    background-color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-font-smoothing: antialiased;
+}
+
+.layout {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.card {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(207, 204, 196, 0.3);
+}
+
+.logo {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.logo img {
+    height: 60px;
+    width: auto;
+}
+
+.headline {
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-align: center;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+}
+
+.support {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    line-height: 1.4;
+}
+
+/*FORMULARIO */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--brand-dark);
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    font-family: inherit;
+    font-size: 1rem;
+    background: #fdfdfd;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    transition: all 0.2s ease;
+}
+
+.form-group textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.form-group input:focus, 
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--brand-dark);
+    box-shadow: 0 0 0 4px rgba(244, 221, 73, 0.2);
+    background: #fff;
+}
+
+/* ERRORES */
+.form-group input.error, 
+.form-group textarea.error {
+    border-color: var(--error);
+}
+
+.field-error {
+    font-size: 0.8rem;
+    color: var(--error);
+    font-weight: 600;
+    margin-top: 0.4rem;
+    display: block;
+}
+
+.global-error {
+    background: var(--error);
+    color: white;
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+
+.row-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 1.1rem;
+    background: var(--brand-dark);
+    color: white;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+
+.btn-primary:hover:not(:disabled) {
+    background: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.back-link-container {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--brand-dark);
+    transform: translateX(-4px);
+}
+
+@media (max-width: 767px) {
+    body { 
+        background-color: #ffffff !important; 
+        align-items: flex-start; 
+    }
+    .layout { padding: 0; }
+    .card { 
+        box-shadow: none; 
+        border: none; 
+        padding: 2.5rem 1.5rem; 
+        border-radius: 0;
+    }
+    .row-two { grid-template-columns: 1fr; }
+}
