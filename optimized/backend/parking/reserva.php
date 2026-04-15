@@ -11,7 +11,7 @@ if (!isset($_SESSION['usuario'])) {
     exit;
 }
 
-require_once '../conexion.php';
+require_once '../sesion//conexion.php';
 
 $id_plaza = isset($_GET['id_plaza']) ? (int) $_GET['id_plaza'] : 0;
 $dni = $_SESSION['usuario']['dni'] ?? '';
@@ -21,36 +21,75 @@ $dni = $_SESSION['usuario']['dni'] ?? '';
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservar — Zpot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Reservar plaza — Zpot</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Iconos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <link rel="stylesheet" href="../app.css">
+    <link rel="stylesheet" href="../styles/reservar.css">
 </head>
-<body>
+<body class="booking-page">
 
-<div class="reserva-wrap">
-    <h1>Reservar plaza</h1>
+<div class="layout">
+    <div class="layout-container">
+        <header class="booking-header">
+            <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> Volver al mapa</a>
+            <h1 class="headline">Finalizar reserva</h1>
+            <p class="support">Confirma los detalles de tu estancia en la plaza seleccionada.</p>
+        </header>
 
-    <p>Plaza seleccionada: #<?php echo $id_plaza; ?>.</p>
+        <main class="card booking-card">
+            <!-- Resumen rápido de la plaza -->
+            <div class="booking-summary">
+                <div class="summary-icon">
+                    <i data-lucide="map-pin"></i>
+                </div>
+                <div class="summary-text">
+                    <span>Plaza seleccionada</span>
+                    <strong>Identificador: #<?php echo $id_plaza; ?></strong>
+                </div>
+            </div>
 
-    <form method="POST" action="pago.php">
+            <form method="POST" action="pago.php" class="booking-form">
+                <input type="hidden" name="id_plaza" value="<?php echo $id_plaza; ?>">
+                <input type="hidden" name="dni" value="<?php echo htmlspecialchars($dni); ?>">
 
-        <input type="hidden" name="id_plaza" value="<?php echo $id_plaza; ?>">
-        <input type="hidden" name="dni" value="<?php echo htmlspecialchars($dni); ?>">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i data-lucide="calendar-input"></i> Hora de entrada</label>
+                        <input type="datetime-local" name="hora_entrada" required>
+                    </div>
 
-        <label>Hora entrada:</label>
-        <input type="datetime-local" name="hora_entrada" required>
+                    <div class="form-group">
+                        <label><i data-lucide="calendar-output"></i> Hora de salida</label>
+                        <input type="datetime-local" name="hora_salida" required>
+                    </div>
 
-        <label>Hora salida:</label>
-        <input type="datetime-local" name="hora_salida" required>
+                    <div class="form-group full-width">
+                        <label><i data-lucide="banknote"></i> Precio total estimado (€)</label>
+                        <input type="number" name="precio" step="0.01" placeholder="0.00" required>
+                        <span class="helper-text">El precio final se calculará al confirmar el pago.</span>
+                    </div>
+                </div>
 
-        <label>Precio total (€):</label>
-        <input type="number" name="precio" required>
-
-        <button type="submit">Reservar</button>
-    </form>
-
-    <a href="../app.html">← Volver al mapa</a>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        Confirmar y pagar <i data-lucide="credit-card"></i>
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
 </div>
 
+<script>
+    lucide.createIcons();
+</script>
 </body>
 </html>

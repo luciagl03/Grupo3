@@ -10,14 +10,14 @@ require_once '../sesion/conexion.php';
 
 // DATOS
 $id_plaza = (int) $_POST['id_plaza'];
-$fecha_inicio = $_POST['fecha_inicio'];
-$fecha_fin = $_POST['fecha_fin'];
+$fecha_inicio = $_POST['hora_entrada'];
+$fecha_fin = $_POST['hora_salida'];
 
-$dni = $_SESSION['usuario'];
+$dni = $_SESSION['dni'] ?? $_SESSION['usuario']['dni'] ?? '';
 
 // VALIDAR FECHAS
-if (strtotime($fecha_fin) <= strtotime($fecha_inicio)) {
-    die("Error: la fecha fin debe ser mayor que la de inicio.");
+if (empty($fecha_inicio) || empty($fecha_fin) || strtotime($fecha_fin) <= strtotime($fecha_inicio)) {
+    die("Error: la fecha fin debe ser mayor que la de inicio. Por favor, vuelve atrás y revisa las horas.");
 }
 
 $inicio = new DateTime($fecha_inicio);
@@ -97,43 +97,49 @@ $id_reserva = $_conexion->insert_id;
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pagar reserva</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Pagar reserva — Zpot</title>
+
+     <!-- Fuentes e Iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="../../../app.css">
+    <link rel="stylesheet" href="../styles/pago.css">
+    
 </head>
-<body>
+<body class="payment-page">
 
-<h2>Total a pagar: <?php echo $total; ?> €</h2>
+<div class="layout">
+    <div class="payment-card">
+        <img src="../../../frontend/assets/images/logo.png" alt="Zpot" class="logo-img">
+        <h2>Resumen del pago</h2>
+        
+        <div class="price-tag">
+            <?php echo number_format($total, 2); ?><span>€</span>
+        </div>
 
-<h3>Precio por hora: <?php echo $precio_hora; ?> €</h3>
-<p>Duración: <?php echo $duracion; ?> horas</p>
-<p>Fecha: <?php echo $fecha; ?></p>
-<p>Hora entrada: <?php echo $hora_entrada; ?></p>
-<p>Hora salida: <?php echo $hora_salida; ?></p>
+        <div class="details-box">
+            <div class="detail-item"><span>Duración:</span> <span><?php echo $duracion; ?> horas</span></div>
+            <div class="detail-item"><span>Fecha:</span> <span><?php echo $fecha; ?></span></div>
+            <div class="detail-item"><span>Total:</span> <span><?php echo number_format($total, 2); ?> €</span></div>
+        </div>
 
-<br>
+        <!-- PASAMOS DATOS AL JS AQUÍ -->
+        <div id="paypal-button-container" 
+             data-total="<?php echo number_format($total, 2, '.', ''); ?>" 
+             data-reserva="<?php echo $id_reserva; ?>">
+        </div>
+        
+        <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> Cancelar y volver</a>
+    </div>
+</div>
 
-<!-- PAYPAL -->
-<script src="https://www.paypal.com/sdk/js?client-id=TU_CLIENT_ID&currency=EUR"></script>
+<!-- SDK DE PAYPAL-->
+<script src="https://www.paypal.com/sdk/js?client-id=AY_hkQ1T9mIhXUfY2Eu7TXdORPVLmI-SF6UaaorGnCYcgYsZ6Zt40_KL-fPTzCzE812wHUxd3JCzYWEP&currency=EUR"></script>
 
-<div id="paypal-button-container"></div>
-
-<script>
-paypal.Buttons({
-    createOrder: function(data, actions) {
-        return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: '<?php echo $total; ?>'
-                }
-            }]
-        });
-    },
-    onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-            window.location.href = "confirmacion.php?id_reserva=<?php echo $id_reserva; ?>";
-        });
-    }
-}).render('#paypal-button-container');
-</script>
-
+<!-- TU JS SEPARADO -->
+<script src="../../scripts/pago.js"></script>
 </body>
 </html>
