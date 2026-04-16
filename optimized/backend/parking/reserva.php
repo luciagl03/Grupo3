@@ -15,6 +15,23 @@ require_once '../sesion//conexion.php';
 
 $id_plaza = isset($_GET['id_plaza']) ? (int) $_GET['id_plaza'] : 0;
 $dni = $_SESSION['usuario']['dni'] ?? '';
+
+$sql = "SELECT Precio FROM PLAZA WHERE ID_plaza = ?";
+$stmt = $_conexion->prepare($sql);
+
+if (!$stmt) {
+    die($_conexion->error);
+}
+
+$stmt->bind_param("i", $id_plaza);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$precio_hora = 0;
+
+if ($row = $result->fetch_assoc()) {
+    $precio_hora = $row['Precio'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -73,7 +90,10 @@ $dni = $_SESSION['usuario']['dni'] ?? '';
 
                     <div class="form-group full-width">
                         <label><i data-lucide="banknote"></i> Precio total estimado (€)</label>
-                        <input type="number" name="precio" step="0.01" placeholder="0.00" required>
+                        <div class="form-group full-width">
+                            <label><i data-lucide="banknote"></i> Precio por hora (€)</label>
+                            <input type="text" value="<?php echo number_format($precio_hora, 2); ?> €/h" disabled>
+                        </div>
                         <span class="helper-text">El precio final se calculará al confirmar el pago.</span>
                     </div>
                 </div>

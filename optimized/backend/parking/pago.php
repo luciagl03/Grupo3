@@ -20,6 +20,9 @@ if (empty($fecha_inicio) || empty($fecha_fin) || strtotime($fecha_fin) <= strtot
     die("Error: la fecha fin debe ser mayor que la de inicio. Por favor, vuelve atrás y revisa las horas.");
 }
 
+$fecha_inicio = str_replace('T', ' ', $_POST['hora_entrada']);
+$fecha_fin = str_replace('T', ' ', $_POST['hora_salida']);
+
 $inicio = new DateTime($fecha_inicio);
 $fin = new DateTime($fecha_fin);
 
