@@ -13,7 +13,7 @@ $id_plaza = (int) $_POST['id_plaza'];
 $fecha_inicio = $_POST['hora_entrada'];
 $fecha_fin = $_POST['hora_salida'];
 
-$dni = $_SESSION['dni'] ?? $_SESSION['usuario']['dni'] ?? '';
+$dni = $_SESSION['dni'] ?? ($_SESSION['usuario']['dni'] ?? '');
 
 // VALIDAR FECHAS
 if (empty($fecha_inicio) || empty($fecha_fin) || strtotime($fecha_fin) <= strtotime($fecha_inicio)) {
