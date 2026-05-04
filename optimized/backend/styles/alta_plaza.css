@@ -214,3 +214,25 @@ body {
     }
     .row-two { grid-template-columns: 1fr; }
 }
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: border-color 0.15s, background 0.15s;
+}
+.radio-option:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent);
+}
+.radio-option input { display: none; }

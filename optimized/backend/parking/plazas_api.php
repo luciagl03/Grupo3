@@ -23,7 +23,11 @@ function mapPlazaRow($row, $hasPrecio) {
         'descripcion' => $row['Descripcion'] ?? '',
         'precio' => $hasPrecio && isset($row['Precio']) && $row['Precio'] !== null ? (float) $row['Precio'] : null,
         'owner' => trim(($row['owner_nombre'] ?? '') . ' ' . ($row['owner_apellidos'] ?? '')),
-        'owner_dni' => $row['DNI'] ?? null
+        'owner_dni' => $row['DNI'] ?? null,
+        'ubicacion' => $row['Ubicacion'] ?? null,
+        'extras' => !empty($row['Extras']) ? explode(',', $row['Extras']) : [],
+        'lat' => isset($row['Lat']) && $row['Lat'] !== null ? (float) $row['Lat'] : null,
+        'lng' => isset($row['Lng']) && $row['Lng'] !== null ? (float) $row['Lng'] : null,
     ];
 }
 
@@ -36,13 +40,13 @@ require_once __DIR__ . '/../sesion/conexion.php';
 $list = [];
 $hasPrecio = true;
 
-$sqlWithPrecio = "SELECT p.ID_plaza, p.DNI, p.Direccion, p.Foto, p.Ancho, p.Largo, p.Descripcion, p.Precio,
+$sqlWithPrecio = "SELECT p.ID_plaza, p.DNI, p.Direccion, p.Foto, p.Ancho, p.Largo, p.Descripcion, p.Precio, p.Ubicacion, p.Extras, p.Lat, p.Lng,
     u.Nombre AS owner_nombre, u.Apellidos AS owner_apellidos
     FROM PLAZA p
     LEFT JOIN USUARIO u ON p.DNI = u.DNI
     ORDER BY p.ID_plaza";
 
-$sqlNoPrecio = "SELECT p.ID_plaza, p.DNI, p.Direccion, p.Foto, p.Ancho, p.Largo, p.Descripcion,
+$sqlNoPrecio = "SELECT p.ID_plaza, p.DNI, p.Direccion, p.Foto, p.Ancho, p.Largo, p.Descripcion, p.Ubicacion, p.Extras, p.Lat, p.Lng,
     u.Nombre AS owner_nombre, u.Apellidos AS owner_apellidos
     FROM PLAZA p
     LEFT JOIN USUARIO u ON p.DNI = u.DNI

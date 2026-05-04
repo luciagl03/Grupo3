@@ -18,4 +18,4 @@ mysql -u root -p < database/zpot_bd.sql
 Crea el usuario `admin` (contraseña `admin`), la base `zpot_bd`, las tablas (USUARIO, PLAZA, RESERVA) y datos de ejemplo: un usuario demo y 8 plazas en Málaga para probar el mapa.
 
 ## Estado del proyecto
-Actualmente el proyecto ha avanzado a la creación de la base de datos y las páginas de registro e inicio de sesión de la aplicación web.
+Actualmente el proyecto está en su fase final de creación. Las funcionalidades principales de añadir plaza, reserva y pago están listas.

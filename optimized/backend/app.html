@@ -24,11 +24,17 @@
                     <button type="button" class="search-filters-btn" id="filtersBtn" aria-haspopup="true" aria-expanded="false" aria-label="Filtros">Filtros</button>
                 </div>
                 <div class="filters-dropdown" id="filtersDropdown" hidden>
+                    <p class="filters-label">Ubicación</p>
                     <div class="filters-grid">
-                        <label class="filter-option"><input type="checkbox" name="filter" value="cubierto"> Cubierto</label>
-                        <label class="filter-option"><input type="checkbox" name="filter" value="garaje"> Garaje</label>
-                        <label class="filter-option"><input type="checkbox" name="filter" value="exterior"> Exterior</label>
-                        <label class="filter-option"><input type="checkbox" name="filter" value="ev"> Carga eléctrica</label>
+                        <label class="filter-option"><input type="checkbox" name="filter-ubicacion" value="cubierto"> Cubierto</label>
+                        <label class="filter-option"><input type="checkbox" name="filter-ubicacion" value="garaje"> Garaje</label>
+                        <label class="filter-option"><input type="checkbox" name="filter-ubicacion" value="exterior"> Exterior</label>
+                    </div>
+                    <p class="filters-label">Extras</p>
+                    <div class="filters-grid">
+                        <label class="filter-option"><input type="checkbox" name="filter-extras" value="ev"> Carga eléctrica</label>
+                        <label class="filter-option"><input type="checkbox" name="filter-extras" value="vigilado"> Vigilado</label>
+                        <label class="filter-option"><input type="checkbox" name="filter-extras" value="24h"> Acceso 24h</label>
                     </div>
                     <div class="filters-footer">
                         <button type="button" class="btn-text" id="clearFilters">Limpiar</button>
@@ -43,10 +49,11 @@
                 <div class="account-dropdown" id="accountDropdown" hidden>
                     <a href="parking/alta_plaza.php" class="account-item account-item-primary" id="addParkingLink">Añadir mi plaza</a>
                     <a href="profile/mi_perfil.php" class="account-item">Mi perfil</a>
-                    <a href="#" class="account-item">Mis reservas</a>
-                    <a href="#" class="account-item">Ajustes</a>
+                    <a href="parking/mis_reservas.php" class="account-item">Mis reservas</a>
+                    <a href="parking/mis_plazas.php" class="account-item">Mis plazas</a>
                     <a href="#" class="account-item">Métodos de pago</a>
                     <hr class="account-divider">
+                    <a href="#" class="account-item">Ajustes</a>
                     <a href="sesion/logout.php" class="account-item">Cerrar sesión</a>
                 </div>
             </div>
@@ -56,8 +63,12 @@
     <div id="plazaCreatedBanner" class="success-banner" role="status" aria-live="polite" hidden>
         Plaza publicada correctamente. Ya aparece en el mapa.
     </div>
+    <div id="sinUbicacionBanner" class="warning-banner" role="status" aria-live="polite" hidden>
+        Plaza guardada, pero no pudimos ubicarla en el mapa. Comprueba que la dirección incluye la ciudad (ej: Calle Larios 2, Málaga).
+    </div>
 
     <main class="map-container">
+        <div id="noResultsMsg" class="no-results-msg" hidden>No se encontraron plazas con esos criterios.</div>
         <div id="map" class="map" role="application" aria-label="Mapa de plazas de aparcamiento"></div>
         <aside class="detail-panel" id="detailPanel" hidden>
             <button type="button" class="detail-close" id="detailClose" aria-label="Cerrar">×</button>
@@ -68,10 +79,10 @@
                 </div>
                 <h2 id="detailTitle" class="detail-title"></h2>
                 <p id="detailPrice" class="detail-price"></p>
-                <p id="detailOwner" class="detail-owner"></p>
-                <p id="detailLocation" class="detail-location"></p>
+                <div id="detailTags" class="detail-tags"></div>
                 <p id="detailDescription" class="detail-description"></p>
                 <p id="detailSize" class="detail-size"></p>
+                <p id="detailOwner" class="detail-owner"></p>
                 <a href="#" class="btn btn-primary detail-book" id="detailBook">Reservar</a>
             </div>
         </aside>

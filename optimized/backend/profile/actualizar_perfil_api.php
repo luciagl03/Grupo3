@@ -2,8 +2,6 @@
 // ------------------------------------------------------------
 // Profile update endpoint (form POST from mi_perfil.php)
 // ------------------------------------------------------------
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 session_start();
 require_once __DIR__ . "/../sesion/conexion.php";
 
@@ -22,9 +20,13 @@ $email = trim($_POST['email'] ?? '');
 $telefono = trim($_POST['telefono'] ?? '');
 $direccion = trim($_POST['direccion'] ?? '');
 
-// Update only the current authenticated user's row.
-$sql = "UPDATE USUARIO 
-        SET Nombre=?, Apellidos=?, Email=?, Telefono=?, Direccion=? 
+if ($nombre === '' || $apellidos === '' || $email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    header("Location: ./mi_perfil.php?error=1");
+    exit;
+}
+
+$sql = "UPDATE USUARIO
+        SET Nombre=?, Apellidos=?, Email=?, Telefono=?, Direccion=?
         WHERE DNI=?";
 
 $stmt = $_conexion->prepare($sql);
@@ -32,6 +34,5 @@ $stmt->bind_param("ssssss", $nombre, $apellidos, $email, $telefono, $direccion, 
 $stmt->execute();
 $stmt->close();
 
-// Return to profile page after saving.
-header("Location: ./mi_perfil.php");
+header("Location: ./mi_perfil.php?updated=1");
 exit;
