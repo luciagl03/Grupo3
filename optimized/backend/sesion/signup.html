@@ -222,10 +222,16 @@
                         var ok = _ref.ok, status = _ref.status, data = _ref.data;
 
                         if (ok && data.success) {
-                            form.innerHTML = `
-                                <div style="text-align:center;padding:1rem 0;">
-                                    <div style="font-size:3rem;margin-bottom:1rem;">📬</div>
-                                    <h2 style="font-size:1.3rem;font-weight:700;color:var(--brand-dark);margin-bottom:0.75rem;">
+                            document.querySelector('.card').innerHTML = `
+                                <div class="logo"><a href="../index.php"><img src="../../frontend/assets/images/logo.png" alt="Zpot"></a></div>
+                                <div style="text-align:center;padding:2rem 1rem;">
+                                    <div style="width:72px;height:72px;background:var(--brand-yellow);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;">
+                                        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M6 11C6 9.89543 6.89543 9 8 9H28C29.1046 9 30 9.89543 30 11V25C30 26.1046 29.1046 27 28 27H8C6.89543 27 6 26.1046 6 25V11Z" stroke="#3a382f" stroke-width="2" stroke-linejoin="round"/>
+                                            <path d="M6 12L18 20L30 12" stroke="#3a382f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <h2 style="font-size:1.4rem;font-weight:700;color:var(--brand-dark);margin-bottom:0.75rem;">
                                         Revisa tu email
                                     </h2>
                                     <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.6;margin-bottom:2rem;">

@@ -1,0 +1,278 @@
+/* ═══════════════════════════════════════════════════
+   ZPOT DATE PICKER — zdp-*.css
+   Incluir en reservar.css / editar_reserva.css
+   ═══════════════════════════════════════════════════ */
+
+.zdp-wrap {
+    position: relative;
+}
+
+/* Botón que reemplaza el input nativo */
+.zdp-display {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    color: var(--brand-dark);
+    background: #fdfdfd;
+    border: 1.5px solid var(--brand-grey);
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.zdp-display:hover {
+    border-color: var(--brand-dark);
+    background: #fff;
+}
+
+.zdp-display:focus {
+    outline: none;
+    border-color: var(--brand-dark);
+    box-shadow: 0 0 0 4px rgba(244, 221, 73, 0.25);
+}
+
+.zdp-display-text {
+    flex: 1;
+    color: inherit;
+}
+
+.zdp-display-icon {
+    font-size: 1.1rem;
+    opacity: 0.5;
+}
+
+/* Dropdown container */
+.zdp-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 9999;
+    background: #fff;
+    border: 1.5px solid var(--brand-grey);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px -8px rgba(58,56,47,0.18);
+    width: 300px;
+    overflow: hidden;
+    animation: zdp-appear 0.15s ease;
+}
+
+@keyframes zdp-appear {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Calendar */
+.zdp-cal {
+    padding: 1.25rem 1.25rem 0.75rem;
+}
+
+.zdp-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.zdp-month-label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--brand-dark);
+}
+
+.zdp-nav {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--brand-grey);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--brand-dark);
+    transition: all 0.15s;
+    font-family: inherit;
+}
+.zdp-nav:hover {
+    background: var(--brand-dark);
+    color: #fff;
+    border-color: var(--brand-dark);
+}
+
+.zdp-days-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 0.5rem;
+}
+.zdp-days-row span {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted, #706e66);
+    text-transform: uppercase;
+    padding: 4px 0;
+}
+
+.zdp-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.zdp-day {
+    aspect-ratio: 1;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    font-family: inherit;
+    font-size: 0.82rem;
+    color: var(--brand-dark);
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zdp-day:hover:not(:disabled) {
+    background: var(--brand-bg, #f1f0ea);
+}
+
+.zdp-day--today {
+    font-weight: 700;
+    color: var(--brand-dark);
+    border: 1.5px solid var(--brand-grey);
+}
+
+.zdp-day--selected {
+    background: var(--brand-dark) !important;
+    color: #fff !important;
+    font-weight: 700;
+}
+
+.zdp-day--past {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Time picker */
+.zdp-time {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--brand-bg, #f1f0ea);
+    background: #fafaf8;
+}
+
+.zdp-time-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #706e66);
+    margin-bottom: 0.6rem;
+}
+
+.zdp-time-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.zdp-time-sep {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+    line-height: 1;
+}
+
+.zdp-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.zdp-spin-btn {
+    width: 32px;
+    height: 28px;
+    background: #fff;
+    border: 1.5px solid var(--brand-grey);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--brand-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.12s;
+    font-family: inherit;
+}
+.zdp-spin-btn:hover {
+    background: var(--brand-dark);
+    color: #fff;
+    border-color: var(--brand-dark);
+}
+
+.zdp-spin-val {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--brand-dark);
+    min-width: 40px;
+    text-align: center;
+    letter-spacing: -0.02em;
+}
+
+/* Footer */
+.zdp-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--brand-bg, #f1f0ea);
+    gap: 0.5rem;
+}
+
+.zdp-btn-clear {
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--text-muted, #706e66);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+.zdp-btn-clear:hover {
+    background: var(--brand-bg, #f1f0ea);
+    color: var(--brand-dark);
+}
+
+.zdp-btn-ok {
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--brand-dark);
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex: 1;
+}
+.zdp-btn-ok:hover {
+    background: #1a1915;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .zdp-dropdown {
+        width: calc(100vw - 3rem);
+    }
+}

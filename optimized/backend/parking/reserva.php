@@ -45,6 +45,10 @@ if ($row = $result->fetch_assoc()) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="../styles/zpot-datetime-picker.css">
+
+    <script src="../scripts/zpot-datetime-picker.js"></script>
+
     <!-- Iconos -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -84,12 +88,12 @@ if ($row = $result->fetch_assoc()) {
                     ?>
                     <div class="form-group">
                         <label><i data-lucide="calendar-input"></i> Hora de entrada</label>
-                        <input type="datetime-local" name="hora_entrada" required min="<?php echo $ahora; ?>" max="<?php echo $maxFecha; ?>">
+                        <input type="hidden" id="hora_entrada" name="hora_entrada">
                     </div>
 
                     <div class="form-group">
                         <label><i data-lucide="calendar-output"></i> Hora de salida</label>
-                        <input type="datetime-local" name="hora_salida" required min="<?php echo $ahora; ?>" max="<?php echo $maxFecha; ?>">
+                        <input type="hidden" id="hora_salida" name="hora_salida">
                     </div>
 
                     <div class="form-group full-width">

@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 /**
  * Create parking spot (PLAZA) for the logged-in user.
  * POST JSON: direccion, foto?, ancho?, largo?, descripcion?, precio?

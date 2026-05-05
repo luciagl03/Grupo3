@@ -43,6 +43,12 @@ $result = $stmt->get_result();
 </head>
 <body class="my-reservations-page">
 
+<?php if (isset($_GET['updated'])): ?>
+    <div style="background:#f4dd49;padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-weight:500;">
+        Reserva actualizada correctamente.
+    </div>
+<?php endif; ?>
+
 <div class="layout">
     <div class="layout-container">
         
@@ -106,6 +112,9 @@ $result = $stmt->get_result();
                     </div>
 
                     <div class="reserva-footer">
+                        <a href="editar_reserva.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-edit">
+                            <i data-lucide="pencil"></i> Modificar
+                        </a>
                         <form method="POST" action="eliminar_reserva.php" 
                               onsubmit="return confirm('¿Seguro que quieres cancelar esta reserva?');">
                             <input type="hidden" name="id_reserva" value="<?php echo $row['ID_reserva']; ?>">
