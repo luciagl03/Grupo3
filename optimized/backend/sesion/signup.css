@@ -250,3 +250,13 @@ body {
         height: 70px;
     }
 }
+
+.global-success {
+    font-size: 0.9rem;
+    color: #fff;
+    background: #2e7d32;
+    padding: 0.8rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}

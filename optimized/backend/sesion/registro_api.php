@@ -22,34 +22,26 @@ function cleanText($value) {
 }
 
 // Handles the confirmation email delivery.
-function enviarConfirmacion($email, $token) {
-    $to = $email;
-    $subject = "Confirma tu cuenta en Zpot";
-    $link = "https://zpot.great-site.net/confirmar.php?token=$token";
-    $message = "
-    <html>
-    <head>
-      <title>Confirma tu cuenta en Zpot</title>
-    </head>
-    <body>
-      <h2>Bienvenido a Zpot</h2>
-      <p>Haz click en el siguiente enlace para confirmar tu cuenta:</p>
-      <p><a href='$link'>Confirmar cuenta</a></p>
-    </body>
-    </html>
-    ";
+function enviarConfirmacion($email, $nombre, $token) {
+    $link = "https://zpot.great-site.net/optimized/backend/sesion/confirmar.php?token=$token";
+    
+    // Cargar el template
+    $template = file_get_contents(__DIR__ . '/email_confirmacion.html');
+    
+    // Reemplazar variables
+    $message = str_replace(
+        ['{NOMBRE}', '{LINK_CONFIRMACION}'],
+        [htmlspecialchars($nombre), $link],
+        $template
+    );
 
     $headers = "MIME-Version: 1.0\r\n";
     $headers .= "Content-type: text/html; charset=UTF-8\r\n";
     $headers .= "From: Zpot <noreply@zpot.great-site.net>\r\n";
-    $headers .= "Reply-To: noreply@zpot.great-site.net\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
 
-    if (mail($to, $subject, $message, $headers)) {
-        return ['success' => true];
-    }
-
-    return ['success' => false, 'error' => 'No se pudo enviar el email'];
+    return mail($email, "Confirma tu cuenta en Zpot", $message, $headers)
+        ? ['success' => true]
+        : ['success' => false, 'error' => 'No se pudo enviar el email'];
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -109,17 +101,19 @@ try {
     $token = bin2hex(random_bytes(32));
     $hash = password_hash($contrasena, PASSWORD_DEFAULT);
 
+    $expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
     $stmt = $_conexion->prepare('
         INSERT INTO USUARIO 
-        (DNI, Nombre, Apellidos, Direccion, Foto, Telefono, Email, Contrasena_encriptada, token, confirmado) 
-        VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?, ?, 0)
+        (DNI, Nombre, Apellidos, Direccion, Foto, Telefono, Email, Contrasena_encriptada, token, token_expires_at, confirmado) 
+        VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?, ?, ?, 0)
     ');
-    $stmt->bind_param('ssssss', $dni, $nombre, $apellidos, $email, $hash, $token);
+    $stmt->bind_param('sssssss', $dni, $nombre, $apellidos, $email, $hash, $token, $expires);
     $stmt->execute();
     $stmt->close();
 
     // -------- Confirmation email --------
-    $mailResult = enviarConfirmacion($email, $token);
+    $mailResult = enviarConfirmacion($email, $nombre, $token);
 
     if (!$mailResult['success']) {
         respondJson(500, [

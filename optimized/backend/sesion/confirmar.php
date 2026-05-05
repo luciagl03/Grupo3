@@ -1,10 +1,10 @@
- <?php
+<?php
 require 'conexion.php';
 
 $token = $_GET['token'] ?? '';
 
 if (!$token) {
-    echo "Token inválido";
+    header("Location: login.php?error=token_invalido");
     exit;
 }
 
@@ -14,14 +14,21 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    echo "Token inválido";
+    header("Location: login.php?error=token_invalido");
     exit;
 }
 
 $user = $result->fetch_assoc();
 
-$stmt = $_conexion->prepare("UPDATE USUARIO SET confirmado = 1, token = NULL WHERE Email = ?");
+// Comprobar expiración
+if ($user['token_expires_at'] && strtotime($user['token_expires_at']) < time()) {
+    header("Location: login.php?error=token_expirado");
+    exit;
+}
+
+$stmt = $_conexion->prepare("UPDATE USUARIO SET confirmado = 1, token = NULL, token_expires_at = NULL WHERE Email = ?");
 $stmt->bind_param("s", $user['Email']);
 $stmt->execute();
 
-echo "Cuenta confirmada correctamente. Ya puedes iniciar sesión.";
+header("Location: login.php?confirmed=1");
+exit;

@@ -91,3 +91,6 @@ INSERT INTO PLAZA (DNI, Direccion, Foto, Ancho, Largo, Descripcion, Precio, Ubic
 -- ALTER TABLE PLAZA   ADD COLUMN Lat        DECIMAL(10,7) NULL;
 -- ALTER TABLE PLAZA   ADD COLUMN Lng        DECIMAL(10,7) NULL;
 -- ALTER TABLE RESERVA ADD COLUMN Estado ENUM('pendiente','confirmada','cancelada') NOT NULL DEFAULT 'pendiente';
+
+-- Token de expiracion para la confirmación del correo TABLA USUARIO
+ALTER TABLE USUARIO ADD COLUMN token_expires_at DATETIME DEFAULT NULL;

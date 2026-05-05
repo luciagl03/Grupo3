@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Confirma tu cuenta — Zpot</title>
+    <style>
+        /* RESET */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: #f1f0ea;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-wrapper {
+            background-color: #f1f0ea;
+            padding: 48px 16px;
+        }
+
+        .email-container {
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* HEADER CON LOGO */
+        .email-header {
+            text-align: center;
+            padding-bottom: 32px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            color: #3a382f;
+            letter-spacing: -0.04em;
+        }
+
+        .logo-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #f4dd49;
+            border-radius: 50%;
+            margin-left: 2px;
+            vertical-align: middle;
+            position: relative;
+            top: -3px;
+        }
+
+        /* CARD PRINCIPAL */
+        .email-card {
+            background-color: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px -8px rgba(58, 56, 47, 0.12);
+            border: 1px solid rgba(207, 204, 196, 0.4);
+        }
+
+        /* BANNER SUPERIOR AMARILLO */
+        .card-banner {
+            background-color: #f4dd49;
+            padding: 40px 48px 36px;
+            text-align: center;
+            position: relative;
+        }
+
+        .banner-icon {
+            width: 64px;
+            height: 64px;
+            background-color: #3a382f;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .card-banner h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #3a382f;
+            margin: 0;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+        }
+
+        /* CONTENIDO */
+        .card-body {
+            padding: 40px 48px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            font-weight: 700;
+            color: #3a382f;
+            margin-bottom: 16px;
+        }
+
+        .body-text {
+            font-size: 15px;
+            line-height: 1.65;
+            color: #706e66;
+            margin-bottom: 20px;
+        }
+
+        /* BOTÓN CTA */
+        .cta-wrapper {
+            text-align: center;
+            margin: 36px 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #3a382f;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 16px 40px;
+            border-radius: 12px;
+            letter-spacing: -0.01em;
+            transition: background-color 0.2s;
+        }
+
+        /* SEPARADOR */
+        .divider {
+            border: none;
+            border-top: 1px solid #f1f0ea;
+            margin: 32px 0;
+        }
+
+        /* ENLACE ALTERNATIVO */
+        .alt-link-box {
+            background-color: #f9f9f8;
+            border-radius: 12px;
+            padding: 20px 24px;
+            border: 1px solid #eee;
+        }
+
+        .alt-link-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #9e9b93;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .alt-link-url {
+            font-size: 13px;
+            color: #3a382f;
+            word-break: break-all;
+            line-height: 1.5;
+            text-decoration: none;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* AVISO DE SEGURIDAD */
+        .security-note {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            margin-top: 28px;
+            padding: 16px 20px;
+            background-color: #fdfaf0;
+            border-radius: 12px;
+            border-left: 3px solid #f4dd49;
+        }
+
+        .security-note-text {
+            font-size: 13px;
+            color: #706e66;
+            line-height: 1.5;
+        }
+
+        .security-note-text strong {
+            color: #3a382f;
+        }
+
+        /* FOOTER */
+        .email-footer {
+            padding: 32px 48px;
+            background-color: #f9f9f8;
+            border-top: 1px solid #f1f0ea;
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: #9e9b93;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .footer-brand {
+            font-size: 13px;
+            font-weight: 700;
+            color: #cfccc4;
+            letter-spacing: -0.02em;
+        }
+
+        /* RESPONSIVE */
+        @media only screen and (max-width: 480px) {
+            .email-wrapper { padding: 0; }
+            .email-card { border-radius: 0; }
+            .card-banner { padding: 32px 24px 28px; }
+            .card-banner h1 { font-size: 22px; }
+            .card-body { padding: 28px 24px; }
+            .email-footer { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="email-wrapper">
+    <div class="email-container">
+
+        <!-- LOGO EN LOCAL!!!!! -->
+        <img src="/optimized/frontend/assets/images/logo.png" 
+            alt="Zpot" height="90" style="height:90px;width:auto;display:block;margin:0 auto;">
+
+        <!-- CARD -->
+        <div class="email-card">
+
+            <!-- BANNER AMARILLO -->
+            <div class="card-banner">
+                <!-- Icono: sobre / email abierto (SVG inline para máxima compatibilidad) -->
+                <div class="banner-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 10C5 8.89543 5.89543 8 7 8H25C26.1046 8 27 8.89543 27 10V22C27 23.1046 26.1046 24 25 24H7C5.89543 24 5 23.1046 5 22V10Z" stroke="#f4dd49" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M5 11L16 18L27 11" stroke="#f4dd49" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="24" cy="9" r="5" fill="#f4dd49"/>
+                        <path d="M21.5 9L23.5 11L26.5 7.5" stroke="#3a382f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1>Confirma tu cuenta</h1>
+            </div>
+
+            <!-- CUERPO -->
+            <div class="card-body">
+                <p class="greeting">¡Hola, {NOMBRE}! </p>
+
+                <p class="body-text">
+                    Gracias por registrarte en <strong style="color:#3a382f;">Zpot</strong>, la plataforma para reservar y compartir plazas de aparcamiento. 
+                    Ya casi estás — solo necesitamos verificar que este email es tuyo.
+                </p>
+
+                <p class="body-text">
+                    Haz clic en el botón para activar tu cuenta:
+                </p>
+
+                <!-- BOTÓN -->
+                <div class="cta-wrapper">
+                    <a href="{LINK_CONFIRMACION}" class="cta-button">
+                        ✓ &nbsp;Confirmar mi cuenta
+                    </a>
+                </div>
+
+                <hr class="divider">
+
+                <!-- ENLACE ALTERNATIVO -->
+                <div class="alt-link-box">
+                    <span class="alt-link-label">¿El botón no funciona? Copia este enlace en tu navegador</span>
+                    <a href="{LINK_CONFIRMACION}" class="alt-link-url">{LINK_CONFIRMACION}</a>
+                </div>
+
+                <!-- NOTA DE SEGURIDAD -->
+                <div class="security-note">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink:0;margin-top:1px;" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 2L3 5V10C3 13.866 6.13401 17.3922 10 18C13.866 17.3922 17 13.866 17 10V5L10 2Z" stroke="#f4dd49" stroke-width="1.6" stroke-linejoin="round"/>
+                        <path d="M10 9V13M10 7V7.5" stroke="#3a382f" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                    <p class="security-note-text">
+                        <strong>Este enlace expira en 24 horas.</strong> Si no creaste una cuenta en Zpot, puedes ignorar este email con total seguridad.
+                    </p>
+                </div>
+            </div>
+
+            <!-- FOOTER DE LA CARD -->
+            <div class="email-footer">
+                <p class="footer-text">
+                    Este email fue enviado automáticamente por Zpot.<br>
+                    Por favor, no respondas a este mensaje.
+                </p>
+                <p class="footer-brand">© 2026 Zpot · Todos los derechos reservados</p>
+            </div>
+
+        </div>
+        <!-- FIN CARD -->
+
+    </div>
+</div>
+
+</body>
+</html>
