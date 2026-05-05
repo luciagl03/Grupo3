@@ -8,6 +8,7 @@
     var map = null;
     var markersLayer = null;
     var plazas = [];
+    var allPlazas = [];
 
     var detailPanel = document.getElementById('detailPanel');
     var detailClose = document.getElementById('detailClose');
@@ -16,7 +17,6 @@
     var detailTitle = document.getElementById('detailTitle');
     var detailPrice = document.getElementById('detailPrice');
     var detailOwner = document.getElementById('detailOwner');
-    var detailLocation = document.getElementById('detailLocation');
     var detailDescription = document.getElementById('detailDescription');
     var detailSize = document.getElementById('detailSize');
     var detailBook = document.getElementById('detailBook');
@@ -54,43 +54,29 @@
     function loadPlazas() {
         return fetchJsonOrRedirect('/parking/plazas_api.php')
             .then(function (data) {
-                plazas = data.plazas || [];
+                allPlazas = data.plazas || [];
+                plazas = allPlazas;
                 return plazas;
             });
     }
 
-    // Resolve marker coordinates:
-    // 1) exact coords from API, 2) predefined Malaga points, 3) fallback offset.
-    function getMarkerPosition(plaza, index) {
+    // Returns [lat, lng] from geocoded coords stored in DB, or null if not available.
+    function getMarkerPosition(plaza) {
         if (plaza.lat != null && plaza.lng != null) {
             return [plaza.lat, plaza.lng];
         }
-        var knownMalaga = [
-            [36.7213, -4.4214],
-            [36.7198, -4.4232],
-            [36.7235, -4.4198],
-            [36.7182, -4.4190],
-            [36.7248, -4.4180],
-            [36.7260, -4.4210],
-            [36.7205, -4.4250],
-            [36.7190, -4.4218]
-        ];
-        if (index < knownMalaga.length) {
-            return knownMalaga[index];
-        }
-        return [
-            MALAGA[0] + (index * 0.002),
-            MALAGA[1] + (index * 0.0015)
-        ];
+        return null;
     }
 
-    function createParkingIcon() {
-        var html = '<div style="width:40px;height:40px;background:#c9a227;color:#111;border:2px solid #111;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;font-family:sans-serif;box-shadow:0 2px 10px rgba(0,0,0,0.3);">P</div>';
+    function createParkingIcon(precio) {
+        var label = (precio != null && precio > 0) ? parseFloat(precio.toFixed(1)) + '€' : 'P';
+        var fontSize = label.length > 4 ? '10px' : label.length > 3 ? '11px' : '13px';
+        var html = '<div style="width:44px;height:44px;background:#f4dd49;color:#3a382f;border:2px solid #3a382f;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:' + fontSize + ';font-family:sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.25);">' + label + '</div>';
         return L.divIcon({
             className: 'zpot-parking-marker',
             html: html,
-            iconSize: [40, 40],
-            iconAnchor: [20, 20]
+            iconSize: [44, 44],
+            iconAnchor: [22, 22]
         });
     }
 
@@ -112,15 +98,22 @@
         markersLayer = L.layerGroup().addTo(map);
     }
 
-    // Draw all markers and auto-fit map bounds.
-    function addMarkers() {
-        if (!markersLayer || !plazas.length) return;
+    // Draw all markers. Pass skipFit=true to keep current viewport (e.g. after filter/geocode).
+    function addMarkers(skipFit) {
+        if (!markersLayer) return;
         markersLayer.clearLayers();
+        var noResults = document.getElementById('noResultsMsg');
+        if (!plazas.length) {
+            if (noResults) noResults.hidden = false;
+            return;
+        }
+        if (noResults) noResults.hidden = true;
         var bounds = [];
-        plazas.forEach(function (p, i) {
-            var pos = getMarkerPosition(p, i);
+        plazas.forEach(function (p) {
+            var pos = getMarkerPosition(p);
+            if (!pos) return;
             bounds.push(pos);
-            var marker = L.marker(pos, { icon: createParkingIcon() });
+            var marker = L.marker(pos, { icon: createParkingIcon(p.precio) });
             marker.on('click', function () { openDetail(p); });
             marker.bindTooltip(p.direccion || 'Plaza', {
                 direction: 'top',
@@ -129,7 +122,7 @@
             });
             markersLayer.addLayer(marker);
         });
-        if (bounds.length > 0) {
+        if (!skipFit && bounds.length > 0) {
             map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
         }
     }
@@ -141,9 +134,8 @@
             ? plaza.precio.toFixed(2) + ' €/h'
             : 'no especificado');
         detailPrice.hidden = false;
-        detailOwner.textContent = 'Anfitrión: ' + (plaza.owner || '—');
-        detailLocation.textContent = plaza.direccion || '—';
-        detailDescription.textContent = plaza.descripcion || 'Sin descripción.';
+        detailOwner.textContent = 'Publicado por ' + (plaza.owner || '—');
+        detailDescription.textContent = plaza.descripcion || '';
         detailSize.textContent = (plaza.ancho != null && plaza.largo != null)
             ? plaza.ancho + ' m × ' + plaza.largo + ' m'
             : '';
@@ -156,6 +148,25 @@
             detailPhoto.removeAttribute('src');
             detailPhoto.style.display = 'none';
             detailPhotoPlaceholder.style.display = 'block';
+        }
+        var tagsEl = document.getElementById('detailTags');
+        if (tagsEl) {
+            tagsEl.innerHTML = '';
+            var ubicLabels = { cubierto: 'Cubierto', garaje: 'Garaje', exterior: 'Exterior' };
+            var extraLabels = { ev: 'Carga electrica', vigilado: 'Vigilado', '24h': 'Acceso 24h' };
+            if (plaza.ubicacion && ubicLabels[plaza.ubicacion]) {
+                var t = document.createElement('span');
+                t.className = 'detail-tag detail-tag--type';
+                t.textContent = ubicLabels[plaza.ubicacion];
+                tagsEl.appendChild(t);
+            }
+            (plaza.extras || []).forEach(function (e) {
+                if (!extraLabels[e]) return;
+                var t = document.createElement('span');
+                t.className = 'detail-tag';
+                t.textContent = extraLabels[e];
+                tagsEl.appendChild(t);
+            });
         }
         detailBook.href = apiUrl('/parking/reserva.php?id_plaza=' + plaza.id);
         detailBook.textContent = 'Reservar';
@@ -192,6 +203,60 @@
     // -----------------------------
     // UI events
     // -----------------------------
+    // Filter markers by ubicacion/extras only (does not affect map viewport).
+    function applyFilters() {
+        var ubicaciones = Array.from(document.querySelectorAll('input[name="filter-ubicacion"]:checked')).map(function (cb) { return cb.value; });
+        var extras = Array.from(document.querySelectorAll('input[name="filter-extras"]:checked')).map(function (cb) { return cb.value; });
+        plazas = allPlazas.filter(function (p) {
+            var matchUbic = ubicaciones.length === 0 || ubicaciones.indexOf(p.ubicacion) !== -1;
+            var matchExtras = extras.every(function (e) { return p.extras && p.extras.indexOf(e) !== -1; });
+            return matchUbic && matchExtras;
+        });
+        addMarkers(true); // keep current viewport when filters change
+    }
+
+    // Geocode the search query and navigate the map using the result bounding box.
+    // This gives natural zoom levels: a country zooms out to show it all,
+    // a street zooms in to a neighbourhood — without hard-coding zoom levels.
+    var searchTimeout = null;
+    function geocodeAndFly(query) {
+        query = (query || '').trim();
+        if (query.length < 2) return;
+        var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(query);
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (results) {
+                if (!results || !results.length) return;
+                var r = results[0];
+                if (r.boundingbox) {
+                    // boundingbox = [south, north, west, east]
+                    var bb = r.boundingbox;
+                    var bounds = [
+                        [parseFloat(bb[0]), parseFloat(bb[2])],
+                        [parseFloat(bb[1]), parseFloat(bb[3])]
+                    ];
+                    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 17, animate: true });
+                } else {
+                    map.flyTo([parseFloat(r.lat), parseFloat(r.lon)], 14, { duration: 1.2 });
+                }
+            })
+            .catch(function () {});
+    }
+
+    var searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                clearTimeout(searchTimeout);
+                geocodeAndFly(searchInput.value);
+            }
+        });
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function () { geocodeAndFly(searchInput.value); }, 700);
+        });
+    }
+
     detailClose.addEventListener('click', closeDetail);
 
     accountBtn.addEventListener('click', function () {
@@ -213,26 +278,28 @@
     });
 
     document.getElementById('clearFilters').addEventListener('click', function () {
-        document.querySelectorAll('.filters-dropdown input[name="filter"]').forEach(function (cb) { cb.checked = false; });
+        document.querySelectorAll('.filters-dropdown input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
+        applyFilters();
     });
     document.getElementById('applyFilters').addEventListener('click', function () {
+        applyFilters();
         toggleDropdown(filtersDropdown, filtersBtn, false);
     });
 
-    // Show one-time success banner after creating a plaza.
+    // Show one-time banner after creating a plaza (success or geocoding warning).
     (function showPlazaCreatedBannerIfNeeded() {
         var params = new URLSearchParams(window.location.search);
         if (params.get('plaza_created') !== '1') return;
-        var banner = document.getElementById('plazaCreatedBanner');
-        if (!banner) return;
-        banner.hidden = false;
+        var bannerId = params.get('sin_ubicacion') === '1' ? 'sinUbicacionBanner' : 'plazaCreatedBanner';
+        var banner = document.getElementById(bannerId);
+        if (banner) {
+            banner.hidden = false;
+            setTimeout(function () { banner.hidden = true; }, 7000);
+        }
         var cleanUrl = window.location.pathname + (window.location.hash || '');
         if (window.history.replaceState) {
             window.history.replaceState(null, '', cleanUrl);
         }
-        setTimeout(function () {
-            banner.hidden = true;
-        }, 5000);
     })();
 
     // -----------------------------

@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 
 if (!isset($_SESSION['usuario'])) {
@@ -9,7 +6,7 @@ if (!isset($_SESSION['usuario'])) {
     exit;
 }
 
-require_once 'sesion/conexion.php';
+require_once '../sesion/conexion.php';
 
 $dni = $_SESSION['dni'];
 
@@ -31,52 +28,113 @@ $result = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <title>Mis plazas</title>
-    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="../app.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+
+    <link rel="stylesheet" href="../app.css">
+    <link rel="stylesheet" href="../styles/mis_plazas.css">
 </head>
-<body>
+<body class="my-plazas-page">
 
-<a href="index.php" class="back-link">← Volver</a>
+<div class="layout">
+    <div class="layout-container">
+        
+        <header class="page-header">
+            <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> Volver al mapa</a>
+            <h1 class="headline">Mis plazas publicadas</h1>
+            <p class="support">Gestiona los anuncios de tus plazas de aparcamiento o añade nuevas.</p>
+        </header>
 
-<h1>Mis plazas</h1>
+        <?php if (isset($_GET['updated'])): ?>
+            <div style="background:#f4dd49;padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-weight:500;">Plaza actualizada correctamente.</div>
+        <?php endif; ?>
 
-<?php if ($result->num_rows === 0): ?>
-    <p>No tienes plazas publicadas.</p>
-<?php else: ?>
+        <?php if ($result->num_rows === 0): ?>
+            <div class="empty-state">
+                <i data-lucide="parking-circle"></i>
+                <p>Aún no has publicado ninguna plaza.</p>
+                <a href="../parking/alta_plaza.php" class="btn-primary-link">Publicar mi primera plaza</a>
+            </div>
+        <?php else: ?>
 
-<div class="reservas-container">
+        <div class="plazas-grid">
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <div class="card plaza-card">
+                    <div class="plaza-image-wrap">
+                        <?php if (!empty($row['Foto'])): ?>
+                            <img src="<?php echo htmlspecialchars($row['Foto']); ?>" alt="Foto de la plaza">
+                        <?php else: ?>
+                            <div class="no-image"><i data-lucide="image"></i></div>
+                        <?php endif; ?>
+                    </div>
 
-    <?php while ($row = $result->fetch_assoc()): ?>
+                    <div class="plaza-content">
+                        <h3>Plaza #<?php echo $row['ID_plaza']; ?></h3>
+                        
+                        <div class="info-row">
+                            <i data-lucide="map-pin"></i>
+                            <div>
+                                <span>Dirección</span>
+                                <strong><?php echo htmlspecialchars($row['Direccion']); ?></strong>
+                            </div>
+                        </div>
 
-        <div class="reserva-card">
+                        <div class="info-row">
+                            <i data-lucide="banknote"></i>
+                            <div>
+                                <span>Precio</span>
+                                <strong class="price-text"><?php echo number_format($row['Precio'], 2); ?> € /h</strong>
+                            </div>
+                        </div>
 
-            <h3>Plaza #<?php echo $row['ID_plaza']; ?></h3>
+                        <div class="info-row">
+                            <i data-lucide="maximize"></i>
+                            <div>
+                                <span>Medidas</span>
+                                <strong>
+                                    <?php if ($row['Ancho'] && $row['Largo']): ?>
+                                        <?php echo $row['Ancho']; ?>m &times; <?php echo $row['Largo']; ?>m
+                                    <?php else: ?>
+                                        No especificado
+                                    <?php endif; ?>
+                                </strong>
+                            </div>
+                        </div>
 
-            <p><strong>Dirección:</strong> <?php echo $row['Direccion']; ?></p>
-            <p><strong>Precio:</strong> <?php echo number_format($row['Precio'], 2); ?> € /h</p>
-            <p><strong>Descripción:</strong> <?php echo $row['Descripcion']; ?></p>
-            <p><strong>Medidas:</strong> <?php echo $row['Ancho']; ?> x <?php echo $row['Largo']; ?></p>
+                        <?php if(!empty($row['Descripcion'])): ?>
+                        <div class="plaza-description">
+                            <?php echo htmlspecialchars($row['Descripcion']); ?>
+                        </div>
+                        <?php endif; ?>
 
-            <?php if (!empty($row['Foto'])): ?>
-                <img src="<?php echo $row['Foto']; ?>" style="width:100%; border-radius:10px;">
-            <?php endif; ?>
-
-            <!-- ELIMINAR -->
-            <form method="POST" action="eliminar_plaza.php"
-                  onsubmit="return confirm('¿Seguro que quieres eliminar esta plaza?');">
-
-                <input type="hidden" name="id_plaza" value="<?php echo $row['ID_plaza']; ?>">
-
-                <button type="submit">Eliminar plaza</button>
-
-            </form>
-
+                        <div class="plaza-footer">
+                            <a href="editar_plaza.php?id_plaza=<?php echo $row['ID_plaza']; ?>" class="btn-edit">
+                                <i data-lucide="pencil"></i> Editar
+                            </a>
+                            <form method="POST" action="eliminar_plaza.php"
+                                  onsubmit="return confirm('¿Estás seguro de que deseas eliminar este anuncio?');">
+                                <input type="hidden" name="id_plaza" value="<?php echo $row['ID_plaza']; ?>">
+                                <button type="submit" class="btn-delete">
+                                    <i data-lucide="trash-2"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <?php endwhile; ?>
         </div>
 
-    <?php endwhile; ?>
-
+        <?php endif; ?>
+    </div>
 </div>
 
-<?php endif; ?>
+<script>
+    lucide.createIcons();
+</script>
 
 </body>
 </html>

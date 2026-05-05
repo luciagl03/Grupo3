@@ -14,6 +14,17 @@ function respondJson($status, $payload) {
     exit;
 }
 
+// Geocodes an address string via Nominatim. Returns [lat, lng] or null on failure.
+function geocodeAddress($address) {
+    $url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' . urlencode($address);
+    $ctx = stream_context_create(['http' => ['header' => "User-Agent: Zpot/1.0\r\n", 'timeout' => 5]]);
+    $json = @file_get_contents($url, false, $ctx);
+    if (!$json) return null;
+    $results = json_decode($json, true);
+    if (empty($results)) return null;
+    return [(float) $results[0]['lat'], (float) $results[0]['lon']];
+}
+
 // Sanitizes optional text fields.
 function cleanNullableText($value) {
     $clean = trim((string) $value);
@@ -56,17 +67,35 @@ $direccionRaw = isset($data['direccion']) ? trim((string) $data['direccion']) : 
 $foto = cleanNullableText($data['foto'] ?? '');
 $descripcion = cleanNullableText($data['descripcion'] ?? '');
 $escritura = cleanNullableText($data['escritura'] ?? '');
+$ubicacionesValidas = ['cubierto', 'garaje', 'exterior'];
+$ubicacion = isset($data['ubicacion']) && in_array($data['ubicacion'], $ubicacionesValidas, true) ? $data['ubicacion'] : null;
+
+$extrasValidos = ['ev', 'vigilado', '24h'];
+$extrasRaw = isset($data['extras']) && is_array($data['extras']) ? $data['extras'] : [];
+$extrasRaw = array_filter($extrasRaw, fn($e) => in_array($e, $extrasValidos, true));
+$extras = count($extrasRaw) > 0 ? implode(',', array_values($extrasRaw)) : null;
 
 $errors = [];
 
 if ($direccionRaw === '') {
     $errors['direccion'] = 'La dirección es obligatoria';
+} elseif (strpos($direccionRaw, ',') === false) {
+    $errors['direccion'] = 'Incluye la ciudad separada por coma (ej: Calle Larios 2, Málaga)';
 }
 $direccion = $direccionRaw !== '' ? htmlspecialchars($direccionRaw, ENT_QUOTES, 'UTF-8') : '';
 
 $ancho = parseOptionalNumber($data['ancho'] ?? null, 'ancho', $errors);
 $largo = parseOptionalNumber($data['largo'] ?? null, 'largo', $errors);
-$precio = parseOptionalNumber($data['precio'] ?? null, 'precio', $errors);
+$precioRaw = $data['precio'] ?? null;
+if ($precioRaw === null || $precioRaw === '') {
+    $errors['precio'] = 'El precio es obligatorio';
+    $precio = null;
+} else {
+    $precio = parseOptionalNumber($precioRaw, 'precio', $errors);
+    if ($precio !== null && $precio <= 0) {
+        $errors['precio'] = 'El precio debe ser mayor que 0';
+    }
+}
 
 if ($foto !== null && $foto !== '' && !filter_var($foto, FILTER_VALIDATE_URL)) {
     $errors['foto'] = 'La URL de la foto no es válida';
@@ -92,10 +121,10 @@ try {
 
     // -------- Insert parking spot --------
     $stmt = $_conexion->prepare(
-        'INSERT INTO PLAZA (DNI, Direccion, Foto, Ancho, Largo, Descripcion, Escritura, Precio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO PLAZA (DNI, Direccion, Foto, Ancho, Largo, Descripcion, Escritura, Precio, Ubicacion, Extras) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->bind_param(
-        'ssddsssd',
+        'sssddssdss',
         $dni,
         $direccion,
         $foto,
@@ -103,13 +132,23 @@ try {
         $largo,
         $descripcion,
         $escritura,
-        $precio
+        $precio,
+        $ubicacion,
+        $extras
     );
     $stmt->execute();
     $id = (int) $_conexion->insert_id;
     $stmt->close();
 
-    respondJson(201, ['success' => true, 'id' => $id]);
+    $coords = geocodeAddress($direccion);
+    if ($coords) {
+        $stmtGeo = $_conexion->prepare('UPDATE PLAZA SET Lat = ?, Lng = ? WHERE ID_plaza = ?');
+        $stmtGeo->bind_param('ddi', $coords[0], $coords[1], $id);
+        $stmtGeo->execute();
+        $stmtGeo->close();
+    }
+
+    respondJson(201, ['success' => true, 'id' => $id, 'geocoded' => $coords !== null]);
 } catch (mysqli_sql_exception $e) {
     respondJson(500, ['success' => false, 'error' => 'Error al guardar la plaza. Inténtalo de nuevo.']);
 }

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'sesion/conexion.php';
+require_once '../sesion/conexion.php';
 
 if (!isset($_SESSION['dni'])) {
     header("Location: ../sesion/login.php");
