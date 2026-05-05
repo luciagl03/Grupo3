@@ -4,8 +4,6 @@
 // - loads current user data from session DNI
 // - renders editable form
 // ------------------------------------------------------------
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 session_start();
 require_once __DIR__ . "/../sesion/conexion.php";
 
@@ -66,23 +64,29 @@ $stmt->close();
                 </div>
             </header>
 
+            <?php if (isset($_GET['updated'])): ?>
+                <div class="success-flash">Cambios guardados correctamente.</div>
+            <?php elseif (isset($_GET['error'])): ?>
+                <div class="error-flash">Nombre, apellidos y email son obligatorios.</div>
+            <?php endif; ?>
+
             <main class="card profile-card">
-                <form action="actualizar_perfil_api.php" method="POST" class="profile-form">
+                <form action="actualizar_perfil_api.php" method="POST" class="profile-form" novalidate id="profileForm">
                         
                     <div class="form-grid">
                         <div class="form-group">
-                            <label><i data-lucide="user"></i> Nombre</label>
-                            <input type="text" name="nombre" value="<?= htmlspecialchars($user['Nombre'] ?? '') ?>" placeholder="Tu nombre">
+                            <label><i data-lucide="user"></i> Nombre *</label>
+                            <input type="text" name="nombre" value="<?= htmlspecialchars($user['Nombre'] ?? '') ?>" placeholder="Tu nombre" required>
                         </div>
 
                         <div class="form-group">
-                            <label><i data-lucide="user"></i> Apellidos</label>
-                            <input type="text" name="apellidos" value="<?= htmlspecialchars($user['Apellidos'] ?? '') ?>" placeholder="Tus apellidos">
+                            <label><i data-lucide="user"></i> Apellidos *</label>
+                            <input type="text" name="apellidos" value="<?= htmlspecialchars($user['Apellidos'] ?? '') ?>" placeholder="Tus apellidos" required>
                         </div>
 
                         <div class="form-group full-width">
-                            <label><i data-lucide="mail"></i> Correo electrónico</label>
-                            <input type="email" name="email" value="<?= htmlspecialchars($user['Email'] ?? '') ?>" placeholder="tu@email.com">
+                            <label><i data-lucide="mail"></i> Correo electrónico *</label>
+                            <input type="email" name="email" value="<?= htmlspecialchars($user['Email'] ?? '') ?>" placeholder="tu@email.com" required>
                         </div>
 
                         <div class="form-group">
@@ -106,9 +110,18 @@ $stmt->close();
         </div>
     </div>
 
-    <!-- Inicializar iconos -->
     <script>
       lucide.createIcons();
+
+      document.getElementById('profileForm').addEventListener('submit', function (e) {
+          var nombre = this.nombre.value.trim();
+          var apellidos = this.apellidos.value.trim();
+          var email = this.email.value.trim();
+          if (!nombre || !apellidos || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              e.preventDefault();
+              alert('Nombre, apellidos y un email válido son obligatorios.');
+          }
+      });
     </script>
 </body>
 </html>

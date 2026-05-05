@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 
 if (!isset($_SESSION['usuario'])) {
@@ -91,10 +88,24 @@ $result = $stmt->get_result();
                         </div>
 
                         <div class="info-row">
+                            <i data-lucide="banknote"></i>
+                            <div>
+                                <span>Precio</span>
+                                <strong class="price-text"><?php echo number_format($row['Precio'], 2); ?> € /h</strong>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
                             <i data-lucide="maximize"></i>
                             <div>
                                 <span>Medidas</span>
-                                <strong><?php echo $row['Ancho']; ?>m x <?php echo $row['Largo']; ?>m</strong>
+                                <strong>
+                                    <?php if ($row['Ancho'] && $row['Largo']): ?>
+                                        <?php echo $row['Ancho']; ?>m &times; <?php echo $row['Largo']; ?>m
+                                    <?php else: ?>
+                                        No especificado
+                                    <?php endif; ?>
+                                </strong>
                             </div>
                         </div>
 
@@ -105,11 +116,14 @@ $result = $stmt->get_result();
                         <?php endif; ?>
 
                         <div class="plaza-footer">
-                            <form method="POST" action="/zpot/optimized/backend/parking/eliminar_plaza.php" 
+                            <a href="editar_plaza.php?id_plaza=<?php echo $row['ID_plaza']; ?>" class="btn-edit">
+                                <i data-lucide="pencil"></i> Editar
+                            </a>
+                            <form method="POST" action="eliminar_plaza.php"
                                   onsubmit="return confirm('¿Estás seguro de que deseas eliminar este anuncio?');">
                                 <input type="hidden" name="id_plaza" value="<?php echo $row['ID_plaza']; ?>">
                                 <button type="submit" class="btn-delete">
-                                    <i data-lucide="trash-2"></i> Eliminar anuncio
+                                    <i data-lucide="trash-2"></i> Eliminar
                                 </button>
                             </form>
                         </div>

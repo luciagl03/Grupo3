@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
 require "conexion.php";
 
 $err_email = null;
@@ -64,6 +62,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="logo"><a href="../index.php"><img src="../../frontend/assets/images/logo.png" alt="Zpot"></a></div>
             <h1 class="headline">Iniciar sesión</h1>
             <p class="support">Entra en tu cuenta para reservar o publicar plazas.</p>
+
+            <?php if (isset($_GET['confirmed'])): ?>
+                <div class="global-success" role="alert">
+                    ✓ &nbsp;¡Cuenta confirmada! Ya puedes iniciar sesión.
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['error'])): ?>
+                <div class="global-error" role="alert">
+                    <?php
+                    $msgs = [
+                        'token_invalido' => 'El enlace de confirmación no es válido.',
+                        'token_expirado' => 'El enlace ha caducado (24h). Regístrate de nuevo.',
+                    ];
+                    echo htmlspecialchars($msgs[$_GET['error']] ?? 'Ha ocurrido un error.');
+                    ?>
+                </div>
+            <?php endif; ?>
 
             <?php if ($global_error): ?>
                 <div class="global-error" role="alert"><?php echo htmlspecialchars($global_error); ?></div>

@@ -171,3 +171,12 @@ body.profile-page {
     .header-content { flex-direction: column; align-items: flex-start; text-align: left; }
     .profile-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
 }
+.success-flash, .error-flash {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+.success-flash { background: #f4dd49; color: #3a382f; }
+.error-flash   { background: #fde8e8; color: #c0392b; border: 1px solid #f5c6c6; }

@@ -222,7 +222,21 @@
                         var ok = _ref.ok, status = _ref.status, data = _ref.data;
 
                         if (ok && data.success) {
-                            window.location.href = '../index.php';
+                            form.innerHTML = `
+                                <div style="text-align:center;padding:1rem 0;">
+                                    <div style="font-size:3rem;margin-bottom:1rem;">📬</div>
+                                    <h2 style="font-size:1.3rem;font-weight:700;color:var(--brand-dark);margin-bottom:0.75rem;">
+                                        Revisa tu email
+                                    </h2>
+                                    <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.6;margin-bottom:2rem;">
+                                        Te hemos enviado un enlace de confirmación a<br>
+                                        <strong style="color:var(--brand-dark);">${fields.email.el.value.trim()}</strong>
+                                    </p>
+                                    <a href="login.php" class="btn btn-secondary" style="display:inline-block;width:auto;padding:0.8rem 2rem;">
+                                        Ir al inicio de sesión
+                                    </a>
+                                </div>
+                            `;
                             return;
                         }
 

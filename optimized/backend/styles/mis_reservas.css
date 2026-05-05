@@ -64,7 +64,23 @@ body.my-reservations-page {
     border-radius: 999px;
     font-size: 0.75rem;
     font-weight: 700;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+
+.estado-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+}
+.estado-confirmada { background: #d1fae5; color: #065f46; }
+.estado-pendiente  { background: #fef3c7; color: #92400e; }
+.estado-cancelada  { background: #fee2e2; color: #991b1b; }
 
 .price-tag {
     font-weight: 800;

@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 
 if (!isset($_SESSION['usuario'])) {
@@ -13,7 +10,11 @@ require_once '../sesion/conexion.php';
 
 $dni = $_SESSION['dni'];
 
-$sql = "SELECT * FROM RESERVA WHERE DNI = ? ORDER BY Fecha DESC, Hora_entrada DESC";
+$sql = "SELECT r.*, p.Direccion AS PlazaDireccion
+        FROM RESERVA r
+        LEFT JOIN PLAZA p ON r.ID_plaza = p.ID_plaza
+        WHERE r.DNI = ?
+        ORDER BY r.Fecha DESC, r.Hora_entrada DESC";
 
 $stmt = $_conexion->prepare($sql);
 
@@ -62,10 +63,20 @@ $result = $stmt->get_result();
         <div class="reservas-grid">
             <?php while ($row = $result->fetch_assoc()): ?>
                 
+                <?php
+                    $estado = $row['Estado'] ?? 'pendiente';
+                    $estadoLabel = ['confirmada' => 'Pagada', 'pendiente' => 'Pendiente', 'cancelada' => 'Cancelada'];
+                    $estadoClass = ['confirmada' => 'estado-confirmada', 'pendiente' => 'estado-pendiente', 'cancelada' => 'estado-cancelada'];
+                ?>
                 <div class="card reserva-card">
                     <div class="reserva-header">
-                        <div class="plaza-tag">Plaza #<?php echo $row['ID_plaza']; ?></div>
+                        <div class="plaza-tag">
+                            <?php echo htmlspecialchars($row['PlazaDireccion'] ?? 'Plaza #' . $row['ID_plaza']); ?>
+                        </div>
                         <div class="price-tag"><?php echo number_format($row['Precio'], 2); ?> €</div>
+                    </div>
+                    <div class="estado-badge <?php echo $estadoClass[$estado] ?? 'estado-pendiente'; ?>">
+                        <?php echo $estadoLabel[$estado] ?? $estado; ?>
                     </div>
 
                     <div class="reserva-body">

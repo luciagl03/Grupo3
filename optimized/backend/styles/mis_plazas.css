@@ -130,7 +130,28 @@ body.my-plazas-page {
 }
 
 /* FOOTER Y BOTÓN */
-.plaza-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid #f1f0ea; }
+.plaza-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid #f1f0ea; display: flex; gap: 0.5rem; }
+.plaza-footer form { flex: 1; }
+
+.btn-edit {
+    flex: 1;
+    background: #f4dd49;
+    border: 1.5px solid #e0c93a;
+    padding: 10px;
+    border-radius: 12px;
+    color: #3a382f;
+    font-family: inherit;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: 0.2s;
+}
+.btn-edit:hover { background: #edd93a; }
 
 .btn-delete {
     width: 100%;
