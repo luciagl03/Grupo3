@@ -170,6 +170,9 @@
                 tagsEl.appendChild(t);
             });
         }
+        // Cargar reseñas en el widget
+        initResenas(plaza.id);
+
         var isOwner = currentUser && plaza.owner_dni && plaza.owner_dni === currentUser.dni;
         if (isOwner) {
             detailBook.hidden = true;
@@ -331,4 +334,191 @@
         .catch(function () {
             // Intentionally silent: auth redirect or transient API issue.
         });
+    // ─────────────────────────────────────────────────────
+    // RESEÑAS
+    // ─────────────────────────────────────────────────────
+
+    function initResenas(idPlaza) {
+        var container = document.getElementById('resenas-widget');
+        if (!container) return;
+
+        container.innerHTML =
+            '<div class="resenas-section" id="rs-' + idPlaza + '">' +
+                '<div class="resenas-header">' +
+                    '<h3>Reseñas</h3>' +
+                    '<span class="resenas-media-badge" id="rs-media-' + idPlaza + '" style="display:none"></span>' +
+                    '<span class="resenas-total" id="rs-total-' + idPlaza + '"></span>' +
+                '</div>' +
+                '<div class="resenas-list" id="rs-list-' + idPlaza + '">' +
+                    '<p class="r-empty">Cargando…</p>' +
+                '</div>' +
+                '<div id="rs-accion-' + idPlaza + '"></div>' +
+                '<div class="r-form" id="rs-form-' + idPlaza + '">' +
+                    '<label class="r-form-label">Tu puntuación</label>' +
+                    '<div class="r-picker" id="rs-picker-' + idPlaza + '">' +
+                        '<span data-val="1">★</span><span data-val="2">★</span><span data-val="3">★</span><span data-val="4">★</span><span data-val="5">★</span>' +
+                    '</div>' +
+                    '<label class="r-form-label">Comentario (opcional)</label>' +
+                    '<textarea id="rs-comment-' + idPlaza + '" maxlength="500" placeholder="Cuéntanos tu experiencia…"></textarea>' +
+                    '<div class="r-form-actions">' +
+                        '<button class="btn-r-cancelar" onclick="cerrarFormResena(' + idPlaza + ')">Cancelar</button>' +
+                        '<button class="btn-r-enviar"   onclick="enviarResena(' + idPlaza + ')">Publicar</button>' +
+                    '</div>' +
+                    '<p class="r-msg" id="rs-msg-' + idPlaza + '"></p>' +
+                '</div>' +
+            '</div>';
+
+        _initPicker(idPlaza);
+        _cargarResenas(idPlaza);
+    }
+
+    function _cargarResenas(idPlaza) {
+        fetch(apiUrl('/reseñas/resenas_api.php?id_plaza=' + idPlaza), { credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) { _pintarResenas(idPlaza, data); })
+            .catch(function() {
+                var list = document.getElementById('rs-list-' + idPlaza);
+                if (list) list.innerHTML = '<p class="r-empty">No se pudieron cargar las reseñas.</p>';
+            });
+    }
+
+    function _pintarResenas(idPlaza, data) {
+        var list   = document.getElementById('rs-list-'   + idPlaza);
+        var media  = document.getElementById('rs-media-'  + idPlaza);
+        var total  = document.getElementById('rs-total-'  + idPlaza);
+        var accion = document.getElementById('rs-accion-' + idPlaza);
+
+        if (data.total > 0 && media) {
+            media.style.display = 'inline-flex';
+            media.innerHTML = _stars(data.media, true) + ' ' + data.media;
+            if (total) total.textContent = data.total + ' reseña' + (data.total !== 1 ? 's' : '');
+        } else if (total) {
+            total.textContent = 'Sin reseñas aún';
+        }
+
+        if (list) {
+            if (!data.resenas || data.resenas.length === 0) {
+                list.innerHTML = '<p class="r-empty">¡Sé el primero en opinar!</p>';
+            } else {
+                list.innerHTML = data.resenas.map(function(r) {
+                    return '<div class="r-item">' +
+                        '<div class="r-item-top">' +
+                            _stars(r.puntuacion, false) +
+                            '<span class="r-autor">' + _esc(r.autor) + '</span>' +
+                            '<span class="r-fecha">'  + _esc(r.fecha) + '</span>' +
+                        '</div>' +
+                        (r.comentario ? '<p class="r-comentario">' + _esc(r.comentario) + '</p>' : '') +
+                    '</div>';
+                }).join('');
+            }
+        }
+
+        if (!accion) return;
+        if (data.puede_resenar) {
+            accion.innerHTML = '<button class="btn-escribir-resena" onclick="abrirFormResena(' + idPlaza + ')">&#9998; Escribir una reseña</button>';
+        } else if (data.ya_reseno) {
+            accion.innerHTML = '<p class="r-empty">Ya has reseñado esta plaza.</p>';
+        } else {
+            accion.innerHTML = '<p class="r-empty">Solo pueden reseñar usuarios que hayan aparcado aquí.</p>';
+        }
+    }
+
+    window.abrirFormResena = function(idPlaza) {
+        var form = document.getElementById('rs-form-'   + idPlaza);
+        var btn  = document.querySelector('#rs-accion-' + idPlaza + ' .btn-escribir-resena');
+        if (form) form.classList.add('open');
+        if (btn)  btn.style.display = 'none';
+    };
+
+    window.cerrarFormResena = function(idPlaza) {
+        var form = document.getElementById('rs-form-' + idPlaza);
+        if (form) { form.classList.remove('open'); _resetForm(idPlaza); }
+        var btn = document.querySelector('#rs-accion-' + idPlaza + ' .btn-escribir-resena');
+        if (btn) btn.style.display = '';
+    };
+
+    window.enviarResena = function(idPlaza) {
+        var picker    = document.getElementById('rs-picker-'  + idPlaza);
+        var textarea  = document.getElementById('rs-comment-' + idPlaza);
+        var msgEl     = document.getElementById('rs-msg-'     + idPlaza);
+        var puntuacion = picker ? (picker._valor || 0) : 0;
+
+        if (msgEl) { msgEl.textContent = ''; msgEl.className = 'r-msg'; }
+        if (puntuacion < 1) {
+            if (msgEl) { msgEl.textContent = 'Selecciona una puntuación.'; msgEl.className = 'r-msg error'; }
+            return;
+        }
+
+        fetch(apiUrl('/resenas/resenas_api.php'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                id_plaza:   idPlaza,
+                puntuacion: puntuacion,
+                comentario: textarea ? textarea.value.trim() : ''
+            })
+        })
+        .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+        .then(function(ref) {
+            if (ref.ok && ref.data.success) {
+                if (msgEl) { msgEl.textContent = '¡Reseña publicada!'; msgEl.className = 'r-msg ok'; }
+                setTimeout(function() {
+                    window.cerrarFormResena(idPlaza);
+                    _cargarResenas(idPlaza);
+                }, 1000);
+            } else {
+                var err = (ref.data.errors && Object.values(ref.data.errors)[0]) || ref.data.error || 'Error al publicar';
+                if (msgEl) { msgEl.textContent = err; msgEl.className = 'r-msg error'; }
+            }
+        })
+        .catch(function() {
+            if (msgEl) { msgEl.textContent = 'Error de conexión.'; msgEl.className = 'r-msg error'; }
+        });
+    };
+
+    function _initPicker(idPlaza) {
+        var picker = document.getElementById('rs-picker-' + idPlaza);
+        if (!picker) return;
+        picker._valor = 0;
+        var spans = picker.querySelectorAll('span');
+        spans.forEach(function(span) {
+            span.addEventListener('mouseover', function() {
+                var v = parseInt(this.dataset.val);
+                spans.forEach(function(s) { s.classList.toggle('hover', parseInt(s.dataset.val) <= v); });
+            });
+            span.addEventListener('mouseout', function() {
+                var sel = picker._valor;
+                spans.forEach(function(s) { s.classList.remove('hover'); s.classList.toggle('on', parseInt(s.dataset.val) <= sel); });
+            });
+            span.addEventListener('click', function() {
+                picker._valor = parseInt(this.dataset.val);
+                spans.forEach(function(s) { s.classList.remove('hover'); s.classList.toggle('on', parseInt(s.dataset.val) <= picker._valor); });
+            });
+        });
+    }
+
+    function _resetForm(idPlaza) {
+        var picker = document.getElementById('rs-picker-'  + idPlaza);
+        var area   = document.getElementById('rs-comment-' + idPlaza);
+        var msg    = document.getElementById('rs-msg-'     + idPlaza);
+        if (picker) { picker._valor = 0; picker.querySelectorAll('span').forEach(function(s){ s.classList.remove('on','hover'); }); }
+        if (area)  area.value = '';
+        if (msg)   { msg.textContent = ''; msg.className = 'r-msg'; }
+    }
+
+    function _stars(val, small) {
+        var size = small ? '0.75rem' : '0.85rem';
+        var html = '<span class="r-stars">';
+        for (var i = 1; i <= 5; i++) {
+            html += '<span class="r-star' + (i <= Math.round(val) ? ' on' : '') + '" style="font-size:' + size + '">&#9733;</span>';
+        }
+        return html + '</span>';
+    }
+
+    function _esc(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
 })();

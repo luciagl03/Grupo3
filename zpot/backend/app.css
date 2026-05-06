@@ -530,3 +530,201 @@ body {
     }
     .detail-image-wrap { height: 180px; }
 }
+
+/* ─── RESEÑAS ────────────────────────────────────────── */
+.resenas-section {
+    margin-top: 1.1rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.9rem;
+}
+
+.resenas-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+}
+.resenas-header h3 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+    margin: 0;
+}
+.resenas-media-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--brand-yellow);
+    color: var(--brand-dark);
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+.resenas-total {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+/* Estrellitas */
+.r-stars { display: inline-flex; gap: 1px; line-height: 1; }
+.r-star   { font-size: 0.85rem; color: #ddd; }
+.r-star.on { color: #f4a800; }
+
+/* Lista */
+.resenas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 0.6rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+.resenas-list::-webkit-scrollbar { width: 3px; }
+.resenas-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.r-item {
+    background: var(--brand-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem 0.7rem;
+}
+.r-item-top {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+}
+.r-autor {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--brand-dark);
+}
+.r-fecha {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+.r-comentario {
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
+}
+.r-empty {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 0.4rem 0;
+}
+
+/* Botón escribir reseña */
+.btn-escribir-resena {
+    width: 100%;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0.45rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--brand-dark);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 0.1rem;
+}
+.btn-escribir-resena:hover {
+    border-color: var(--brand-dark);
+    background: var(--brand-bg);
+}
+
+/* Formulario nueva reseña */
+.r-form {
+    background: var(--brand-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+.r-form.open { display: block; }
+
+.r-form-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+/* Star picker */
+.r-picker {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0.65rem;
+}
+.r-picker span {
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.1s;
+    user-select: none;
+    line-height: 1;
+}
+.r-picker span.on, .r-picker span.hover { color: #f4a800; }
+
+.r-form textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    resize: vertical;
+    min-height: 64px;
+    box-sizing: border-box;
+    background: #fff;
+    color: var(--brand-dark);
+}
+.r-form textarea:focus { outline: none; border-color: var(--brand-dark); }
+
+.r-form-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+.btn-r-enviar {
+    flex: 1;
+    background: var(--brand-dark);
+    color: var(--brand-yellow);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+}
+.btn-r-enviar:hover { background: #1a1915; }
+.btn-r-cancelar {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: inherit;
+}
+.r-msg {
+    font-size: 0.75rem;
+    margin-top: 0.35rem;
+    min-height: 1rem;
+}
+.r-msg.ok    { color: #065f46; }
+.r-msg.error { color: #c0392b; }

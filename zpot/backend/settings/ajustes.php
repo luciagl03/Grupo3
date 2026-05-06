@@ -40,6 +40,172 @@ $stmt->close();
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/ajustes.css">
     <script src="../translations.js"></script>
+     <!-- AIUDA CON EL CSS SUSI ns si es mejor ponerlo en app.css o q -->
+    <style>
+   .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(58,56,47,0.4);
+        backdrop-filter: blur(6px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+
+    .modal-content {
+        background: var(--bg);
+        padding: 1.5rem;
+        border-radius: var(--radius);
+        width: 320px;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border);
+        text-align: center;
+    }
+
+    .modal-content h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.1rem;
+        color: var(--brand-dark);
+    }
+
+    .modal-content p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .modal-content input {
+        width: 100%;
+        padding: 0.6rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        margin-bottom: 1rem;
+        font-family: inherit;
+    }
+
+    .modal-content input:focus {
+        outline: none;
+        border-color: var(--brand-dark);
+        box-shadow: 0 0 0 3px var(--accent-focus);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .modal-actions button {
+        flex: 1;
+        padding: 0.6rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        border: none;
+    }
+
+    #cancelDelete {
+        background: var(--brand-bg);
+        color: var(--text);
+    }
+
+    #cancelDelete:hover {
+        background: var(--border);
+    }
+
+    #confirmDelete {
+        background: #c0392b;
+        color: white;
+    }
+
+    #confirmDelete:hover {
+        background: #a93226;
+    }
+
+    .modal {
+        display: none; 
+    }
+
+    .modal.open {
+        display: flex;
+    }
+
+    .ajuste-content form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin-top: 0.8rem;
+    }
+
+    .ajuste-content input {
+        width: 100%;
+        padding: 0.55rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        font-family: inherit;
+        font-size: 0.85rem;
+        background: #fff;
+    }
+
+    .ajuste-content input:focus {
+        outline: none;
+        border-color: var(--brand-dark);
+        box-shadow: 0 0 0 3px var(--accent-focus);
+    }
+
+    .ajuste-content button {
+        margin-top: 0.5rem;
+        background: var(--brand-dark);
+        color: var(--brand-yellow);
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+
+    .ajuste-content button:hover {
+        background: #1a1915;
+    }
+
+    #passMsg {
+        font-size: 0.75rem;
+        min-height: 1rem;
+    }
+    .ajuste-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .ajuste-content.open {
+        max-height: 300px;
+    }
+
+    .ajuste-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        padding: 0 1rem; /* 👈 AÑADIDO */
+    }
+
+    .ajuste-content.open {
+        max-height: 300px;
+        padding: 1rem; /* 👈 AÑADIDO */
+    }
+
+    #deleteBox {
+        display: flex;
+        justify-content: center;
+    }
+
+    #deleteBox button {
+        width: 100%;
+        max-width: 220px;
+    }
+    </style>
 </head>
 
 <body class="settings-page">
@@ -67,8 +233,11 @@ $stmt->close();
                         <i data-lucide="shield"></i>
                         <h2 class="section-title">Privacidad y Seguridad</h2>
                     </div>
+
                     <div class="settings-card">
-                        <div class="setting-item setting-item-action">
+
+                        <!-- CAMBIAR CONTRASEÑA -->
+                        <div class="setting-item setting-item-action" onclick="toggleAjuste('passwordBox', this)">
                             <div class="setting-info">
                                 <i data-lucide="key" class="setting-icon"></i>
                                 <div class="setting-text">
@@ -76,14 +245,26 @@ $stmt->close();
                                     <p class="setting-description">Actualiza tu contraseña de acceso</p>
                                 </div>
                             </div>
-                            <button type="button" class="btn-action" id="changePasswordBtn">
-                                <i data-lucide="chevron-right"></i>
+                            <button type="button" class="btn-action">
+                                <i data-lucide="chevron-right" class="arrow-icon"></i>
                             </button>
                         </div>
-                        
+
+                        <!-- DESPLEGABLE PASSWORD -->
+                        <div id="passwordBox" class="ajuste-content">
+                            <form id="formPassword">
+                                <input type="password" id="currentPass" placeholder="Contraseña actual" required>
+                                <input type="password" id="newPass" placeholder="Nueva contraseña" required>
+                                <input type="password" id="confirmPass" placeholder="Confirmar contraseña" required>
+                                <button type="submit">Actualizar contraseña</button>
+                                <p id="passMsg"></p>
+                            </form>
+                        </div>
+
                         <div class="setting-divider"></div>
-                        
-                        <div class="setting-item setting-item-action setting-item-danger">
+
+                        <!-- ELIMINAR CUENTA -->
+                        <div class="setting-item setting-item-action setting-item-danger" onclick="toggleAjuste('deleteBox', this)">
                             <div class="setting-info">
                                 <i data-lucide="trash-2" class="setting-icon"></i>
                                 <div class="setting-text">
@@ -91,10 +272,18 @@ $stmt->close();
                                     <p class="setting-description">Eliminar permanentemente tu cuenta</p>
                                 </div>
                             </div>
-                            <button type="button" class="btn-action btn-action-danger" id="deleteAccountBtn">
-                                <i data-lucide="chevron-right"></i>
+                            <button type="button" class="btn-action btn-action-danger">
+                                <i data-lucide="chevron-right" class="arrow-icon"></i>
                             </button>
                         </div>
+
+                        <!-- DESPLEGABLE DELETE -->
+                        <div id="deleteBox" class="ajuste-content">
+                            <button id="openDeleteModal" class="btn-action btn-action-danger">
+                                Eliminar mi cuenta
+                            </button>
+                        </div>
+
                     </div>
                 </section>
 
@@ -234,6 +423,22 @@ $stmt->close();
         </div>
     </div>
 
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>¿Eliminar cuenta?</h3>
+            <p>Esta acción es permanente.</p>
+
+            <input type="password" id="deletePass" placeholder="Introduce tu contraseña">
+
+            <div class="modal-actions">
+                <button id="confirmDelete" class="danger">Eliminar definitivamente</button>
+                <button id="cancelDelete">Cancelar</button>
+            </div>
+
+            <p id="deleteMsg"></p>
+        </div>
+    </div>
+
     <script>
         //Lucide icons
         lucide.createIcons();
@@ -258,6 +463,106 @@ $stmt->close();
         document.getElementById('languageSelect')?.addEventListener('change', function() {
             changeLanguage(this.value);
         });
+
+        formPassword.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const current = currentPass.value;
+            const pass = newPass.value;
+            const confirm = confirmPass.value;
+
+            if (pass.length < 8) return passMsg.textContent = "Mínimo 8 caracteres";
+            if (!/\d/.test(pass)) return passMsg.textContent = "Debe tener un número";
+            if (pass !== confirm) return passMsg.textContent = "No coinciden";
+
+            try {
+                const res = await fetch('cambiar_password.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ current, pass })
+                });
+
+                const text = await res.text();  
+                const data = JSON.parse(text);   
+
+                if (data.success) {
+                    passMsg.textContent = "Contraseña actualizada";
+
+                    currentPass.value = "";
+                    newPass.value = "";
+                    confirmPass.value = "";
+                } else {
+                    passMsg.textContent = data.error;
+                }
+
+            } catch (err) {
+                console.error(err);
+                passMsg.textContent = "Error del servidor";
+            }
+
+            if (data.success) {
+                passMsg.textContent = "Contraseña actualizada";
+                
+                // limpiar campos
+                currentPass.value = "";
+                newPass.value = "";
+                confirmPass.value = "";
+            } else {
+                passMsg.textContent = data.error;
+            }
+        };
+
+        const deleteModal = document.getElementById('deleteModal');
+        const openDeleteModal = document.getElementById('openDeleteModal');
+        const cancelDelete = document.getElementById('cancelDelete');
+        const confirmDelete = document.getElementById('confirmDelete');
+        const deleteMsg = document.getElementById('deleteMsg');
+
+        openDeleteModal.onclick = () => {
+            deleteModal.classList.add('open');
+        };
+
+        cancelDelete.onclick = () => {
+            deleteModal.classList.remove('open');
+            deleteMsg.textContent = "";
+        };
+
+        deleteModal.onclick = (e) => {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('open');
+            }
+        };
+
+        confirmDelete.onclick = async () => {
+            const password = deletePass.value;
+
+            const res = await fetch('eliminar_cuenta.php', {
+                method: 'POST',
+                body: JSON.stringify({ password })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = '../sesion/logout.php';
+            } else {
+                deleteMsg.textContent = data.error;
+            }
+        };
+
+        function toggleAjuste(id, el) {
+            const box = document.getElementById(id);
+            const isOpen = box.classList.contains('open');
+
+            document.querySelectorAll('.ajuste-content').forEach(e => e.classList.remove('open'));
+            document.querySelectorAll('.setting-item').forEach(e => e.classList.remove('open'));
+
+            if (!isOpen) {
+                box.classList.add('open');
+                el.classList.add('open');
+            }
+        }
+
     </script>
+    
 </body>
 </html>
