@@ -50,6 +50,10 @@ if ($row = $result->fetch_assoc()) {
     <!-- Iconos -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Flatpickr para calendario elegante -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/reservar.css">
 </head>
@@ -79,25 +83,81 @@ if ($row = $result->fetch_assoc()) {
                 <input type="hidden" name="id_plaza" value="<?php echo $id_plaza; ?>">
                 <input type="hidden" name="dni" value="<?php echo htmlspecialchars($dni); ?>">
 
-                <div class="form-grid">
-                    <?php
-                        $ahora = date('Y-m-d\TH:i');
-                        $maxFecha = date('Y-m-d\TH:i', strtotime('+1 year'));
-                    ?>
-                    <div class="form-group">
-                        <label><i data-lucide="calendar-input"></i> Hora de entrada</label>
-                        <input type="datetime-local" name="hora_entrada" required min="<?php echo $ahora; ?>" max="<?php echo $maxFecha; ?>">
+                <!-- Selector de fechas -->
+                <div class="date-time-section">
+                    <div class="section-header">
+                        <i data-lucide="calendar"></i>
+                        <h3>Selecciona las fechas</h3>
                     </div>
-
-                    <div class="form-group">
-                        <label><i data-lucide="calendar-output"></i> Hora de salida</label>
-                        <input type="datetime-local" name="hora_salida" required min="<?php echo $ahora; ?>" max="<?php echo $maxFecha; ?>">
+                    
+                    <div class="date-picker-wrapper">
+                        <input type="text" id="dateRange" placeholder="Selecciona entrada y salida" readonly>
+                        <input type="hidden" name="hora_entrada" id="hiddenEntrada" required>
+                        <input type="hidden" name="hora_salida" id="hiddenSalida" required>
                     </div>
+                </div>
 
-                    <div class="form-group full-width">
-                        <label><i data-lucide="banknote"></i> Precio estimado</label>
-                        <input type="text" id="precioEstimado" value="<?php echo number_format($precio_hora, 2); ?> €/h" disabled>
-                        <span class="helper-text">Se actualiza al seleccionar las horas.</span>
+                <!-- Selector de horas -->
+                <div class="time-section">
+                    <div class="section-header">
+                        <i data-lucide="clock"></i>
+                        <h3>Selecciona las horas</h3>
+                    </div>
+                    
+                    <div class="time-grid">
+                        <div class="time-picker-group">
+                            <label class="time-label">Hora de entrada</label>
+                            <div class="time-picker-custom">
+                                <select id="horaEntrada" class="time-select">
+                                    <?php for($h = 0; $h < 24; $h++): ?>
+                                        <option value="<?php echo sprintf('%02d', $h); ?>"><?php echo sprintf('%02d', $h); ?></option>
+                                    <?php endfor; ?>
+                                </select>
+                                <span class="time-separator">:</span>
+                                <select id="minutoEntrada" class="time-select">
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="time-picker-group">
+                            <label class="time-label">Hora de salida</label>
+                            <div class="time-picker-custom">
+                                <select id="horaSalida" class="time-select">
+                                    <?php for($h = 0; $h < 24; $h++): ?>
+                                        <option value="<?php echo sprintf('%02d', $h); ?>"><?php echo sprintf('%02d', $h); ?></option>
+                                    <?php endfor; ?>
+                                </select>
+                                <span class="time-separator">:</span>
+                                <select id="minutoSalida" class="time-select">
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen de precio -->
+                <div class="price-summary">
+                    <div class="price-details">
+                        <div class="price-row">
+                            <span class="price-label">Precio por hora</span>
+                            <span class="price-value"><?php echo number_format($precio_hora, 2); ?> €</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Duración estimada</span>
+                            <span class="price-value" id="duracionEstimada">—</span>
+                        </div>
+                        <div class="price-row price-total">
+                            <span class="price-label">Total estimado</span>
+                            <span class="price-value" id="precioTotal">—</span>
+                        </div>
                     </div>
                 </div>
 
@@ -111,35 +171,121 @@ if ($row = $result->fetch_assoc()) {
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script>
     lucide.createIcons();
 
     (function () {
         var form = document.querySelector('.booking-form');
-        var inputEntrada = document.querySelector('[name="hora_entrada"]');
-        var inputSalida  = document.querySelector('[name="hora_salida"]');
+        var hiddenEntrada = document.getElementById('hiddenEntrada');
+        var hiddenSalida = document.getElementById('hiddenSalida');
+        var horaEntrada = document.getElementById('horaEntrada');
+        var minutoEntrada = document.getElementById('minutoEntrada');
+        var horaSalida = document.getElementById('horaSalida');
+        var minutoSalida = document.getElementById('minutoSalida');
+        var duracionEl = document.getElementById('duracionEstimada');
+        var precioTotalEl = document.getElementById('precioTotal');
+        var precioPorHora = <?php echo (float) $precio_hora; ?>;
+        
         var errorBox = document.createElement('p');
-        errorBox.style.cssText = 'color:#c0392b;font-size:0.875rem;margin:0.5rem 0;display:none;';
+        errorBox.style.cssText = 'color:#c0392b;font-size:0.875rem;margin:1rem 0;display:none;background:#ffe5e5;padding:1rem;border-radius:8px;';
         form.querySelector('.form-actions').before(errorBox);
 
+        var fechaEntrada = null;
+        var fechaSalida = null;
+
+        // Inicializar Flatpickr con rango de fechas
+        var fp = flatpickr("#dateRange", {
+            mode: "range",
+            locale: "es",
+            minDate: "today",
+            maxDate: new Date().fp_incr(365),
+            dateFormat: "d/m/Y",
+            onChange: function(selectedDates) {
+                if (selectedDates.length === 2) {
+                    fechaEntrada = selectedDates[0];
+                    fechaSalida = selectedDates[1];
+                    actualizarPrecio();
+                }
+            }
+        });
+
+        // Actualizar precio cuando cambian las horas
+        [horaEntrada, minutoEntrada, horaSalida, minutoSalida].forEach(function(el) {
+            el.addEventListener('change', actualizarPrecio);
+        });
+
+        function actualizarPrecio() {
+            if (!fechaEntrada || !fechaSalida) {
+                duracionEl.textContent = '—';
+                precioTotalEl.textContent = '—';
+                return;
+            }
+
+            // Crear fechas completas con horas
+            var entrada = new Date(fechaEntrada);
+            entrada.setHours(parseInt(horaEntrada.value), parseInt(minutoEntrada.value), 0);
+            
+            var salida = new Date(fechaSalida);
+            salida.setHours(parseInt(horaSalida.value), parseInt(minutoSalida.value), 0);
+
+            // Actualizar campos ocultos
+            hiddenEntrada.value = entrada.toISOString().slice(0, 16).replace('T', ' ');
+            hiddenSalida.value = salida.toISOString().slice(0, 16).replace('T', ' ');
+
+            // Calcular duración
+            var diff = salida - entrada;
+            if (diff <= 0) {
+                duracionEl.textContent = '—';
+                precioTotalEl.textContent = '—';
+                return;
+            }
+
+            var horas = Math.ceil(diff / 3600000);
+            var dias = Math.floor(horas / 24);
+            var horasRestantes = horas % 24;
+            
+            var duracionTexto = '';
+            if (dias > 0) {
+                duracionTexto = dias + ' día' + (dias > 1 ? 's' : '');
+                if (horasRestantes > 0) {
+                    duracionTexto += ' y ' + horasRestantes + 'h';
+                }
+            } else {
+                duracionTexto = horas + ' hora' + (horas > 1 ? 's' : '');
+            }
+            
+            duracionEl.textContent = duracionTexto;
+            
+            var precioTotal = horas * precioPorHora;
+            precioTotalEl.textContent = precioTotal.toFixed(2) + ' €';
+        }
+
         form.addEventListener('submit', function (e) {
-            var ahora = new Date();
-            var entrada = new Date(inputEntrada.value);
-            var salida  = new Date(inputSalida.value);
             errorBox.style.display = 'none';
 
-            if (!inputEntrada.value || !inputSalida.value) {
+            if (!fechaEntrada || !fechaSalida) {
                 e.preventDefault();
-                errorBox.textContent = 'Debes indicar fecha de entrada y salida.';
+                errorBox.textContent = 'Por favor, selecciona las fechas de entrada y salida.';
                 errorBox.style.display = 'block';
                 return;
             }
+
+            var entrada = new Date(fechaEntrada);
+            entrada.setHours(parseInt(horaEntrada.value), parseInt(minutoEntrada.value), 0);
+            
+            var salida = new Date(fechaSalida);
+            salida.setHours(parseInt(horaSalida.value), parseInt(minutoSalida.value), 0);
+
+            var ahora = new Date();
             if (entrada < ahora) {
                 e.preventDefault();
                 errorBox.textContent = 'La fecha de entrada no puede ser en el pasado.';
                 errorBox.style.display = 'block';
                 return;
             }
+
             if (salida <= entrada) {
                 e.preventDefault();
                 errorBox.textContent = 'La fecha de salida debe ser posterior a la de entrada.';
@@ -147,28 +293,6 @@ if ($row = $result->fetch_assoc()) {
                 return;
             }
         });
-
-        var precioPorHora = <?php echo (float) $precio_hora; ?>;
-        var estimadoEl = document.getElementById('precioEstimado');
-
-        function actualizarPrecio() {
-            if (!inputEntrada.value || !inputSalida.value) return;
-            var entrada = new Date(inputEntrada.value);
-            var salida  = new Date(inputSalida.value);
-            if (salida <= entrada) return;
-            var horas = Math.max(1, Math.ceil((salida - entrada) / 3600000));
-            estimadoEl.value = (horas * precioPorHora).toFixed(2) + ' € (' + horas + 'h × ' + precioPorHora.toFixed(2) + ' €/h)';
-        }
-
-        inputEntrada.addEventListener('change', function () {
-            if (inputEntrada.value && (!inputSalida.value || new Date(inputSalida.value) <= new Date(inputEntrada.value))) {
-                var min = new Date(inputEntrada.value);
-                min.setHours(min.getHours() + 1);
-                inputSalida.min = min.toISOString().slice(0, 16);
-            }
-            actualizarPrecio();
-        });
-        inputSalida.addEventListener('change', actualizarPrecio);
     })();
 </script>
 </body>

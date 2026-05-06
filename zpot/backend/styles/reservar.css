@@ -115,54 +115,184 @@ body.booking-page {
     border: 1px solid rgba(207, 204, 196, 0.4);
 }
 
-/* FORM */
-.form-grid {
+/* FORM SECTIONS */
+.date-time-section,
+.time-section,
+.price-summary {
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.section-header svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--brand-yellow);
+    stroke-width: 2px;
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+}
+
+/* DATE PICKER */
+.date-picker-wrapper {
+    position: relative;
+}
+
+#dateRange {
+    width: 100%;
+    padding: 1.2rem 1.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 2px solid var(--brand-grey);
+    border-radius: 16px;
+    background-color: #ffffff;
+    color: var(--brand-dark);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#dateRange:hover {
+    border-color: var(--brand-dark);
+}
+
+#dateRange:focus {
+    outline: none;
+    border-color: var(--brand-yellow);
+    box-shadow: 0 0 0 4px rgba(244, 221, 73, 0.15);
+}
+
+#dateRange::placeholder {
+    color: var(--text-muted);
+}
+
+/* TIME PICKER */
+.time-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
 
-.full-width { grid-column: span 2; }
+.time-picker-group {
+    background: #fdfaf0;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(244, 221, 73, 0.3);
+}
 
-.form-group label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.75rem;
+.time-label {
+    display: block;
+    font-size: 0.85rem;
     font-weight: 700;
     text-transform: uppercase;
-    color: var(--brand-dark);
-    margin-bottom: 8px;
-}
-
-.form-group label svg {
-    width: 20px;
-    stroke: var(--brand-yellow);
-    stroke-width: 2.5px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 0.9rem 1rem;
-    font-family: inherit;
-    font-size: 1rem;
-    border: 1.5px solid var(--brand-grey);
-    border-radius: var(--radius);
-    background-color: #fdfdfd;
-    transition: 0.2s;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: var(--brand-dark);
-    box-shadow: 0 0 0 4px rgba(244, 221, 73, 0.2);
-}
-
-.helper-text {
-    font-size: 0.75rem;
     color: var(--text-muted);
-    margin-top: 6px;
-    display: block;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.time-picker-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.time-select {
+    width: 80px;
+    padding: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid var(--brand-grey);
+    border-radius: 12px;
+    background-color: #ffffff;
+    color: var(--brand-dark);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+}
+
+.time-select:hover {
+    border-color: var(--brand-dark);
+    transform: translateY(-2px);
+}
+
+.time-select:focus {
+    outline: none;
+    border-color: var(--brand-yellow);
+    box-shadow: 0 0 0 4px rgba(244, 221, 73, 0.15);
+}
+
+.time-separator {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+}
+
+/* PRICE SUMMARY */
+.price-summary {
+    background: linear-gradient(135deg, #fdfaf0 0%, #f9f6e8 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(244, 221, 73, 0.4);
+}
+
+.price-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+}
+
+.price-row:not(:last-child) {
+    border-bottom: 1px solid rgba(207, 204, 196, 0.3);
+}
+
+.price-label {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.price-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+}
+
+.price-total {
+    margin-top: 0.5rem;
+    padding-top: 1.5rem !important;
+    border-top: 2px solid var(--brand-yellow) !important;
+    border-bottom: none !important;
+}
+
+.price-total .price-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+}
+
+.price-total .price-value {
+    font-size: 1.8rem;
+    color: var(--brand-dark);
 }
 
 /* BUTTON */
@@ -191,11 +321,67 @@ body.booking-page {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* FLATPICKR CUSTOMIZATION */
+.flatpickr-calendar {
+    font-family: 'DM Sans', sans-serif !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+    border: 2px solid var(--brand-yellow) !important;
+}
+
+.flatpickr-day.selected {
+    background: var(--brand-yellow) !important;
+    border-color: var(--brand-yellow) !important;
+    color: var(--brand-dark) !important;
+    font-weight: 700 !important;
+}
+
+.flatpickr-day.inRange {
+    background: rgba(244, 221, 73, 0.2) !important;
+    border-color: transparent !important;
+}
+
+.flatpickr-day:hover {
+    background: rgba(244, 221, 73, 0.3) !important;
+    border-color: var(--brand-yellow) !important;
+}
+
+.flatpickr-months .flatpickr-month {
+    background: var(--brand-yellow) !important;
+    color: var(--brand-dark) !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    background: var(--brand-yellow) !important;
+}
+
+.flatpickr-weekday {
+    color: var(--brand-dark) !important;
+    font-weight: 700 !important;
+}
+
 /* RESPONSIVE */
 @media (max-width: 767px) {
     body.booking-page { background-color: #fff; }
     .layout { align-items: flex-start; padding: 0; }
     .card { border-radius: 0; border: none; box-shadow: none; padding: 1.5rem; }
     .booking-header { padding: 2rem 1.5rem 0.5rem 1.5rem; margin-bottom: 0; }
-    .form-grid { grid-template-columns: 1fr; }
+    
+    .time-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .time-select {
+        width: 70px;
+        font-size: 1.3rem;
+        padding: 0.8rem;
+    }
+    
+    .price-summary {
+        padding: 1.5rem;
+    }
+    
+    .price-total .price-value {
+        font-size: 1.5rem;
+    }
 }
