@@ -11,7 +11,7 @@ body.my-reservations-page {
 
 .layout-container {
     width: 100%;
-    max-width: 900px;
+    max-width: 1100px;
 }
 
 .page-header {
@@ -29,70 +29,109 @@ body.my-reservations-page {
     transition: color 0.15s ease, transform 0.15s ease;
 }
 
-.back-link:hover { color: var(--brand-dark); transform: translateX(-4px); }
+.back-link:hover { 
+    color: var(--brand-dark); 
+    transform: translateX(-4px); 
+}
 
-.headline { font-size: 2.2rem; font-weight: 800; color: var(--brand-dark); margin: 0; }
+.headline { 
+    font-size: 2.2rem; 
+    font-weight: 800; 
+    color: var(--brand-dark); 
+    margin: 0; 
+    letter-spacing: -0.02em;
+}
+
+.support {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
 
 /* GRID */
 .reservas-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.75rem;
 }
 
 /* CARD */
 .reserva-card {
     background: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 0 10px 25px -5px rgba(58, 56, 47, 0.05);
-    border: 1px solid rgba(207, 204, 196, 0.3);
+    border-radius: 24px;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(58, 56, 47, 0.08);
+    border: 1px solid rgba(207, 204, 196, 0.25);
     display: flex;
     flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+    position: relative;
 }
 
 .reserva-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 28px -6px rgba(58, 56, 47, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(58, 56, 47, 0.15);
 }
 
 .reserva-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
+    align-items: flex-start;
+    padding: 1.75rem 1.75rem 0 1.75rem;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
 }
 
 .plaza-tag {
     background: var(--brand-dark);
     color: white;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 0.75rem;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 0.8rem;
     font-weight: 700;
-    max-width: 200px;
+    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    letter-spacing: -0.01em;
 }
 
 .estado-badge {
     display: inline-block;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    padding: 3px 10px;
+    text-transform: uppercase;
+    padding: 6px 14px;
     border-radius: 20px;
-    margin-bottom: 1rem;
+    margin: 0 1.75rem 1.25rem 1.75rem;
+    letter-spacing: 0.03em;
 }
-.estado-confirmada { background: #d1fae5; color: #065f46; }
-.estado-pendiente  { background: #fef3c7; color: #92400e; }
-.estado-cancelada  { background: #fee2e2; color: #991b1b; }
+
+.estado-confirmada { 
+    background: #d1fae5; 
+    color: #065f46; 
+}
+
+.estado-pendiente { 
+    background: #fef3c7; 
+    color: #92400e; 
+}
+
+.estado-cancelada { 
+    background: #fee2e2; 
+    color: #991b1b; 
+}
 
 .price-tag {
     font-weight: 800;
     color: var(--brand-dark);
-    font-size: 1.1rem;
+    font-size: 1.4rem;
+    background: var(--brand-yellow);
+    padding: 8px 16px;
+    border-radius: 12px;
+    white-space: nowrap;
+    letter-spacing: -0.02em;
 }
 
 /* BODY */
@@ -100,19 +139,26 @@ body.my-reservations-page {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    margin-bottom: 1.5rem;
+    padding: 0 1.75rem 1.75rem 1.75rem;
+    margin-bottom: 0.5rem;
 }
 
 .info-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
 .info-row svg {
-    width: 18px;
+    width: 20px;
+    height: 20px;
     color: var(--brand-yellow);
     stroke-width: 2.5px;
+    flex-shrink: 0;
+}
+
+.info-row > div {
+    flex: 1;
 }
 
 .info-row span {
@@ -122,25 +168,28 @@ body.my-reservations-page {
     color: var(--text-muted);
     font-weight: 700;
     letter-spacing: 0.05em;
+    margin-bottom: 4px;
 }
 
 .info-row strong {
     display: block;
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--brand-dark);
+    font-weight: 600;
 }
 
 /* FOOTER */
 .reserva-footer {
     margin-top: auto;
-    border-top: 1px solid #f1f0ea;
-    padding-top: 1rem;
+    border-top: 1px solid rgba(207, 204, 196, 0.2);
+    padding: 1.25rem 1.75rem;
+    background: rgba(241, 240, 234, 0.3);
 }
 
 .btn-cancel {
     width: 100%;
-    background: none;
-    border: none;
+    background: white;
+    border: 1.5px solid rgba(204, 0, 0, 0.2);
     color: #cc0000;
     font-family: inherit;
     font-weight: 600;
@@ -150,33 +199,196 @@ body.my-reservations-page {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 8px;
-    border-radius: 10px;
-    transition: 0.2s;
+    padding: 12px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel svg {
+    width: 16px;
+    height: 16px;
 }
 
 .btn-cancel:hover {
     background: #fff5f5;
+    border-color: #cc0000;
+    transform: translateY(-1px);
 }
 
 /* EMPTY STATE */
 .empty-state {
     text-align: center;
     background: white;
-    padding: 4rem 2rem;
+    padding: 5rem 2rem;
     border-radius: 24px;
     color: var(--text-muted);
+    box-shadow: 0 4px 20px rgba(58, 56, 47, 0.08);
 }
 
-.empty-state svg { width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.3; }
+.empty-state svg { 
+    width: 64px; 
+    height: 64px; 
+    margin-bottom: 1.5rem; 
+    opacity: 0.3; 
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin: 0;
+}
 
 .btn-primary-link {
     display: inline-block;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     background: var(--brand-dark);
     color: white;
-    padding: 12px 24px;
+    padding: 14px 28px;
     border-radius: 12px;
     text-decoration: none;
     font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.btn-primary-link:hover {
+    background: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* RESPONSIVE - MOBILE */
+@media (max-width: 767px) {
+   
+    body.my-reservations-page {
+        background-color: #ffffff;
+    }
+
+    .layout {
+        padding: 0;
+    }
+
+    .layout-container {
+        max-width: 100%;
+    }
+
+    .page-header {
+        padding: 2rem 1.5rem 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .back-link {
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .headline {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    .support {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    /* Grid en móvil: 1 columna completa */
+    .reservas-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 1.5rem 2rem 1.5rem;
+    }
+
+    .reserva-card {
+        border-radius: 20px;
+        box-shadow: 0 4px 16px rgba(58, 56, 47, 0.1);
+    }
+
+    .reserva-header {
+        padding: 1.5rem 1.5rem 0 1.5rem;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .plaza-tag {
+        font-size: 0.75rem;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .price-tag {
+        font-size: 1.4rem;
+        padding: 10px 16px;
+        text-align: center;
+        width: 100%;
+    }
+
+    .estado-badge {
+        margin: 0 1.5rem 1rem 1.5rem;
+        text-align: center;
+        display: block;
+    }
+
+    .reserva-body {
+        padding: 0 1.5rem 1.5rem 1.5rem;
+        gap: 1rem;
+    }
+
+    .info-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .info-row svg {
+        width: 20px;
+        height: 20px;
+        margin: 0 auto;
+    }
+
+    .info-row > div {
+        text-align: center;
+    }
+
+    .info-row span {
+        text-align: center;
+    }
+
+    .info-row strong {
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .reserva-footer {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .btn-cancel {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+
+    .empty-state {
+        padding: 4rem 1.5rem;
+        margin: 0 1.5rem;
+        border-radius: 20px;
+    }
+}
+
+/* RESPONSIVE - TABLET */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .reservas-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+/* RESPONSIVE - DESKTOP GRANDE */
+@media (min-width: 1200px) {
+    .reservas-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
 }
