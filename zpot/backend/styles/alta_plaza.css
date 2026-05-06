@@ -79,7 +79,7 @@ body {
     margin-bottom: 1.5rem;
 }
 
-.form-group label {
+.form-group > label:not(.file-label) {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -270,7 +270,7 @@ body {
     width: 100%;
     padding: 1rem;
     background: var(--brand-dark);
-    color: white;
+    color: white !important;
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 600;
@@ -288,9 +288,15 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.file-label i {
+.file-label svg {
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
+}
+
+.file-label span {
+    color: white;
+    font-weight: 600;
 }
 
 /* IMAGE PREVIEW */
