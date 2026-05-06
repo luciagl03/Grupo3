@@ -64,7 +64,21 @@ if (!$data) {
 
 // -------- Input normalization --------
 $direccionRaw = isset($data['direccion']) ? trim((string) $data['direccion']) : '';
-$foto = cleanNullableText($data['foto'] ?? '');
+
+// Handle Base64 image data
+$foto = null;
+if (isset($data['foto']) && !empty($data['foto'])) {
+    $fotoData = $data['foto'];
+    // Check if it's a Base64 data URI
+    if (preg_match('/^data:image\/(jpeg|jpg|png|gif|webp);base64,/', $fotoData)) {
+        // Validate Base64 format and keep as-is for storage
+        $foto = $fotoData;
+    } else {
+        // If it's a regular URL, clean it
+        $foto = cleanNullableText($fotoData);
+    }
+}
+
 $descripcion = cleanNullableText($data['descripcion'] ?? '');
 $escritura = cleanNullableText($data['escritura'] ?? '');
 $ubicacionesValidas = ['cubierto', 'garaje', 'exterior'];
@@ -97,8 +111,11 @@ if ($precioRaw === null || $precioRaw === '') {
     }
 }
 
-if ($foto !== null && $foto !== '' && !filter_var($foto, FILTER_VALIDATE_URL)) {
-    $errors['foto'] = 'La URL de la foto no es válida';
+// Validate foto: skip validation if it's Base64 data URI
+if ($foto !== null && $foto !== '') {
+    if (!preg_match('/^data:image\/(jpeg|jpg|png|gif|webp);base64,/', $foto) && !filter_var($foto, FILTER_VALIDATE_URL)) {
+        $errors['foto'] = 'La URL de la foto no es válida';
+    }
 }
 
 if (!empty($errors)) {
