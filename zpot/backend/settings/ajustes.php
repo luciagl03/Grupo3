@@ -389,15 +389,57 @@ $stmt->close();
                         <h2 class="section-title">Centro de Ayuda</h2>
                     </div>
                     <div class="settings-card">
-                        <a href="#" class="setting-item setting-item-link">
-                            <div class="setting-info">
+                        <!-- FAQ Accordion -->
+                        <div class="faq-section">
+                            <div class="faq-header">
                                 <i data-lucide="message-circle" class="setting-icon"></i>
-                                <div class="setting-text">
-                                    <h3 class="setting-label">Preguntas frecuentes (FAQ)</h3>
+                                <h3 class="setting-label" data-i18n="faqTitle">Preguntas frecuentes (FAQ)</h3>
+                            </div>
+                            
+                            <!-- FAQ Item 1 -->
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)">
+                                    <span data-i18n="faqQ1">¿Cómo reservo una plaza?</span>
+                                    <i data-lucide="chevron-down" class="faq-arrow"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    <p data-i18n="faqA1">Selecciona el punto en el mapa, elige tus horas y confirma.</p>
                                 </div>
                             </div>
-                            <i data-lucide="external-link" class="link-icon"></i>
-                        </a>
+                            
+                            <!-- FAQ Item 2 -->
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)">
+                                    <span data-i18n="faqQ2">¿Puedo cancelar una reserva?</span>
+                                    <i data-lucide="chevron-down" class="faq-arrow"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    <p data-i18n="faqA2">Sí, desde el apartado 'Mis Reservas' hasta 1 hora antes.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- FAQ Item 3 -->
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)">
+                                    <span data-i18n="faqQ3">¿Cómo publico mi garaje?</span>
+                                    <i data-lucide="chevron-down" class="faq-arrow"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    <p data-i18n="faqA3">Ve a 'Mis Plazas' y rellena el formulario con fotos y dirección.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- FAQ Item 4 -->
+                            <div class="faq-item">
+                                <button class="faq-question" onclick="toggleFAQ(this)">
+                                    <span data-i18n="faqQ4">¿Es seguro el pago?</span>
+                                    <i data-lucide="chevron-down" class="faq-arrow"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    <p data-i18n="faqA4">Sí, usamos pasarelas de pago cifradas para tu seguridad.</p>
+                                </div>
+                            </div>
+                        </div>
                         
                         <div class="setting-divider"></div>
                         
@@ -560,6 +602,30 @@ $stmt->close();
                 box.classList.add('open');
                 el.classList.add('open');
             }
+        }
+
+        // FAQ Accordion functionality
+        function toggleFAQ(button) {
+            const faqItem = button.parentElement;
+            const answer = faqItem.querySelector('.faq-answer');
+            const isOpen = answer.classList.contains('open');
+
+            // Close all other FAQ items
+            document.querySelectorAll('.faq-answer').forEach(ans => {
+                ans.classList.remove('open');
+            });
+            document.querySelectorAll('.faq-question').forEach(q => {
+                q.classList.remove('active');
+            });
+
+            // Toggle current item
+            if (!isOpen) {
+                answer.classList.add('open');
+                button.classList.add('active');
+            }
+
+            // Re-initialize Lucide icons for the newly opened content
+            lucide.createIcons();
         }
 
     </script>

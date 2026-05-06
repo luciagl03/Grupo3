@@ -10,7 +10,17 @@ const translations = {
         close: "Cerrar",
         save: "Guardar",
         back: "Volver",
-        addMySpot: "Añadir mi plaza"
+        addMySpot: "Añadir mi plaza",
+        // FAQ
+        faqTitle: "Preguntas frecuentes (FAQ)",
+        faqQ1: "¿Cómo reservo una plaza?",
+        faqA1: "Selecciona el punto en el mapa, elige tus horas y confirma.",
+        faqQ2: "¿Puedo cancelar una reserva?",
+        faqA2: "Sí, desde el apartado 'Mis Reservas' hasta 1 hora antes.",
+        faqQ3: "¿Cómo publico mi garaje?",
+        faqA3: "Ve a 'Mis Plazas' y rellena el formulario con fotos y dirección.",
+        faqQ4: "¿Es seguro el pago?",
+        faqA4: "Sí, usamos pasarelas de pago cifradas para tu seguridad."
     },
     en: {
         settings: "Settings",
@@ -18,7 +28,17 @@ const translations = {
         close: "Close",
         save: "Save",
         back: "Back",
-        addMySpot: "Add my spot"
+        addMySpot: "Add my spot",
+        // FAQ
+        faqTitle: "Frequently Asked Questions (FAQ)",
+        faqQ1: "How do I book a spot?",
+        faqA1: "Select the point on the map, choose your hours and confirm.",
+        faqQ2: "Can I cancel a reservation?",
+        faqA2: "Yes, from the 'My Reservations' section up to 1 hour before.",
+        faqQ3: "How do I publish my garage?",
+        faqA3: "Go to 'My Spots' and fill out the form with photos and address.",
+        faqQ4: "Is payment secure?",
+        faqA4: "Yes, we use encrypted payment gateways for your security."
     },
     fr: {
         settings: "Paramètres",
@@ -26,7 +46,17 @@ const translations = {
         close: "Fermer",
         save: "Enregistrer",
         back: "Retour",
-        addMySpot: "Ajouter ma place"
+        addMySpot: "Ajouter ma place",
+        // FAQ
+        faqTitle: "Questions fréquemment posées (FAQ)",
+        faqQ1: "Comment réserver une place ?",
+        faqA1: "Sélectionnez le point sur la carte, choisissez vos heures et confirmez.",
+        faqQ2: "Puis-je annuler une réservation ?",
+        faqA2: "Oui, depuis la section 'Mes Réservations' jusqu'à 1 heure avant.",
+        faqQ3: "Comment publier mon garage ?",
+        faqA3: "Allez dans 'Mes Places' et remplissez le formulaire avec photos et adresse.",
+        faqQ4: "Le paiement est-il sécurisé ?",
+        faqA4: "Oui, nous utilisons des passerelles de paiement cryptées pour votre sécurité."
     },
     de: {
         settings: "Einstellungen",
@@ -34,7 +64,17 @@ const translations = {
         close: "Schließen",
         save: "Speichern",
         back: "Zurück",
-        addMySpot: "Meinen Platz hinzufügen"
+        addMySpot: "Meinen Platz hinzufügen",
+        // FAQ
+        faqTitle: "Häufig gestellte Fragen (FAQ)",
+        faqQ1: "Wie buche ich einen Platz?",
+        faqA1: "Wählen Sie den Punkt auf der Karte, wählen Sie Ihre Stunden und bestätigen Sie.",
+        faqQ2: "Kann ich eine Reservierung stornieren?",
+        faqA2: "Ja, im Bereich 'Meine Reservierungen' bis 1 Stunde vorher.",
+        faqQ3: "Wie veröffentliche ich meine Garage?",
+        faqA3: "Gehen Sie zu 'Meine Plätze' und füllen Sie das Formular mit Fotos und Adresse aus.",
+        faqQ4: "Ist die Zahlung sicher?",
+        faqA4: "Ja, wir verwenden verschlüsselte Zahlungsgateways für Ihre Sicherheit."
     }
 };
 
