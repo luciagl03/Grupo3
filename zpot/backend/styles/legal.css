@@ -1,0 +1,163 @@
+/* ============================================================
+   ESTILOS LEGALES
+   ============================================================ */
+
+:root {
+    --brand-yellow: #f4dd49;
+    --brand-dark:   #3a382f;
+    --brand-bg:     #f1f0ea;
+    --text-muted:   #706e66;
+    --border-color: #e0ddd7;
+    --radius:       14px;
+}
+
+body.legal-page {
+    background-color: var(--brand-bg);
+    margin: 0;
+    padding: 0;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    color: var(--brand-dark);
+    -webkit-font-smoothing: antialiased;
+}
+
+.layout {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+}
+
+.layout-container {
+    width: 100%;
+    max-width: 750px;
+}
+
+/* HEADER*/
+.legal-header {
+    margin-bottom: 2.5rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    color: var(--brand-dark);
+    transform: translateX(-4px);
+}
+
+.headline {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--brand-dark);
+    margin: 0;
+}
+
+.support {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* TARJETA DE CONTENIDO */
+.card-legal {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 3.5rem;
+    box-shadow: 0 20px 40px -10px rgba(58, 56, 47, 0.08);
+    border: 1px solid rgba(207, 204, 196, 0.3);
+}
+
+.legal-section {
+    margin-bottom: 3rem;
+}
+
+.legal-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+}
+
+.feature-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--brand-yellow);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.section-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--brand-dark);
+}
+
+.legal-content {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #55524a;
+}
+
+.legal-content p {
+    margin-bottom: 1rem;
+}
+
+.legal-content ul {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.legal-content li {
+    margin-bottom: 0.75rem;
+}
+
+/* FOOTER*/
+.legal-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--brand-bg);
+    text-align: center;
+}
+
+.university-tag {
+    display: inline-block;
+    background: var(--brand-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* RESPONSIVe */
+@media (max-width: 767px) {
+    .layout { padding: 0; }
+    body.legal-page { background-color: #fff; }
+    
+    .legal-header { padding: 3rem 1.5rem 1rem; }
+    
+    .card-legal {
+        border-radius: 0;
+        border: none;
+        padding: 1.5rem;
+        box-shadow: none;
+    }
+
+    .headline { font-size: 2rem; }
+}

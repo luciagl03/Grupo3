@@ -188,12 +188,12 @@ $stmt->close();
         max-height: 0;
         overflow: hidden;
         transition: all 0.3s ease;
-        padding: 0 1rem; /* 👈 AÑADIDO */
+        padding: 0 1rem;
     }
 
     .ajuste-content.open {
         max-height: 300px;
-        padding: 1rem; /* 👈 AÑADIDO */
+        padding: 1rem; 
     }
 
     #deleteBox {
@@ -358,7 +358,7 @@ $stmt->close();
                         <h2 class="section-title">Soporte y Legal</h2>
                     </div>
                     <div class="settings-card">
-                        <a href="#" class="setting-item setting-item-link">
+                        <a href="terminos.php" class="setting-item setting-item-link">
                             <div class="setting-info">
                                 <i data-lucide="file-text" class="setting-icon"></i>
                                 <div class="setting-text">
@@ -370,7 +370,7 @@ $stmt->close();
                         
                         <div class="setting-divider"></div>
                         
-                        <a href="#" class="setting-item setting-item-link">
+                        <a href="privacidad.php" class="setting-item setting-item-link">
                             <div class="setting-info">
                                 <i data-lucide="shield-check" class="setting-icon"></i>
                                 <div class="setting-text">
