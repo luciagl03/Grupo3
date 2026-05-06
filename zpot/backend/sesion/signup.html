@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <title>Crear cuenta — Zpot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="signup.css">
+</head>
+<body class="auth-page">
+    <div class="layout">
+        <main class="card">
+            <div class="logo"><a href="../index.php"><img src="../../frontend/assets/images/logo.png" alt="Zpot"></a></div>
+            <h1 class="headline">Crear cuenta</h1>
+            <p class="support">Reserva o comparte plazas de aparcamiento y garajes.</p>
+
+            <div id="globalError" class="global-error" role="alert" hidden></div>
+
+            <form id="signupForm" novalidate>
+                <div class="form-group">
+                    <label for="dni">DNI</label>
+                    <input type="text" id="dni" name="dni" autocomplete="off" placeholder="12345678A" maxlength="9">
+                    <span id="dniHint" class="field-hint">8 dígitos + 1 letra</span>
+                    <span id="dniError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <div class="row-two">
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" autocomplete="given-name">
+                        <span id="nombreError" class="field-error" aria-live="polite"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos</label>
+                        <input type="text" id="apellidos" name="apellidos" autocomplete="family-name">
+                        <span id="apellidosError" class="field-error" aria-live="polite"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" autocomplete="email">
+                    <span id="emailError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" autocomplete="new-password">
+                    <span id="contrasenaHint" class="field-hint">Mínimo 8 caracteres y un número</span>
+                    <span id="contrasenaError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmar">Confirmar contraseña</label>
+                    <input type="password" id="confirmar" name="confirmar" autocomplete="new-password">
+                    <span id="confirmarError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms" name="terms" aria-describedby="termsError">
+                    <label for="terms">Acepto los <a href="#">términos y condiciones</a> y la <a href="#">política de privacidad</a> de Zpot.</label>
+                    <span id="termsError" class="field-error" aria-live="polite"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">Crear cuenta</button>
+            </form>
+
+            <div class="divider">¿Ya tienes cuenta?</div>
+            <a href="login.php" class="btn btn-secondary">Iniciar sesión</a>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            const form = document.getElementById('signupForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const globalError = document.getElementById('globalError');
+
+            const fields = {
+                dni:        { el: document.getElementById('dni'),        err: document.getElementById('dniError') },
+                nombre:     { el: document.getElementById('nombre'),     err: document.getElementById('nombreError') },
+                apellidos:  { el: document.getElementById('apellidos'),  err: document.getElementById('apellidosError') },
+                email:      { el: document.getElementById('email'),      err: document.getElementById('emailError') },
+                contrasena: { el: document.getElementById('contrasena'), err: document.getElementById('contrasenaError') },
+                confirmar:  { el: document.getElementById('confirmar'), err: document.getElementById('confirmarError') }
+            };
+            const terms = { el: document.getElementById('terms'), err: document.getElementById('termsError') };
+
+            function setError(field, message) {
+                const f = fields[field];
+                if (!f) return;
+                f.err.textContent = message || '';
+                f.el.classList.toggle('error', !!message);
+            }
+
+            function setTermsError(message) {
+                terms.err.textContent = message || '';
+            }
+
+            function clearErrors() {
+                Object.keys(fields).forEach(function (k) {
+                    setError(k, '');
+                });
+                setTermsError('');
+                globalError.hidden = true;
+                globalError.textContent = '';
+            }
+
+            function showGlobalError(msg) {
+                globalError.textContent = msg;
+                globalError.hidden = false;
+            }
+
+            var DNI_REGEX = /^[0-9]{8}[A-Za-z]$/;
+            var EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            function validate() {
+                var valid = true;
+                var dniVal = (fields.dni.el.value || '').trim();
+                var nombreVal = (fields.nombre.el.value || '').trim();
+                var apellidosVal = (fields.apellidos.el.value || '').trim();
+                var emailVal = (fields.email.el.value || '').trim();
+                var passVal = fields.contrasena.el.value;
+                var confirmVal = fields.confirmar.el.value;
+
+                if (!dniVal) {
+                    setError('dni', 'Inserta un DNI');
+                    valid = false;
+                } else if (!DNI_REGEX.test(dniVal)) {
+                    setError('dni', 'Formato incorrecto (8 dígitos + 1 letra)');
+                    valid = false;
+                } else {
+                    setError('dni', '');
+                }
+
+                if (!nombreVal) {
+                    setError('nombre', 'Inserta un nombre');
+                    valid = false;
+                } else {
+                    setError('nombre', '');
+                }
+
+                if (!apellidosVal) {
+                    setError('apellidos', 'Inserta los apellidos');
+                    valid = false;
+                } else {
+                    setError('apellidos', '');
+                }
+
+                if (!emailVal) {
+                    setError('email', 'Inserta un email');
+                    valid = false;
+                } else if (!EMAIL_REGEX.test(emailVal)) {
+                    setError('email', 'Email no válido');
+                    valid = false;
+                } else {
+                    setError('email', '');
+                }
+
+                if (!passVal) {
+                    setError('contrasena', 'Inserta una contraseña');
+                    valid = false;
+                } else if (passVal.length < 8) {
+                    setError('contrasena', 'Mínimo 8 caracteres');
+                    valid = false;
+                } else if (!/[0-9]/.test(passVal)) {
+                    setError('contrasena', 'Debe contener al menos un número');
+                    valid = false;
+                } else {
+                    setError('contrasena', '');
+                }
+
+                if (passVal !== confirmVal) {
+                    setError('confirmar', 'Las contraseñas no coinciden');
+                    valid = false;
+                } else {
+                    setError('confirmar', '');
+                }
+
+                if (!terms.el.checked) {
+                    setTermsError('Debes aceptar los términos');
+                    valid = false;
+                } else {
+                    setTermsError('');
+                }
+
+                return valid;
+            }
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                clearErrors();
+
+                if (!validate()) {
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creando cuenta…';
+
+                fetch('registro_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        dni:        fields.dni.el.value.trim(),
+                        nombre:     fields.nombre.el.value.trim(),
+                        apellidos:  fields.apellidos.el.value.trim(),
+                        email:      fields.email.el.value.trim(),
+                        contrasena: fields.contrasena.el.value
+                    })
+                })
+                    .then(function (res) {
+                        return res.json().then(function (data) {
+                            return { ok: res.ok, status: res.status, data: data };
+                        });
+                    })
+                    .then(function (_ref) {
+                        var ok = _ref.ok, status = _ref.status, data = _ref.data;
+
+                        if (ok && data.success) {
+                            window.location.href = '../index.php';
+                            return;
+                        }
+
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Crear cuenta';
+
+                        if (data.errors && typeof data.errors === 'object') {
+                            Object.keys(data.errors).forEach(function (key) {
+                                if (fields[key]) {
+                                    setError(key, data.errors[key]);
+                                }
+                            });
+                        }
+                        if (data.error && !(data.errors && Object.keys(data.errors).length > 0)) {
+                            showGlobalError(data.error);
+                        } else if (status >= 500) {
+                            showGlobalError('Algo ha fallado. Inténtalo de nuevo.');
+                        } else if (data.error) {
+                            showGlobalError(data.error);
+                        }
+                    })
+                    .catch(function () {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Crear cuenta';
+                        showGlobalError('Error de conexión. Inténtalo de nuevo.');
+                    });
+            });
+        })();
+    </script>
+</body>
+</html>

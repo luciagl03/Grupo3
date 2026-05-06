@@ -1,0 +1,420 @@
+
+
+<!-- ── ESTILOS ──────────────────────────────────────────────────────── -->
+<style>
+/* ---- Contenedor principal ---- */
+.resenas-section {
+    margin-top: 1.25rem;
+    border-top: 1px solid #e8e6dc;
+    padding-top: 1rem;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ---- Cabecera con media ---- */
+.resenas-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+.resenas-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #3a382f;
+    margin: 0;
+}
+.media-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #f4dd49;
+    color: #3a382f;
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+.total-resenas {
+    font-size: 0.8rem;
+    color: #888;
+    margin-left: auto;
+}
+
+/* ---- Estrellitas ---- */
+.stars {
+    display: inline-flex;
+    gap: 2px;
+    line-height: 1;
+}
+.star { color: #ddd; font-size: 1rem; }
+.star.filled  { color: #f4a800; }
+.star.half    { color: #f4a800; } 
+
+/* ---- Lista de reseñas ---- */
+.resenas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 0.75rem;
+}
+.resena-item {
+    background: #faf9f4;
+    border: 1px solid #e8e6dc;
+    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+}
+.resena-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+}
+.resena-autor {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #3a382f;
+}
+.resena-fecha {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-left: auto;
+}
+.resena-comentario {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
+}
+.resenas-empty {
+    font-size: 0.875rem;
+    color: #999;
+    text-align: center;
+    padding: 0.5rem 0;
+}
+
+/* ---- Botón escribir reseña ---- */
+.btn-resena {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #f4dd49;
+    color: #3a382f;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.25rem;
+}
+.btn-resena:hover { background: #ebd23a; }
+.btn-resena:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---- Formulario nueva reseña ---- */
+.form-resena {
+    background: #faf9f4;
+    border: 1px solid #e8e6dc;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    display: none;
+}
+.form-resena.open { display: block; }
+
+.star-picker {
+    display: flex;
+    gap: 6px;
+    margin: 0.5rem 0 0.75rem;
+}
+.star-picker span {
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.1s;
+    user-select: none;
+}
+.star-picker span.selected,
+.star-picker span.hover { color: #f4a800; }
+
+.form-resena textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.6rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box;
+}
+.form-resena .form-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+.form-resena .resena-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+.btn-enviar-resena {
+    flex: 1;
+    background: #3a382f;
+    color: #f4dd49;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+.btn-enviar-resena:hover { background: #2a2820; }
+.btn-cancelar-resena {
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #666;
+}
+.resena-msg {
+    font-size: 0.8rem;
+    margin-top: 0.4rem;
+    min-height: 1rem;
+}
+.resena-msg.ok    { color: #065f46; }
+.resena-msg.error { color: #c0392b; }
+</style>
+
+
+
+<!-- ── JAVASCRIPT ───────────────────────────────────────────────────── -->
+<script>
+
+function initResenas(idPlaza, containerId) {
+    containerId = containerId || 'resenas-widget';
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="resenas-section" id="rs-${idPlaza}">
+            <div class="resenas-header">
+                <h3>Reseñas</h3>
+                <span class="media-badge" id="rs-media-${idPlaza}" style="display:none"></span>
+                <span class="total-resenas" id="rs-total-${idPlaza}"></span>
+            </div>
+            <div class="resenas-list" id="rs-list-${idPlaza}">
+                <p class="resenas-empty">Cargando reseñas…</p>
+            </div>
+            <div id="rs-accion-${idPlaza}"></div>
+            <div class="form-resena" id="rs-form-${idPlaza}">
+                <label class="form-label">Tu puntuación</label>
+                <div class="star-picker" id="rs-picker-${idPlaza}">
+                    ${[1,2,3,4,5].map(n => `<span data-val="${n}">★</span>`).join('')}
+                </div>
+                <label class="form-label">Comentario (opcional)</label>
+                <textarea id="rs-comment-${idPlaza}" maxlength="500"
+                          placeholder="Cuéntanos tu experiencia…"></textarea>
+                <div class="resena-actions">
+                    <button class="btn-cancelar-resena" onclick="cerrarFormResena(${idPlaza})">Cancelar</button>
+                    <button class="btn-enviar-resena"   onclick="enviarResena(${idPlaza})">Publicar</button>
+                </div>
+                <p class="resena-msg" id="rs-msg-${idPlaza}"></p>
+            </div>
+        </div>`;
+
+    _initStarPicker(idPlaza);
+    _cargarResenas(idPlaza);
+}
+
+/* ── Carga reseñas desde la API ── */
+function _cargarResenas(idPlaza) {
+    fetch('/parking/resenas_api.php?id_plaza=' + idPlaza, { credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            _pintarResenas(idPlaza, data);
+        })
+        .catch(function() {
+            var list = document.getElementById('rs-list-' + idPlaza);
+            if (list) list.innerHTML = '<p class="resenas-empty">No se pudieron cargar las reseñas.</p>';
+        });
+}
+
+/* ── Pinta la lista de reseñas y el badge de media ── */
+function _pintarResenas(idPlaza, data) {
+    var list  = document.getElementById('rs-list-'  + idPlaza);
+    var media = document.getElementById('rs-media-' + idPlaza);
+    var total = document.getElementById('rs-total-' + idPlaza);
+    var accion = document.getElementById('rs-accion-' + idPlaza);
+
+    // Media y total
+    if (data.total > 0 && media) {
+        media.style.display = 'inline-flex';
+        media.innerHTML = _renderStars(data.media, 14) + ' ' + data.media;
+        total.textContent = data.total + ' reseña' + (data.total !== 1 ? 's' : '');
+    } else if (total) {
+        total.textContent = 'Sin reseñas aún';
+    }
+
+    // Lista
+    if (!list) return;
+    if (!data.resenas || data.resenas.length === 0) {
+        list.innerHTML = '<p class="resenas-empty">Esta plaza aún no tiene reseñas. ¡Sé el primero!</p>';
+    } else {
+        list.innerHTML = data.resenas.map(function(r) {
+            return `<div class="resena-item">
+                        <div class="resena-top">
+                            ${_renderStars(r.puntuacion, 13)}
+                            <span class="resena-autor">${_esc(r.autor)}</span>
+                            <span class="resena-fecha">${_esc(r.fecha)}</span>
+                        </div>
+                        ${r.comentario ? `<p class="resena-comentario">${_esc(r.comentario)}</p>` : ''}
+                    </div>`;
+        }).join('');
+    }
+
+    // Botón reseñar
+    if (!accion) return;
+    if (data.puede_resenar) {
+        accion.innerHTML = `<button class="btn-resena" onclick="abrirFormResena(${idPlaza})">
+                                ✏️ Escribe una reseña
+                            </button>`;
+    } else if (data.ya_reseno) {
+        accion.innerHTML = '<p style="font-size:0.8rem;color:#888;text-align:center;margin:0.5rem 0">Ya has reseñado esta plaza.</p>';
+    } else {
+        // No logueado o sin reserva confirmada — mensaje discreto
+        accion.innerHTML = `<p style="font-size:0.8rem;color:#aaa;text-align:center;margin:0.5rem 0">
+                                Solo pueden reseñar usuarios que hayan aparcado aquí.
+                            </p>`;
+    }
+}
+
+/* ── Abre/cierra el formulario ── */
+function abrirFormResena(idPlaza) {
+    var form = document.getElementById('rs-form-' + idPlaza);
+    var btn  = document.querySelector('#rs-accion-' + idPlaza + ' .btn-resena');
+    if (form) form.classList.add('open');
+    if (btn)  btn.style.display = 'none';
+}
+function cerrarFormResena(idPlaza) {
+    var form = document.getElementById('rs-form-' + idPlaza);
+    var btn  = document.querySelector('#rs-accion-' + idPlaza + ' .btn-resena');
+    if (form) { form.classList.remove('open'); _resetForm(idPlaza); }
+    if (btn)  btn.style.display = '';
+}
+
+/* ── Star picker interactivo ── */
+function _initStarPicker(idPlaza) {
+    var picker = document.getElementById('rs-picker-' + idPlaza);
+    if (!picker) return;
+    picker._valor = 0;
+
+    var spans = picker.querySelectorAll('span');
+    spans.forEach(function(span) {
+        span.addEventListener('mouseover', function() {
+            var v = parseInt(this.dataset.val);
+            spans.forEach(function(s) { s.classList.toggle('hover', parseInt(s.dataset.val) <= v); });
+        });
+        span.addEventListener('mouseout', function() {
+            var sel = picker._valor;
+            spans.forEach(function(s) { s.classList.remove('hover'); s.classList.toggle('selected', parseInt(s.dataset.val) <= sel); });
+        });
+        span.addEventListener('click', function() {
+            picker._valor = parseInt(this.dataset.val);
+            spans.forEach(function(s) { s.classList.toggle('selected', parseInt(s.dataset.val) <= picker._valor); });
+        });
+    });
+}
+
+/* ── Envía la reseña ── */
+function enviarResena(idPlaza) {
+    var picker    = document.getElementById('rs-picker-' + idPlaza);
+    var textarea  = document.getElementById('rs-comment-' + idPlaza);
+    var msgEl     = document.getElementById('rs-msg-' + idPlaza);
+    var puntuacion = picker ? picker._valor : 0;
+
+    if (!msgEl) return;
+    msgEl.textContent = '';
+    msgEl.className = 'resena-msg';
+
+    if (puntuacion < 1) {
+        msgEl.textContent = 'Selecciona una puntuación.';
+        msgEl.className = 'resena-msg error';
+        return;
+    }
+
+    var payload = {
+        id_plaza:    idPlaza,
+        puntuacion:  puntuacion,
+        comentario:  textarea ? textarea.value.trim() : ''
+    };
+
+    fetch('/parking/resenas_api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(payload)
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(ref) {
+        if (ref.ok && ref.data.success) {
+            msgEl.textContent = '¡Reseña publicada! Gracias.';
+            msgEl.className = 'resena-msg ok';
+            setTimeout(function() {
+                cerrarFormResena(idPlaza);
+                _cargarResenas(idPlaza); // refresca la lista
+            }, 1200);
+        } else {
+            var err = (ref.data.errors && Object.values(ref.data.errors)[0]) || ref.data.error || 'Error al publicar';
+            msgEl.textContent = err;
+            msgEl.className = 'resena-msg error';
+        }
+    })
+    .catch(function() {
+        msgEl.textContent = 'Error de conexión.';
+        msgEl.className = 'resena-msg error';
+    });
+}
+
+/* ── Utilidades ── */
+function _resetForm(idPlaza) {
+    var picker   = document.getElementById('rs-picker-' + idPlaza);
+    var textarea = document.getElementById('rs-comment-' + idPlaza);
+    var msg      = document.getElementById('rs-msg-' + idPlaza);
+    if (picker) {
+        picker._valor = 0;
+        picker.querySelectorAll('span').forEach(function(s) { s.classList.remove('selected', 'hover'); });
+    }
+    if (textarea) textarea.value = '';
+    if (msg) { msg.textContent = ''; msg.className = 'resena-msg'; }
+}
+
+function _renderStars(media, size) {
+    size = size || 14;
+    var html = '<span class="stars">';
+    for (var i = 1; i <= 5; i++) {
+        var filled = i <= Math.round(media);
+        html += `<span class="star${filled ? ' filled' : ''}" style="font-size:${size}px">★</span>`;
+    }
+    html += '</span>';
+    return html;
+}
+
+function _esc(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+</script>

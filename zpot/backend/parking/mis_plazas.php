@@ -49,6 +49,10 @@ $result = $stmt->get_result();
             <p class="support">Gestiona los anuncios de tus plazas de aparcamiento o añade nuevas.</p>
         </header>
 
+        <?php if (isset($_GET['updated'])): ?>
+            <div style="background:#f4dd49;padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-weight:500;">Plaza actualizada correctamente.</div>
+        <?php endif; ?>
+
         <?php if ($result->num_rows === 0): ?>
             <div class="empty-state">
                 <i data-lucide="parking-circle"></i>
@@ -76,14 +80,6 @@ $result = $stmt->get_result();
                             <div>
                                 <span>Dirección</span>
                                 <strong><?php echo htmlspecialchars($row['Direccion']); ?></strong>
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <i data-lucide="banknote"></i>
-                            <div>
-                                <span>Precio</span>
-                                <strong class="price-text"><?php echo number_format($row['Precio'], 2); ?> € /h</strong>
                             </div>
                         </div>
 
