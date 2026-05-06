@@ -1,16 +1,17 @@
 <?php
 
-    /* $_servidor = "localhost";
+    $_servidor = "localhost";
     $_usuario = "admin";
     $_contrasena = "admin";
     $_bd = "zpot_bd";
-    */
-
+ 
+/* 
     $_servidor = "sql111.infinityfree.com";
     $_usuario = "if0_41831685";
     $_contrasena = "Zpot2026";
     $_bd = "if0_41831685_zpot_bd";
- 
+    */
+
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     $_conexion = new mysqli($_servidor, $_usuario, $_contrasena, $_bd);
 

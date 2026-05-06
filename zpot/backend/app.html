@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link rel="stylesheet" href="app.css">
+    <script src="translations.js"></script>
 </head>
 <body>
     <header class="navbar">
@@ -47,13 +48,13 @@
                     <span class="account-icon" aria-hidden="true">☰</span>
                 </button>
                 <div class="account-dropdown" id="accountDropdown" hidden>
-                    <a href="parking/alta_plaza.php" class="account-item account-item-primary" id="addParkingLink">Añadir mi plaza</a>
+                    <a href="parking/alta_plaza.php" class="account-item account-item-primary" id="addParkingLink" data-i18n="addMySpot">Añadir mi plaza</a>
                     <a href="profile/mi_perfil.php" class="account-item">Mi perfil</a>
                     <a href="parking/mis_reservas.php" class="account-item">Mis reservas</a>
                     <a href="parking/mis_plazas.php" class="account-item">Mis plazas</a>
                     <a href="#" class="account-item">Métodos de pago</a>
                     <hr class="account-divider">
-                    <a href="#" class="account-item">Ajustes</a>
+                    <a href="settings/ajustes.php" class="account-item" data-i18n="settings">Ajustes</a>
                     <a href="sesion/logout.php" class="account-item">Cerrar sesión</a>
                 </div>
             </div>
