@@ -279,6 +279,7 @@ body {
     border: none;
     transition: all 0.2s ease;
     margin-top: 0.5rem;
+    text-transform: none;
 }
 
 .file-label:hover {

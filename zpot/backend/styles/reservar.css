@@ -61,7 +61,7 @@ body.booking-page {
 }
 
 /* SUMMARY BOX */
-.booking-summary {
+.booking-summary {    
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -70,7 +70,10 @@ body.booking-page {
     border-radius: 16px;
     margin-bottom: 2rem;
     border: 1px solid rgba(244, 221, 73, 0.3);
+    overflow: hidden;
 }
+
+
 
 .summary-icon {
     width: 48px;
@@ -94,6 +97,13 @@ body.booking-page {
 .summary-text strong {
     font-size: 1.1rem;
     color: var(--brand-dark);
+}
+
+.summary-address {
+    font-size: 1.2rem;
+    color: var(--brand-dark);
+    display: block;
+    line-height: 1.4;
 }
 
 /* CARD */

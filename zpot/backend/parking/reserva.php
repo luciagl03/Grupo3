@@ -16,7 +16,7 @@ require_once '../sesion/conexion.php';
 $id_plaza = isset($_GET['id_plaza']) ? (int) $_GET['id_plaza'] : 0;
 $dni = $_SESSION['dni'] ?? '';
 
-$sql = "SELECT Precio FROM PLAZA WHERE ID_plaza = ?";
+$sql = "SELECT Precio, Direccion FROM PLAZA WHERE ID_plaza = ?";
 $stmt = $_conexion->prepare($sql);
 
 if (!$stmt) {
@@ -28,9 +28,11 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 $precio_hora = 0;
+$direccion = '';
 
 if ($row = $result->fetch_assoc()) {
     $precio_hora = $row['Precio'];
+    $direccion = $row['Direccion'] ?? '';
 }
 ?>
 
@@ -68,8 +70,8 @@ if ($row = $result->fetch_assoc()) {
                     <i data-lucide="map-pin"></i>
                 </div>
                 <div class="summary-text">
-                    <span>Plaza seleccionada</span>
-                    <strong>Identificador: #<?php echo $id_plaza; ?></strong>
+                    <span class="summary-label">Plaza seleccionada</span>
+                    <strong class="summary-address"><?php echo !empty($direccion) ? htmlspecialchars($direccion) : 'Plaza #' . $id_plaza; ?></strong>
                 </div>
             </div>
 
