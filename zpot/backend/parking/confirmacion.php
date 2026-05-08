@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../sesion/conexion.php';
+require_once __DIR__ . '/../notificaciones/notificaciones_helper.php';
 
 if (!isset($_SESSION['usuario'])) {
     header('Location: ../sesion/login.php');
@@ -39,6 +40,18 @@ if ($order_id !== '' && $reserva['Estado'] === 'pendiente') {
     $upd->execute();
     $upd->close();
     $reserva['Estado'] = 'confirmada';
+
+    // Crear notificación ahora que tenemos todos los datos
+    $direccion = $reserva['Direccion'] ?? 'Plaza #' . $reserva['ID_plaza'];
+    $fecha     = date('d/m/Y', strtotime($reserva['Fecha']));
+    crearNotificacion(
+        $_conexion,
+        $dni,
+        'reserva_confirmada',
+        '¡Reserva confirmada!',
+        'Tu reserva en ' . $direccion . ' el ' . $fecha . ' ha sido confirmada.',
+        $id_reserva
+    );
 }
 ?>
 <!DOCTYPE html>

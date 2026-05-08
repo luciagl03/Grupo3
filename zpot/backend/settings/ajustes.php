@@ -1,9 +1,4 @@
 <?php
-// ------------------------------------------------------------
-// Pagina Ajustes:
-// - Preferencias del usuario y gestion de cuenta
-// - Privacidad, notificaciones, soporte
-// ------------------------------------------------------------
 session_start();
 require_once __DIR__ . "/../sesion/conexion.php";
 
@@ -494,9 +489,72 @@ $stmt->close();
             console.log('Borrar cuenta - Funcionalidad pendiente');
         });
 
-        document.getElementById('pushNotifications')?.addEventListener('change', function() {
-            console.log('Push notifications:', this.checked);
-        });
+        // ── Notificaciones push ──────────────────────────────
+        var pushToggle = document.getElementById('pushNotifications');
+        var pushDesc   = pushToggle ? pushToggle.closest('.setting-item').querySelector('.setting-description') : null;
+
+        function actualizarDescripcion(activo, permiso) {
+            if (!pushDesc) return;
+            if (permiso === 'denied') {
+                pushDesc.textContent = 'Bloqueadas en el navegador. Actívalas en Ajustes del navegador.';
+                pushDesc.style.color = '#c0392b';
+            } else if (activo) {
+                pushDesc.textContent = 'Recibirás alertas sobre tus reservas.';
+                pushDesc.style.color = '#065f46';
+            } else {
+                pushDesc.textContent = 'Activa para recibir alertas sobre tus reservas.';
+                pushDesc.style.color = '';
+            }
+        }
+
+        if (pushToggle) {
+            var permiso = ('Notification' in window) ? Notification.permission : 'unsupported';
+            var guardado = localStorage.getItem('zpot_push_enabled');
+
+            if (permiso === 'denied') {
+                pushToggle.checked = false;
+                pushToggle.disabled = true;
+                actualizarDescripcion(false, 'denied');
+            } else if (permiso === 'granted' && guardado !== 'false') {
+                pushToggle.checked = true;
+                actualizarDescripcion(true, 'granted');
+            } else {
+                pushToggle.checked = false;
+                actualizarDescripcion(false, permiso);
+            }
+
+            pushToggle.addEventListener('change', function() {
+                var activar = this.checked;
+                if (activar) {
+                    if (!('Notification' in window)) {
+                        this.checked = false;
+                        if (pushDesc) { pushDesc.textContent = 'Tu navegador no soporta notificaciones.'; }
+                        return;
+                    }
+                    Notification.requestPermission().then(function(resultado) {
+                        if (resultado === 'granted') {
+                            localStorage.setItem('zpot_push_enabled', 'true');
+                            actualizarDescripcion(true, 'granted');
+                            new Notification('¡Notificaciones activadas!', {
+                                body: 'Recibirás alertas sobre tus reservas en Zpot.',
+                                icon: '../frontend/assets/images/Icono.png'
+                            });
+                        } else if (resultado === 'denied') {
+                            pushToggle.checked = false;
+                            pushToggle.disabled = true;
+                            localStorage.setItem('zpot_push_enabled', 'false');
+                            actualizarDescripcion(false, 'denied');
+                        } else {
+                            pushToggle.checked = false;
+                            actualizarDescripcion(false, 'default');
+                        }
+                    });
+                } else {
+                    localStorage.setItem('zpot_push_enabled', 'false');
+                    actualizarDescripcion(false, ('Notification' in window) ? Notification.permission : 'unsupported');
+                }
+            });
+        }
 
         document.getElementById('darkMode')?.addEventListener('change', function() {
             console.log('Dark mode:', this.checked);
