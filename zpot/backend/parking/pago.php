@@ -63,10 +63,11 @@ $precio_hora = $plaza['Precio'];
 
 $total = $horas * $precio_hora;
 
-// COMPROBAR DISPONIBILIDAD
+// COMPROBAR DISPONIBILIDAD (solo reservas confirmadas bloquean la plaza)
 $sql = "SELECT * FROM reserva 
         WHERE ID_plaza = ? 
         AND Fecha = ?
+        AND Estado = 'confirmada'
         AND (Hora_entrada < ? AND Hora_salida > ?)";
 
 $stmt = $_conexion->prepare($sql);
@@ -79,27 +80,50 @@ if ($result->num_rows > 0) {
     die("Esta plaza ya está reservada en ese horario.");
 }
 
-// INSERTAR RESERVA (estado pendiente hasta confirmar pago)
-$sql = "INSERT INTO reserva
-        (DNI, ID_plaza, Precio, Duracion, Hora_entrada, Hora_salida, Fecha, Estado)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente')";
+// EVITAR DUPLICADOS: Comprobar si ya existe una reserva pendiente idéntica
+$sql = "SELECT ID_reserva FROM reserva 
+        WHERE DNI = ? 
+        AND ID_plaza = ? 
+        AND Fecha = ?
+        AND Hora_entrada = ?
+        AND Hora_salida = ?
+        AND Estado = 'pendiente'
+        LIMIT 1";
 
 $stmt = $_conexion->prepare($sql);
-
-$stmt->bind_param(
-    "sidisss",
-    $dni,
-    $id_plaza,
-    $total,
-    $duracion,
-    $hora_entrada,
-    $hora_salida,
-    $fecha
-);
-
+$stmt->bind_param("sisss", $dni, $id_plaza, $fecha, $hora_entrada, $hora_salida);
 $stmt->execute();
+$result = $stmt->get_result();
 
-$id_reserva = $_conexion->insert_id;
+if ($result->num_rows > 0) {
+    // Ya existe una reserva pendiente idéntica, reutilizarla
+    $row = $result->fetch_assoc();
+    $id_reserva = $row['ID_reserva'];
+    $_SESSION['id_reserva_actual'] = $id_reserva;
+} else {
+    // No existe, crear nueva reserva pendiente
+    $sql = "INSERT INTO reserva
+            (DNI, ID_plaza, Precio, Duracion, Hora_entrada, Hora_salida, Fecha, Estado)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente')";
+
+    $stmt = $_conexion->prepare($sql);
+
+    $stmt->bind_param(
+        "sidisss",
+        $dni,
+        $id_plaza,
+        $total,
+        $duracion,
+        $hora_entrada,
+        $hora_salida,
+        $fecha
+    );
+
+    $stmt->execute();
+
+    $id_reserva = $_conexion->insert_id;
+    $_SESSION['id_reserva_actual'] = $id_reserva;
+}
 ?>
 
 <!DOCTYPE html>

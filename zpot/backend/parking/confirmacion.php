@@ -41,6 +41,9 @@ if ($order_id !== '' && $reserva['Estado'] === 'pendiente') {
     $upd->close();
     $reserva['Estado'] = 'confirmada';
 
+    // Limpiar la sesión de reserva actual
+    unset($_SESSION['id_reserva_actual']);
+
     // Crear notificación ahora que tenemos todos los datos
     $direccion = $reserva['Direccion'] ?? 'Plaza #' . $reserva['ID_plaza'];
     $fecha     = date('d/m/Y', strtotime($reserva['Fecha']));

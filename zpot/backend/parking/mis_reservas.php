@@ -13,7 +13,7 @@ $dni = $_SESSION['dni'];
 $sql = "SELECT r.*, p.Direccion AS PlazaDireccion
         FROM RESERVA r
         LEFT JOIN PLAZA p ON r.ID_plaza = p.ID_plaza
-        WHERE r.DNI = ?
+        WHERE r.DNI = ? AND r.Estado != 'pendiente'
         ORDER BY r.Fecha DESC, r.Hora_entrada DESC";
 
 $stmt = $_conexion->prepare($sql);
