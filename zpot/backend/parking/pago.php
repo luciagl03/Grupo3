@@ -146,7 +146,7 @@ $id_reserva = $_conexion->insert_id;
 </div>
 
 <!-- SDK DE PAYPAL-->
-<script src="https://www.paypal.com/sdk/js?client-id=AY_hkQ1T9mIhXUfY2Eu7TXdORPVLmI-SF6UaaorGnCYcgYsZ6Zt40_KL-fPTzCzE812wHUxd3JCzYWEP&currency=EUR"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AY_hkQ1T9mIhXUfY2Eu7TXdORPVLmI-SF6UaaorGnCYcgYsZ6Zt40_KL-fPTzCzE812wHUxd3JCzYWEP&currency=EUR&intent=capture"></script>
 
 <!-- TU JS SEPARADO -->
 <script src="../../scripts/pago.js"></script>
