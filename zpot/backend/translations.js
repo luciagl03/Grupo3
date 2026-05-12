@@ -20,7 +20,18 @@ const translations = {
         faqQ3: "¿Cómo publico mi garaje?",
         faqA3: "Ve a 'Mis Plazas' y rellena el formulario con fotos y dirección.",
         faqQ4: "¿Es seguro el pago?",
-        faqA4: "Sí, usamos pasarelas de pago cifradas para tu seguridad."
+        faqA4: "Sí, usamos pasarelas de pago cifradas para tu seguridad.",
+        // Support Section
+        supportTitle: "Contactar soporte",
+        supportDescription: "Envíanos tus consultas o reporta problemas",
+        supportSubject: "Asunto",
+        supportMessage: "Mensaje",
+        supportSend: "Enviar",
+        supportSending: "Enviando...",
+        supportSuccess: "Mensaje enviado con éxito",
+        supportQuickActions: "Acciones rápidas",
+        supportContactEmail: "Contactar por Email",
+        supportReportBug: "Reportar un error"
     },
     en: {
         settings: "Settings",
@@ -38,7 +49,18 @@ const translations = {
         faqQ3: "How do I publish my garage?",
         faqA3: "Go to 'My Spots' and fill out the form with photos and address.",
         faqQ4: "Is payment secure?",
-        faqA4: "Yes, we use encrypted payment gateways for your security."
+        faqA4: "Yes, we use encrypted payment gateways for your security.",
+        // Support Section
+        supportTitle: "Contact support",
+        supportDescription: "Send us your questions or report issues",
+        supportSubject: "Subject",
+        supportMessage: "Message",
+        supportSend: "Send",
+        supportSending: "Sending...",
+        supportSuccess: "Message sent successfully",
+        supportQuickActions: "Quick actions",
+        supportContactEmail: "Contact by Email",
+        supportReportBug: "Report a bug"
     },
     fr: {
         settings: "Paramètres",
@@ -56,7 +78,18 @@ const translations = {
         faqQ3: "Comment publier mon garage ?",
         faqA3: "Allez dans 'Mes Places' et remplissez le formulaire avec photos et adresse.",
         faqQ4: "Le paiement est-il sécurisé ?",
-        faqA4: "Oui, nous utilisons des passerelles de paiement cryptées pour votre sécurité."
+        faqA4: "Oui, nous utilisons des passerelles de paiement cryptées pour votre sécurité.",
+        // Support Section
+        supportTitle: "Contacter le support",
+        supportDescription: "Envoyez-nous vos questions ou signalez des problèmes",
+        supportSubject: "Sujet",
+        supportMessage: "Message",
+        supportSend: "Envoyer",
+        supportSending: "Envoi en cours...",
+        supportSuccess: "Message envoyé avec succès",
+        supportQuickActions: "Actions rapides",
+        supportContactEmail: "Contacter par Email",
+        supportReportBug: "Signaler un bug"
     },
     de: {
         settings: "Einstellungen",
@@ -74,7 +107,18 @@ const translations = {
         faqQ3: "Wie veröffentliche ich meine Garage?",
         faqA3: "Gehen Sie zu 'Meine Plätze' und füllen Sie das Formular mit Fotos und Adresse aus.",
         faqQ4: "Ist die Zahlung sicher?",
-        faqA4: "Ja, wir verwenden verschlüsselte Zahlungsgateways für Ihre Sicherheit."
+        faqA4: "Ja, wir verwenden verschlüsselte Zahlungsgateways für Ihre Sicherheit.",
+        // Support Section
+        supportTitle: "Support kontaktieren",
+        supportDescription: "Senden Sie uns Ihre Fragen oder melden Sie Probleme",
+        supportSubject: "Betreff",
+        supportMessage: "Nachricht",
+        supportSend: "Senden",
+        supportSending: "Wird gesendet...",
+        supportSuccess: "Nachricht erfolgreich gesendet",
+        supportQuickActions: "Schnellaktionen",
+        supportContactEmail: "Per E-Mail kontaktieren",
+        supportReportBug: "Fehler melden"
     }
 };
 

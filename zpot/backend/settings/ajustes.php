@@ -438,15 +438,65 @@ $stmt->close();
                         
                         <div class="setting-divider"></div>
                         
-                        <a href="#" class="setting-item setting-item-link">
+                        <!-- CONTACTAR SOPORTE -->
+                        <div class="setting-item setting-item-action" onclick="toggleAjuste('supportBox', this)">
                             <div class="setting-info">
                                 <i data-lucide="mail" class="setting-icon"></i>
                                 <div class="setting-text">
-                                    <h3 class="setting-label">Contactar soporte</h3>
+                                    <h3 class="setting-label" data-i18n="supportTitle">Contactar soporte</h3>
+                                    <p class="setting-description" data-i18n="supportDescription">Envíanos tus consultas o reporta problemas</p>
                                 </div>
                             </div>
-                            <i data-lucide="external-link" class="link-icon"></i>
-                        </a>
+                            <button type="button" class="btn-action">
+                                <i data-lucide="chevron-right" class="arrow-icon"></i>
+                            </button>
+                        </div>
+
+                        <!-- DESPLEGABLE SUPPORT -->
+                        <div id="supportBox" class="ajuste-content support-accordion-content">
+                            <!-- Contact Form -->
+                            <form id="supportForm" class="support-form">
+                                <div class="form-group">
+                                    <input 
+                                        type="text" 
+                                        id="supportSubject" 
+                                        class="form-input" 
+                                        data-i18n="supportSubject"
+                                        placeholder="Asunto" 
+                                        required
+                                    >
+                                </div>
+                                <div class="form-group">
+                                    <textarea 
+                                        id="supportMessage" 
+                                        class="form-textarea" 
+                                        data-i18n="supportMessage"
+                                        placeholder="Mensaje" 
+                                        rows="4" 
+                                        required
+                                    ></textarea>
+                                </div>
+                                <button type="submit" class="btn-submit" id="supportSubmitBtn">
+                                    <span data-i18n="supportSend">Enviar</span>
+                                </button>
+                                <p id="supportMsg" class="support-message"></p>
+                            </form>
+                            
+                            <!-- Quick Actions -->
+                            <div class="quick-actions">
+                                <h4 class="quick-actions-title" data-i18n="supportQuickActions">Acciones rápidas</h4>
+                                <div class="quick-actions-buttons">
+                                    <a href="mailto:soporte@zpot.com" class="btn-quick-action">
+                                        <i data-lucide="mail"></i>
+                                        <span data-i18n="supportContactEmail">Contactar por Email</span>
+                                    </a>
+                                    <a href="mailto:soporte@zpot.com?subject=Reporte de Error" class="btn-quick-action">
+                                        <i data-lucide="bug"></i>
+                                        <span data-i18n="supportReportBug">Reportar un error</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -685,6 +735,52 @@ $stmt->close();
             // Re-initialize Lucide icons for the newly opened content
             lucide.createIcons();
         }
+
+        // ── Support Form Functionality ──────────────────────────────
+        const supportForm = document.getElementById('supportForm');
+        const supportMsg = document.getElementById('supportMsg');
+        const supportSubmitBtn = document.getElementById('supportSubmitBtn');
+
+        if (supportForm) {
+            supportForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const subject = document.getElementById('supportSubject').value;
+                const message = document.getElementById('supportMessage').value;
+
+                // Get current language for translated messages
+                const currentLang = getCurrentLanguage();
+
+                // Show sending message
+                supportMsg.textContent = t('supportSending', currentLang);
+                supportMsg.className = 'support-message sending';
+                supportSubmitBtn.disabled = true;
+
+                // Simulate sending (2 seconds delay)
+                setTimeout(() => {
+                    // Show success message
+                    supportMsg.textContent = t('supportSuccess', currentLang);
+                    supportMsg.className = 'support-message success';
+                    
+                    // Clear form
+                    supportForm.reset();
+                    
+                    // Re-enable button
+                    supportSubmitBtn.disabled = false;
+                    
+                    // Clear success message after 5 seconds
+                    setTimeout(() => {
+                        supportMsg.textContent = '';
+                        supportMsg.className = 'support-message';
+                    }, 5000);
+                }, 2000);
+            });
+        }
+
+        // Re-initialize Lucide icons after page load
+        setTimeout(() => {
+            lucide.createIcons();
+        }, 100);
 
     </script>
     
