@@ -207,15 +207,15 @@ $stmt->close();
     <div class="layout">
         <div class="layout-container">
             <header class="settings-header">
-                <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> Volver al mapa</a>
+                <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> <span data-i18n="backToMap">Volver al mapa</span></a>
                 
                 <div class="header-content">
                     <div class="settings-icon">
                         <i data-lucide="settings"></i>
                     </div>
                     <div class="header-text">
-                        <h1 class="headline">Ajustes</h1>
-                        <p class="support">Configura tu experiencia en Zpot</p>
+                        <h1 class="headline" data-i18n="settings">Ajustes</h1>
+                        <p class="support" data-i18n="settingsSubtitle">Configura tu experiencia en Zpot</p>
                     </div>
                 </div>
             </header>
@@ -226,7 +226,7 @@ $stmt->close();
                 <section class="settings-section">
                     <div class="section-header">
                         <i data-lucide="shield"></i>
-                        <h2 class="section-title">Privacidad y Seguridad</h2>
+                        <h2 class="section-title" data-i18n="privacySecurity">Privacidad y Seguridad</h2>
                     </div>
 
                     <div class="settings-card">
@@ -236,8 +236,8 @@ $stmt->close();
                             <div class="setting-info">
                                 <i data-lucide="key" class="setting-icon"></i>
                                 <div class="setting-text">
-                                    <h3 class="setting-label">Cambiar contraseña</h3>
-                                    <p class="setting-description">Actualiza tu contraseña de acceso</p>
+                                    <h3 class="setting-label" data-i18n="changePassword">Cambiar contraseña</h3>
+                                    <p class="setting-description" data-i18n="changePasswordDesc">Actualiza tu contraseña de acceso</p>
                                 </div>
                             </div>
                             <button type="button" class="btn-action">
@@ -248,10 +248,10 @@ $stmt->close();
                         <!-- DESPLEGABLE PASSWORD -->
                         <div id="passwordBox" class="ajuste-content">
                             <form id="formPassword">
-                                <input type="password" id="currentPass" placeholder="Contraseña actual" required>
-                                <input type="password" id="newPass" placeholder="Nueva contraseña" required>
-                                <input type="password" id="confirmPass" placeholder="Confirmar contraseña" required>
-                                <button type="submit">Actualizar contraseña</button>
+                                <input type="password" id="currentPass" data-i18n="currentPassword" placeholder="Contraseña actual" required>
+                                <input type="password" id="newPass" data-i18n="newPassword" placeholder="Nueva contraseña" required>
+                                <input type="password" id="confirmPass" data-i18n="confirmPassword" placeholder="Confirmar contraseña" required>
+                                <button type="submit" data-i18n="updatePassword">Actualizar contraseña</button>
                                 <p id="passMsg"></p>
                             </form>
                         </div>
@@ -263,8 +263,8 @@ $stmt->close();
                             <div class="setting-info">
                                 <i data-lucide="trash-2" class="setting-icon"></i>
                                 <div class="setting-text">
-                                    <h3 class="setting-label">Borrar cuenta</h3>
-                                    <p class="setting-description">Eliminar permanentemente tu cuenta</p>
+                                    <h3 class="setting-label" data-i18n="deleteAccount">Borrar cuenta</h3>
+                                    <p class="setting-description" data-i18n="deleteAccountDesc">Eliminar permanentemente tu cuenta</p>
                                 </div>
                             </div>
                             <button type="button" class="btn-action btn-action-danger">
@@ -274,7 +274,7 @@ $stmt->close();
 
                         <!-- DESPLEGABLE DELETE -->
                         <div id="deleteBox" class="ajuste-content">
-                            <button id="openDeleteModal" class="btn-action btn-action-danger">
+                            <button id="openDeleteModal" class="btn-action btn-action-danger" data-i18n="deleteMyAccount">
                                 Eliminar mi cuenta
                             </button>
                         </div>
@@ -286,15 +286,15 @@ $stmt->close();
                 <section class="settings-section">
                     <div class="section-header">
                         <i data-lucide="bell"></i>
-                        <h2 class="section-title">Notificaciones</h2>
+                        <h2 class="section-title" data-i18n="notifications">Notificaciones</h2>
                     </div>
                     <div class="settings-card">
                         <div class="setting-item">
                             <div class="setting-info">
                                 <i data-lucide="smartphone" class="setting-icon"></i>
                                 <div class="setting-text">
-                                    <h3 class="setting-label">Notificaciones push</h3>
-                                    <p class="setting-description">Recibe alertas sobre tus reservas</p>
+                                    <h3 class="setting-label" data-i18n="pushNotifications">Notificaciones push</h3>
+                                    <p class="setting-description" data-i18n="pushNotificationsDesc">Recibe alertas sobre tus reservas</p>
                                 </div>
                             </div>
                             <label class="switch">
@@ -309,15 +309,15 @@ $stmt->close();
                 <section class="settings-section">
                     <div class="section-header">
                         <i data-lucide="monitor"></i>
-                        <h2 class="section-title">Pantalla e Idiomas</h2>
+                        <h2 class="section-title" data-i18n="displayLanguage">Pantalla e Idiomas</h2>
                     </div>
                     <div class="settings-card">
                         <div class="setting-item">
                             <div class="setting-info">
                                 <i data-lucide="moon" class="setting-icon"></i>
                                 <div class="setting-text">
-                                    <h3 class="setting-label">Modo oscuro</h3>
-                                    <p class="setting-description">Tema oscuro para la interfaz</p>
+                                    <h3 class="setting-label" data-i18n="darkMode">Modo oscuro</h3>
+                                    <p class="setting-description" data-i18n="darkModeDesc">Tema oscuro para la interfaz</p>
                                 </div>
                             </div>
                             <label class="switch">
@@ -332,8 +332,8 @@ $stmt->close();
                             <div class="setting-info">
                                 <i data-lucide="globe" class="setting-icon"></i>
                                 <div class="setting-text">
-                                    <h3 class="setting-label">Idioma</h3>
-                                    <p class="setting-description">Selecciona tu idioma preferido</p>
+                                    <h3 class="setting-label" data-i18n="language">Idioma</h3>
+                                    <p class="setting-description" data-i18n="languageDesc">Selecciona tu idioma preferido</p>
                                 </div>
                             </div>
                             <select class="language-select" id="languageSelect">
@@ -350,14 +350,14 @@ $stmt->close();
                 <section class="settings-section">
                     <div class="section-header">
                         <i data-lucide="life-buoy"></i>
-                        <h2 class="section-title">Soporte y Legal</h2>
+                        <h2 class="section-title" data-i18n="supportlegal">Soporte y Legal</h2>
                     </div>
                     <div class="settings-card">
                         <a href="terminos.php" class="setting-item setting-item-link">
                             <div class="setting-info">
                                 <i data-lucide="file-text" class="setting-icon"></i>
                                 <div class="setting-text">
-                                    <h3 class="setting-label">Términos y condiciones</h3>
+                                    <h3 class="setting-label" data-i18n="termsconditions">Términos y condiciones</h3>
                                 </div>
                             </div>
                             <i data-lucide="external-link" class="link-icon"></i>
@@ -369,7 +369,7 @@ $stmt->close();
                             <div class="setting-info">
                                 <i data-lucide="shield-check" class="setting-icon"></i>
                                 <div class="setting-text">
-                                    <h3 class="setting-label">Política de privacidad</h3>
+                                    <h3 class="setting-label" data-i18n="privacypolicy">Política de privacidad</h3>
                                 </div>
                             </div>
                             <i data-lucide="external-link" class="link-icon"></i>
@@ -381,7 +381,7 @@ $stmt->close();
                 <section class="settings-section">
                     <div class="section-header">
                         <i data-lucide="help-circle"></i>
-                        <h2 class="section-title">Centro de Ayuda</h2>
+                        <h2 class="section-title" data-i18n="helpcenter">Centro de Ayuda</h2>
                     </div>
                     <div class="settings-card">
                         <!-- FAQ Accordion -->
@@ -512,14 +512,14 @@ $stmt->close();
 
     <div id="deleteModal" class="modal">
         <div class="modal-content">
-            <h3>¿Eliminar cuenta?</h3>
-            <p>Esta acción es permanente.</p>
+            <h3 data-i18n="deleteAccountQuestion">¿Eliminar cuenta?</h3>
+            <p data-i18n="deleteAccountWarning">Esta acción es permanente.</p>
 
-            <input type="password" id="deletePass" placeholder="Introduce tu contraseña">
+            <input type="password" id="deletePass" data-i18n="enterPassword" placeholder="Introduce tu contraseña">
 
             <div class="modal-actions">
-                <button id="confirmDelete" class="danger">Eliminar definitivamente</button>
-                <button id="cancelDelete">Cancelar</button>
+                <button id="confirmDelete" class="danger" data-i18n="deletePermanently">Eliminar definitivamente</button>
+                <button id="cancelDelete" data-i18n="cancel">Cancelar</button>
             </div>
 
             <p id="deleteMsg"></p>
