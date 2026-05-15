@@ -188,9 +188,15 @@ if ($row = $result->fetch_assoc()) {
         var precioTotalEl = document.getElementById('precioTotal');
         var precioPorHora = <?php echo (float) $precio_hora; ?>;
         
-        var errorBox = document.createElement('p');
-        errorBox.style.cssText = 'color:#c0392b;font-size:0.875rem;margin:1rem 0;display:none;background:#ffe5e5;padding:1rem;border-radius:8px;';
+        var errorBox = document.createElement('div');
+        errorBox.style.cssText = 'display:none;margin:1rem 0 0;padding:.75rem 1rem;border-radius:12px;background:#fef2f2;border:1.5px solid #fca5a5;color:#991b1b;font-size:.85rem;font-weight:500;line-height:1.4;align-items:center;gap:.5rem;';
         form.querySelector('.form-actions').before(errorBox);
+
+        function mostrarError(msg) {
+            errorBox.style.display = 'flex';
+            errorBox.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>' + msg + '</span>';
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
 
         var fechaEntrada = null;
         var fechaSalida = null;
@@ -267,8 +273,7 @@ if ($row = $result->fetch_assoc()) {
 
             if (!fechaEntrada || !fechaSalida) {
                 e.preventDefault();
-                errorBox.textContent = 'Por favor, selecciona las fechas de entrada y salida.';
-                errorBox.style.display = 'block';
+                mostrarError('Selecciona las fechas de entrada y salida.');
                 return;
             }
 
@@ -279,17 +284,17 @@ if ($row = $result->fetch_assoc()) {
             salida.setHours(parseInt(horaSalida.value), parseInt(minutoSalida.value), 0);
 
             var ahora = new Date();
-            if (entrada < ahora) {
+            // Margen de 5 minutos para evitar falsos positivos por segundos/timezone
+            var ahoraConMargen = new Date(ahora.getTime() - 5 * 60 * 1000);
+            if (entrada < ahoraConMargen) {
                 e.preventDefault();
-                errorBox.textContent = 'La fecha de entrada no puede ser en el pasado.';
-                errorBox.style.display = 'block';
+                mostrarError('La hora de entrada ya ha pasado. Selecciona una hora futura.');
                 return;
             }
 
             if (salida <= entrada) {
                 e.preventDefault();
-                errorBox.textContent = 'La fecha de salida debe ser posterior a la de entrada.';
-                errorBox.style.display = 'block';
+                mostrarError('La hora de salida debe ser posterior a la de entrada.');
                 return;
             }
         });

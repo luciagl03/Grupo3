@@ -19,7 +19,7 @@ function mapPlazaRow($row, $hasPrecio) {
         'ancho' => $row['Ancho'] ? (float) $row['Ancho'] : null,
         'largo' => $row['Largo'] ? (float) $row['Largo'] : null,
         'descripcion' => $row['Descripcion'] ?? '',
-        'precio' => $hasPrecio && isset($row['Precio']) && $row['Precio'] !== null ? (float) $row['Precio'] : null,
+        'precio' => $hasPrecio && isset($row['Precio']) && $row['Precio'] !== null ? round((float) $row['Precio'] * 1.20, 2) : null,
         'owner' => trim(($row['owner_nombre'] ?? '') . ' ' . ($row['owner_apellidos'] ?? '')),
         'owner_dni' => $row['DNI'] ?? null,
         'ubicacion' => $row['Ubicacion'] ?? null,

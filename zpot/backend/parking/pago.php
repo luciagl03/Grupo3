@@ -1,4 +1,4 @@
-<?php
+ <?php
 session_start();
 
 if (!isset($_SESSION['usuario'])) {
@@ -6,7 +6,50 @@ if (!isset($_SESSION['usuario'])) {
     exit;
 }
 
-require_once '../sesion/conexion.php'; 
+require_once '../sesion/conexion.php';
+
+// Función para mostrar errores con estilo
+function mostrarErrorReserva($titulo, $mensaje, $backUrl = '../index.php') {
+    $t = htmlspecialchars($titulo);
+    $m = htmlspecialchars($mensaje);
+    $u = htmlspecialchars($backUrl);
+    echo <<<HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Error — Zpot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../app.css">
+    <style>
+        body{display:flex;align-items:center;justify-content:center;min-height:100dvh;background:var(--brand-bg,#f4f4f0);font-family:"DM Sans",sans-serif;padding:1.5rem;margin:0;}
+        .err-card{background:#fff;border-radius:20px;padding:2rem 1.75rem;max-width:400px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center;}
+        .err-icon{width:52px;height:52px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;}
+        .err-title{font-size:1.1rem;font-weight:700;color:#1a1915;margin:0 0 .5rem;}
+        .err-msg{font-size:.875rem;color:#666;line-height:1.5;margin:0 0 1.5rem;}
+        .err-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.25rem;background:#1a1915;color:#fff;border-radius:999px;text-decoration:none;font-size:.875rem;font-weight:600;transition:background .15s;}
+        .err-btn:hover{background:#2a2920;}
+    </style>
+</head>
+<body>
+<div class="err-card">
+    <div class="err-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <p class="err-title">$t</p>
+    <p class="err-msg">$m</p>
+    <a href="$u" class="err-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Volver
+    </a>
+</div>
+</body>
+</html>
+HTML;
+    exit;
+}
 
 // DATOS
 $id_plaza = (int) $_POST['id_plaza'];
@@ -17,13 +60,14 @@ $dni = $_SESSION['dni'] ?? '';
 
 // VALIDAR FECHAS
 if (empty($fecha_inicio) || empty($fecha_fin)) {
-    die("Error: debes indicar fecha de entrada y salida.");
+    mostrarErrorReserva('Faltan datos', 'Debes indicar la fecha de entrada y salida para continuar.');
 }
-if (strtotime($fecha_inicio) < time()) {
-    die("Error: la fecha de entrada no puede ser en el pasado.");
+// Margen de 5 minutos (igual que la validación JS)
+if (strtotime($fecha_inicio) < (time() - 5 * 60)) {
+    mostrarErrorReserva('Hora en el pasado', 'La hora de entrada seleccionada ya ha pasado. Por favor, vuelve y elige una hora futura.', 'javascript:history.back()');
 }
 if (strtotime($fecha_fin) <= strtotime($fecha_inicio)) {
-    die("Error: la fecha de salida debe ser posterior a la de entrada.");
+    mostrarErrorReserva('Horas incorrectas', 'La hora de salida debe ser posterior a la de entrada.', 'javascript:history.back()');
 }
 
 $fecha_inicio = str_replace('T', ' ', $_POST['hora_entrada']);
@@ -55,13 +99,16 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows == 0) {
-    die("Error: plaza no encontrada.");
+    mostrarErrorReserva('Plaza no encontrada', 'No se encontró la plaza solicitada.', '../index.php');
 }
 
 $plaza = $result->fetch_assoc();
 $precio_hora = $plaza['Precio'];
 
-$total = $horas * $precio_hora;
+// Aplicar comisión del 20% (precio base × 1.20)
+$precio_con_comision = round($precio_hora * 1.20, 2);
+$comision = round($precio_hora * 0.20, 2);
+$total = $horas * $precio_con_comision;
 
 // COMPROBAR DISPONIBILIDAD (solo reservas confirmadas bloquean la plaza)
 $sql = "SELECT * FROM reserva 
@@ -77,7 +124,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-    die("Esta plaza ya está reservada en ese horario.");
+    mostrarErrorReserva('Plaza no disponible', 'Esta plaza ya está reservada en ese horario. Por favor, elige otro horario.', 'javascript:history.back()');
 }
 
 // EVITAR DUPLICADOS: Comprobar si ya existe una reserva pendiente idéntica
@@ -123,6 +170,12 @@ if ($result->num_rows > 0) {
 
     $id_reserva = $_conexion->insert_id;
     $_SESSION['id_reserva_actual'] = $id_reserva;
+    // Marcar que es una reserva nueva para mostrar notificación en el frontend
+    $_SESSION['reserva_recien_creada'] = $direccion ?? '';
+
+    // Crear notificación persistente en BD
+    require_once __DIR__ . '/../notificaciones/notificaciones_helper.php';
+    crearNotificacion($_conexion, $dni, 'reserva_pendiente', 'Reserva pendiente de pago', 'Tu reserva en ' . ($direccion ?? 'tu plaza') . ' está pendiente de pago. Completa el pago para confirmarla.', $id_reserva);
 }
 ?>
 
@@ -154,9 +207,12 @@ if ($result->num_rows > 0) {
         </div>
 
         <div class="details-box">
+            <div class="detail-item"><span>Precio plaza/hora:</span> <span><?php echo number_format($precio_hora, 2); ?> €</span></div>
+            <div class="detail-item"><span>Comisión de servicio (20%):</span> <span><?php echo number_format($comision, 2); ?> €/hora</span></div>
+            <div class="detail-item"><span>Precio final/hora:</span> <span><?php echo number_format($precio_con_comision, 2); ?> €</span></div>
             <div class="detail-item"><span>Duración:</span> <span><?php echo $duracion; ?> horas</span></div>
             <div class="detail-item"><span>Fecha:</span> <span><?php echo $fecha; ?></span></div>
-            <div class="detail-item"><span>Total:</span> <span><?php echo number_format($total, 2); ?> €</span></div>
+            <div class="detail-item" style="font-weight:700;border-top:1px solid #e0e0e0;padding-top:0.5rem;margin-top:0.5rem;"><span>Total:</span> <span><?php echo number_format($total, 2); ?> €</span></div>
         </div>
 
         <!-- PASAMOS DATOS AL JS AQUÍ -->
@@ -174,5 +230,18 @@ if ($result->num_rows > 0) {
 
 <!-- TU JS SEPARADO -->
 <script src="../../scripts/pago.js"></script>
+<script>
+// Banner de "pendiente de pago" visible en la propia página de pago
+(function() {
+    var banner = document.createElement('div');
+    banner.style.cssText = 'background:#fffbeb;border:1.5px solid #f59e0b;border-radius:12px;padding:0.75rem 1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#92400e;';
+    banner.innerHTML =
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+        '<span><strong>Reserva pendiente de pago.</strong> Completa el pago para confirmar tu plaza.</span>';
+    var card = document.querySelector('.payment-card');
+    var h2   = card && card.querySelector('h2');
+    if (h2) { card.insertBefore(banner, h2.nextSibling); }
+})();
+</script>
 </body>
 </html>

@@ -13,7 +13,7 @@ $dni = $_SESSION['dni'];
 $sql = "SELECT r.*, p.Direccion AS PlazaDireccion
         FROM RESERVA r
         LEFT JOIN PLAZA p ON r.ID_plaza = p.ID_plaza
-        WHERE r.DNI = ? AND r.Estado != 'pendiente'
+        WHERE r.DNI = ?
         ORDER BY r.Fecha DESC, r.Hora_entrada DESC";
 
 $stmt = $_conexion->prepare($sql);
@@ -41,6 +41,9 @@ $result = $stmt->get_result();
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/mis_reservas.css">
     
+<style>
+    .estado-completada { background:#d1fae5; color:#065f46; }
+</style>
 </head>
 <body class="my-reservations-page">
 
@@ -66,8 +69,22 @@ $result = $stmt->get_result();
                 
                 <?php
                     $estado = $row['Estado'] ?? 'pendiente';
-                    $estadoLabel = ['confirmada' => 'Pagada', 'pendiente' => 'Pendiente', 'cancelada' => 'Cancelada'];
-                    $estadoClass = ['confirmada' => 'estado-confirmada', 'pendiente' => 'estado-pendiente', 'cancelada' => 'estado-cancelada'];
+                    // Si la reserva está confirmada y la fecha+hora_salida ya pasó, mostrarla como completada
+                    $fechaReserva = strtotime($row['Fecha'] . ' ' . $row['Hora_salida']);
+                    $estaCompletada = ($estado === 'confirmada' && $fechaReserva < time());
+                    $estadoMostrado = $estaCompletada ? 'completada' : $estado;
+                    $estadoLabel = [
+                        'confirmada'  => 'Confirmada',
+                        'pendiente'   => 'Pendiente de pago',
+                        'cancelada'   => 'Cancelada',
+                        'completada'  => 'Completada',
+                    ];
+                    $estadoClass = [
+                        'confirmada'  => 'estado-confirmada',
+                        'pendiente'   => 'estado-pendiente',
+                        'cancelada'   => 'estado-cancelada',
+                        'completada'  => 'estado-completada',
+                    ];
                 ?>
                 <div class="card reserva-card">
                     <div class="reserva-header">
@@ -76,8 +93,8 @@ $result = $stmt->get_result();
                         </div>
                         <div class="price-tag"><?php echo number_format($row['Precio'], 2); ?> €</div>
                     </div>
-                    <div class="estado-badge <?php echo $estadoClass[$estado] ?? 'estado-pendiente'; ?>">
-                        <?php echo $estadoLabel[$estado] ?? $estado; ?>
+                    <div class="estado-badge <?php echo $estadoClass[$estadoMostrado] ?? 'estado-pendiente'; ?>">
+                        <?php echo $estadoLabel[$estadoMostrado] ?? $estadoMostrado;?>
                     </div>
 
                     <div class="reserva-body">
@@ -107,13 +124,43 @@ $result = $stmt->get_result();
                     </div>
 
                     <div class="reserva-footer">
-                        <form method="POST" action="eliminar_reserva.php" 
-                              onsubmit="return confirm('¿Seguro que quieres cancelar esta reserva?');">
-                            <input type="hidden" name="id_reserva" value="<?php echo $row['ID_reserva']; ?>">
-                            <button type="submit" class="btn-cancel">
-                                <i data-lucide="trash-2"></i> Cancelar reserva
-                            </button>
-                        </form>
+                        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                            <?php if ($estado === 'confirmada' && !$estaCompletada): ?>
+                                <a href="chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
+                                    <i data-lucide="message-circle" width="14" height="14"></i> Chat
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($estaCompletada): ?>
+                                <a href="chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
+                                    <i data-lucide="message-circle" width="14" height="14"></i> Chat
+                                </a>
+                                <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;color:#065f46;font-weight:600;padding:0.4rem 0;">
+                                    <i data-lucide="check-circle-2" width="15" height="15"></i>
+                                    Completada
+                                </div>
+                            <?php elseif ($estado === 'cancelada'): ?>
+                                <div style="font-size:0.82rem;color:#c0392b;font-weight:600;padding:0.4rem 0;">Cancelada</div>
+                            <?php elseif ($estado === 'pendiente'): ?>
+                                <a href="reserva.php?id_plaza=<?php echo $row['ID_plaza']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;background:var(--brand-yellow);color:var(--brand-dark);border-color:var(--brand-yellow);">
+                                    <i data-lucide="credit-card" width="14" height="14"></i> Pagar ahora
+                                </a>
+                                <form method="POST" action="eliminar_reserva.php"
+                                      onsubmit="return confirm('¿Seguro que quieres cancelar esta reserva?');">
+                                    <input type="hidden" name="id_reserva" value="<?php echo $row['ID_reserva']; ?>">
+                                    <button type="submit" class="btn-cancel">
+                                        <i data-lucide="trash-2"></i> Cancelar
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <form method="POST" action="eliminar_reserva.php"
+                                      onsubmit="return confirm('¿Seguro que quieres cancelar esta reserva?');">
+                                    <input type="hidden" name="id_reserva" value="<?php echo $row['ID_reserva']; ?>">
+                                    <button type="submit" class="btn-cancel">
+                                        <i data-lucide="trash-2"></i> Cancelar
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 

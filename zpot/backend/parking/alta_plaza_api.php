@@ -165,6 +165,10 @@ try {
         $stmtGeo->close();
     }
 
+    // Notificación al propietario de que su plaza está publicada
+    require_once __DIR__ . '/../notificaciones/notificaciones_helper.php';
+    crearNotificacion($_conexion, $dni, 'plaza_publicada', '¡Plaza publicada!', 'Tu plaza en ' . $direccion . ' ya está visible en el mapa.', $id);
+
     respondJson(201, ['success' => true, 'id' => $id, 'geocoded' => $coords !== null]);
 } catch (mysqli_sql_exception $e) {
     respondJson(500, ['success' => false, 'error' => 'Error al guardar la plaza. Inténtalo de nuevo.']);

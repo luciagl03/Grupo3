@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
@@ -18,7 +16,22 @@ if (!isset($_SESSION['usuario'])) {
 require_once __DIR__ . '/../sesion/conexion.php';
 $_conexion->set_charset('utf8mb4');
 
+// Obtener DNI desde sesión; si no existe, resolverlo desde el email
 $dni = $_SESSION['dni'] ?? '';
+if (empty($dni) && isset($_SESSION['usuario'])) {
+    $email = $_SESSION['usuario'];
+    $stmtDni = $_conexion->prepare('SELECT DNI FROM USUARIO WHERE Email = ?');
+    $stmtDni->bind_param('s', $email);
+    $stmtDni->execute();
+    $rowDni = $stmtDni->get_result()->fetch_assoc();
+    $stmtDni->close();
+    if ($rowDni) {
+        $dni = $rowDni['DNI'];
+        $_SESSION['dni'] = $dni; // cachear para próximas llamadas
+    } else {
+        respondJson(401, ['success' => false, 'error' => 'Usuario no encontrado']);
+    }
+}
 
 // ─────────────────────────────────────────────
 // GET → listar notificaciones

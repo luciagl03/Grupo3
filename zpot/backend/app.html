@@ -13,6 +13,98 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link rel="stylesheet" href="app.css">
     <script src="translations.js"></script>
+
+    <style>
+        /* ── Burbuja flotante ── */
+        #chatBubble {
+            position: fixed; bottom: 1.5rem; right: 1.5rem;
+            width: 52px; height: 52px; border-radius: 50%;
+            background: #fff;
+            color: var(--brand-dark, #1a1915);
+            border: 1px solid #e8e8e4;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,.12); z-index: 1100;
+            transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
+        }
+        #chatBubble:hover  { transform: scale(1.08); box-shadow: 0 4px 20px rgba(0,0,0,.16); background: #fafaf5; }
+        #chatBubble:active { transform: scale(.95); }
+        #chatBubbleBadge {
+            position: absolute; top: 4px; right: 4px;
+            width: 10px; height: 10px; background: #e74c3c;
+            border-radius: 50%; border: 2px solid #fff; display: none;
+        }
+        /* ── Panel lateral ── */
+        #chatPanel {
+            position: fixed; top: 0; right: 0;
+            width: 360px; max-width: 100vw; height: 100dvh;
+            background: #fff; box-shadow: -4px 0 32px rgba(0,0,0,.14);
+            z-index: 1300; display: flex; flex-direction: column;
+            transform: translateX(110%);
+            transition: transform .3s cubic-bezier(.4,0,.2,1);
+            border-left: 1px solid #e8e8e4;
+        }
+        #chatPanel.open { transform: translateX(0); }
+        #chatOverlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,.3);
+            z-index: 1299; opacity: 0; pointer-events: none; transition: opacity .3s;
+        }
+        #chatOverlay.open { opacity: 1; pointer-events: auto; }
+        /* Header panel */
+        .cp-header { display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.1rem;border-bottom:1px solid #e8e8e4;flex-shrink:0; }
+        .cp-header h3 { margin:0;font-size:.95rem;font-weight:700;color:var(--brand-dark,#1a1915); }
+        .cp-close { background:none;border:none;cursor:pointer;color:#999;display:flex;align-items:center;padding:.25rem;border-radius:6px;transition:color .15s,background .15s; }
+        .cp-close:hover { color:var(--brand-dark,#1a1915);background:#f4f4f0; }
+        /* Lista */
+        #cpListView { flex:1;overflow-y:auto;display:flex;flex-direction:column; }
+        .cp-item { display:flex;align-items:center;gap:.75rem;padding:.85rem 1.1rem;border-bottom:1px solid #f0f0ec;cursor:pointer;transition:background .12s; }
+        .cp-item:hover { background:#fafaf5; }
+        .cp-av { width:40px;height:40px;border-radius:50%;background:var(--brand-yellow,#f5e642);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:var(--brand-dark,#1a1915);flex-shrink:0; }
+        .cp-info { flex:1;min-width:0; }
+        .cp-name { font-size:.85rem;font-weight:600;color:var(--brand-dark,#1a1915);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .cp-sub  { font-size:.74rem;color:#888;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .cp-empty { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;color:#bbb;gap:.5rem;text-align:center; }
+        .cp-empty p { font-size:.85rem;margin:0;line-height:1.5; }
+        /* Skeleton */
+        .cp-skel { padding:.85rem 1.1rem;display:flex;align-items:center;gap:.75rem;border-bottom:1px solid #f0f0ec; }
+        .sk { background:linear-gradient(90deg,#f0f0ec 25%,#e8e8e4 50%,#f0f0ec 75%);background-size:200% 100%;border-radius:6px;animation:sksh 1.4s infinite; }
+        .sk-c { width:40px;height:40px;border-radius:50%;flex-shrink:0; }
+        .sk-r { flex:1;display:flex;flex-direction:column;gap:6px; }
+        .sk-l { height:10px; } .sk-l.s { width:55%; }
+        @keyframes sksh { to{background-position:-200% 0;} }
+        /* Conversación */
+        #cpConvView { flex:1;display:none;flex-direction:column;overflow:hidden; }
+        #cpConvView.active { display:flex; }
+        .cv-head { display:flex;align-items:center;gap:.6rem;padding:.75rem 1rem;border-bottom:1px solid #e8e8e4;flex-shrink:0; }
+        .cv-back { background:none;border:none;cursor:pointer;color:#888;display:flex;align-items:center;padding:.2rem;border-radius:6px;transition:color .15s,background .15s; }
+        .cv-back:hover { color:var(--brand-dark,#1a1915);background:#f4f4f0; }
+        .cv-av { width:34px;height:34px;border-radius:50%;background:var(--brand-yellow,#f5e642);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;color:var(--brand-dark,#1a1915);flex-shrink:0; }
+        .cv-ti { flex:1;min-width:0; }
+        .cv-nm { font-size:.875rem;font-weight:700;color:var(--brand-dark,#1a1915);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .cv-sb { font-size:.7rem;color:#999;margin:0; }
+        .cv-adr { background:#fafaf5;border-bottom:1px solid #e8e8e4;padding:.4rem 1rem;font-size:.72rem;color:#888;display:flex;align-items:center;gap:.3rem;flex-shrink:0; }
+        .cv-msgs { flex:1;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.4rem; }
+        .cv-msgs::-webkit-scrollbar { width:3px; }
+        .cv-msgs::-webkit-scrollbar-thumb { background:#e0e0e0;border-radius:4px; }
+        .cv-w { display:flex;flex-direction:column;max-width:80%; }
+        .cv-w.mio  { align-self:flex-end;align-items:flex-end; }
+        .cv-w.otro { align-self:flex-start;align-items:flex-start; }
+        .cv-b { padding:.5rem .8rem;border-radius:16px;font-size:.82rem;line-height:1.45;word-break:break-word; }
+        .cv-w.mio  .cv-b { background:var(--brand-dark,#1a1915);color:#fff;border-bottom-right-radius:4px; }
+        .cv-w.otro .cv-b { background:#f4f4f0;color:var(--brand-dark,#1a1915);border-bottom-left-radius:4px; }
+        .cv-m { font-size:.62rem;color:#bbb;margin-top:2px;display:flex;align-items:center;gap:.25rem; }
+        .cv-sep { align-self:center;font-size:.67rem;color:#bbb;background:#f4f4f0;border-radius:99px;padding:.2rem .65rem;margin:.2rem 0; }
+        .cv-inp { display:flex;align-items:flex-end;gap:.4rem;padding:.65rem .75rem calc(.65rem + env(safe-area-inset-bottom));border-top:1px solid #e8e8e4;flex-shrink:0; }
+        .cv-ta { flex:1;border:1.5px solid #e0e0e0;border-radius:18px;padding:.5rem .85rem;font-family:inherit;font-size:.82rem;color:var(--brand-dark,#1a1915);resize:none;min-height:36px;max-height:100px;overflow-y:auto;line-height:1.4;transition:border-color .15s; }
+        .cv-ta:focus { outline:none;border-color:var(--brand-dark,#1a1915); }
+        .cv-snd { width:36px;height:36px;border-radius:50%;background:var(--brand-dark,#1a1915);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--brand-yellow,#f5e642);transition:background .15s,transform .1s; }
+        .cv-snd:hover   { background:#2a2920; }
+        .cv-snd:active  { transform:scale(.92); }
+        .cv-snd:disabled { opacity:.4;cursor:not-allowed; }
+        @media(max-width:480px){ #chatPanel{width:100vw;border-left:none;} }
+        /* Toast */
+        @keyframes toastIn { from{opacity:0;transform:translateY(10px) scale(.96);}to{opacity:1;transform:none;} }
+    </style>
 </head>
 <body>
     <header class="navbar">
@@ -45,10 +137,10 @@
             </div>
             <div class="nav-right" style="display:flex;align-items:center;gap:0.5rem;">
 
-                <!-- Campana notificaciones -->
+                <!-- Campana notificaciones — SVG inline, no depende de lucide -->
                 <div style="position:relative;">
                     <button type="button" class="account-btn" id="notifBtn" aria-label="Notificaciones" style="position:relative;">
-                        <i data-lucide="bell" style="width:18px;height:18px;stroke:var(--brand-dark);"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-dark,#1a1915)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         <span id="notifBadge" hidden style="position:absolute;top:5px;right:5px;width:8px;height:8px;background:#e74c3c;border-radius:50%;border:2px solid #fff;pointer-events:none;"></span>
                     </button>
                     <div id="notifDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:300px;max-height:420px;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-md);z-index:1200;flex-direction:column;overflow:hidden;">
@@ -106,229 +198,340 @@
         </aside>
     </main>
 
+    <!-- Chat overlay + panel -->
+    <div id="chatOverlay"></div>
+    <div id="chatPanel" role="dialog" aria-label="Mensajes" aria-modal="true">
+        <div class="cp-header">
+            <h3 style="display:flex;align-items:center;gap:.45rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--brand-dark,#1a1915)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Mensajes
+            </h3>
+            <button class="cp-close" id="chatClose" aria-label="Cerrar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div id="cpListView"></div>
+        <div id="cpConvView">
+            <div class="cv-head">
+                <button class="cv-back" id="cvBack" aria-label="Volver">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <div class="cv-av" id="cvAv"></div>
+                <div class="cv-ti">
+                    <p class="cv-nm" id="cvNm"></p>
+                    <p class="cv-sb" id="cvSb"></p>
+                </div>
+            </div>
+            <div class="cv-adr">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="cvAdrTxt"></span>
+            </div>
+            <div class="cv-msgs" id="cvMsgs"></div>
+            <div class="cv-inp">
+                <textarea class="cv-ta" id="cvInput" placeholder="Escribe un mensaje…" rows="1" maxlength="1000"></textarea>
+                <button class="cv-snd" id="cvSend" disabled>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Burbuja flotante -->
+    <button id="chatBubble" aria-label="Abrir mensajes">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span id="chatBubbleBadge"></span>
+    </button>
+
+    <!-- Toast container -->
+    <div id="zpotToasts" style="position:fixed;bottom:5.5rem;right:1.5rem;z-index:2000;display:flex;flex-direction:column;gap:.5rem;max-width:320px;pointer-events:none;"></div>
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="app.js"></script>
     <script>
     lucide.createIcons();
 
-    // ══════════════════════════════════════════
+    // ── Rutas de API (ajustar para InfinityFree con rutas absolutas) ──
+    var _base     = window.location.pathname.replace(/\/[^/]*$/, '');
+    var NOTIF_API = _base + '/notificaciones/notificaciones_api.php';
+    var CHAT_API  = _base + '/chat/chat_api.php';
+    var RES_API   = _base + '/parking/mis_reservas_api.php';
+    // InfinityFree:
+    // var NOTIF_API = '/backend/notificaciones/notificaciones_api.php';
+    // var CHAT_API  = '/backend/chat/chat_api.php';
+    // var RES_API   = '/backend/parking/mis_reservas_api.php';
+
+    function apiFetch(url, opts) {
+        return fetch(url, Object.assign({credentials:'same-origin'}, opts||{}))
+            .then(function(r){ return r.json(); }).catch(function(){ return null; });
+    }
+    function esc(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
+
+    // ════════════════════════════════════════════════
+    // TOAST GLOBAL
+    // ════════════════════════════════════════════════
+    function zpotToast(titulo, mensaje, tipo, enlace) {
+        var cols = {warning:{bg:'#fffbeb',bd:'#f59e0b',ic:'#f59e0b'},
+                    success:{bg:'#f0fdf4',bd:'#22c55e',ic:'#22c55e'},
+                    error:  {bg:'#fef2f2',bd:'#ef4444',ic:'#ef4444'}};
+        var c = cols[tipo||'warning'];
+        var t = document.createElement('div');
+        t.style.cssText = 'background:'+c.bg+';border:1.5px solid '+c.bd+';border-radius:14px;padding:.7rem .9rem;box-shadow:0 4px 20px rgba(0,0,0,.12);display:flex;align-items:flex-start;gap:.55rem;animation:toastIn .3s cubic-bezier(.34,1.56,.64,1);pointer-events:auto;';
+        t.innerHTML =
+            '<span style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:'+c.bd+'22;display:flex;align-items:center;justify-content:center;">'+
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="'+c.ic+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>'+
+            '<div style="flex:1;min-width:0;"><p style="margin:0;font-size:.8rem;font-weight:700;color:#1a1915;">'+titulo+'</p>'+
+            '<p style="margin:.15rem 0 0;font-size:.74rem;color:#666;line-height:1.4;">'+mensaje+'</p>'+
+            (enlace?'<a href="'+enlace.url+'" style="display:inline-block;margin-top:.35rem;font-size:.74rem;font-weight:600;color:'+c.ic+';text-decoration:none;">'+enlace.txt+' →</a>':'')+
+            '</div><button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:#bbb;padding:0;font-size:1.1rem;flex-shrink:0;line-height:1;pointer-events:auto;">×</button>';
+        document.getElementById('zpotToasts').appendChild(t);
+        setTimeout(function(){
+            t.style.transition='opacity .3s,transform .3s';
+            t.style.opacity='0'; t.style.transform='translateY(6px)';
+            setTimeout(function(){ if(t.parentElement) t.remove(); },350);
+        }, 7000);
+    }
+    window.zpotToast = zpotToast;
+
+    // ════════════════════════════════════════════════
     // CENTRO DE NOTIFICACIONES
-    // ══════════════════════════════════════════
-    (function () {
-        /**
-         * PARA INFINITY:
-         * var NOTIF_API = '/backend/notificaciones/notificaciones_api.php';
-            var RES_API   = '/backend/parking/mis_reservas_api.php';
-         * */
-        var _base = window.location.pathname.replace(/\/[^/]*$/, '');
-        var NOTIF_API = _base + '/notificaciones/notificaciones_api.php';
-        var RES_API   = _base + '/parking/mis_reservas_api.php';
+    // ════════════════════════════════════════════════
+    (function(){
+        var btn   = document.getElementById('notifBtn');
+        var drop  = document.getElementById('notifDropdown');
+        var badge = document.getElementById('notifBadge');
+        var list  = document.getElementById('notifList');
+        var mkAll = document.getElementById('marcarTodasBtn');
+        if (!btn) return;
 
-        var notifBtn      = document.getElementById('notifBtn');
-        var notifDropdown = document.getElementById('notifDropdown');
-        var notifBadge    = document.getElementById('notifBadge');
-        var notifList     = document.getElementById('notifList');
-        var marcarBtn     = document.getElementById('marcarTodasBtn');
-
-        if (!notifBtn) return; // seguridad
-
-        var tipoIcono = {
-            reserva_confirmada: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-            reserva_cancelada:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-            nueva_resena:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#92400e" stroke="#92400e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
-            aviso_tiempo:       '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+        var icons = {
+            reserva_confirmada:'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+            reserva_cancelada: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+            reserva_pendiente: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+            nueva_resena:      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#92400e" stroke="#92400e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+            aviso_tiempo:      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            nuevo_mensaje:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
         };
-        var tipoBg = {
-            reserva_confirmada: '#d1fae5',
-            reserva_cancelada:  '#fee2e2',
-            nueva_resena:       '#fef9c3',
-            aviso_tiempo:       '#dbeafe'
-        };
+        var bgs = {reserva_confirmada:'#d1fae5',reserva_cancelada:'#fee2e2',reserva_pendiente:'#fffbeb',nueva_resena:'#fef9c3',aviso_tiempo:'#dbeafe',nuevo_mensaje:'#dbeafe'};
 
-        function esc(s) {
-            return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
-        }
+        function fmtFecha(s){ var d=new Date(s),h=new Date(); return d.toDateString()===h.toDateString()?'Hoy '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); }
 
-        function formatFecha(str) {
-            var d = new Date(str);
-            var hoy = new Date();
-            if (d.toDateString() === hoy.toDateString()) {
-                return 'Hoy ' + d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-            }
-            return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'}) + ' ' +
-                   d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-        }
-
-        function apiFetch(url, opts) {
-            return fetch(url, Object.assign({credentials:'same-origin'}, opts || {}))
-                .then(function(r){ return r.json(); })
-                .catch(function(){ return null; });
-        }
-
-        // ── Renderizar ────────────────────────────
-        function renderNotifs(notifs, noLeidas) {
-            notifBadge.hidden = noLeidas === 0;
-
-            if (!notifs || notifs.length === 0) {
-                notifList.innerHTML = '<p style="text-align:center;color:var(--text-muted);font-size:0.82rem;padding:1.5rem 1rem;">Sin notificaciones</p>';
-                return;
-            }
-
-            notifList.innerHTML = notifs.map(function(n) {
-                var bg = tipoBg[n.tipo] || '#f4f4f0';
-                return '<div class="zpot-notif-item" data-id="' + n.id + '" data-leida="' + (n.leida ? '1':'0') + '" style="display:flex;align-items:flex-start;gap:0.6rem;padding:0.7rem 0.9rem;border-bottom:1px solid var(--border);cursor:pointer;background:' + (n.leida ? '#fff':'#fafaf5') + ';">' +
-                    '<span style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:' + bg + ';display:flex;align-items:center;justify-content:center;font-size:0.8rem;">' + (tipoIcono[n.tipo]||'&#128276;') + '</span>' +
-                    '<div style="flex:1;min-width:0;">' +
-                        '<p style="margin:0;font-size:0.8rem;font-weight:' + (n.leida?'400':'700') + ';color:var(--brand-dark);line-height:1.3;">' + esc(n.titulo) + '</p>' +
-                        '<p style="margin:0.15rem 0 0;font-size:0.74rem;color:var(--text-muted);line-height:1.3;">' + esc(n.mensaje) + '</p>' +
-                        '<p style="margin:0.2rem 0 0;font-size:0.68rem;color:#bbb;">' + formatFecha(n.fecha) + '</p>' +
-                    '</div>' +
-                    (!n.leida ? '<span style="width:7px;height:7px;min-width:7px;background:#e74c3c;border-radius:50%;margin-top:4px;flex-shrink:0;"></span>' : '') +
+        function render(notifs, noLeidas) {
+            badge.hidden = noLeidas===0;
+            if (!notifs||!notifs.length){ list.innerHTML='<p style="text-align:center;color:var(--text-muted);font-size:.82rem;padding:1.5rem 1rem;">Sin notificaciones</p>'; return; }
+            list.innerHTML = notifs.map(function(n){
+                var bg=bgs[n.tipo]||'#f4f4f0';
+                return '<div class="zpot-ni" data-id="'+n.id+'" data-r="'+(n.leida?'1':'0')+'" style="display:flex;align-items:flex-start;gap:.6rem;padding:.7rem .9rem;border-bottom:1px solid var(--border);cursor:pointer;background:'+(n.leida?'#fff':'#fafaf5')+';">'+
+                    '<span style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;">'+(icons[n.tipo]||'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>')+ '</span>'+
+                    '<div style="flex:1;min-width:0;"><p style="margin:0;font-size:.8rem;font-weight:'+(n.leida?'400':'700')+';color:var(--brand-dark);line-height:1.3;">'+esc(n.titulo)+'</p>'+
+                    '<p style="margin:.15rem 0 0;font-size:.74rem;color:var(--text-muted);line-height:1.3;">'+esc(n.mensaje)+'</p>'+
+                    '<p style="margin:.2rem 0 0;font-size:.68rem;color:#bbb;">'+fmtFecha(n.fecha)+'</p></div>'+
+                    (!n.leida?'<span style="width:7px;height:7px;min-width:7px;background:#e74c3c;border-radius:50%;margin-top:4px;flex-shrink:0;"></span>':'')+
                 '</div>';
             }).join('');
-
-            notifList.querySelectorAll('.zpot-notif-item').forEach(function(el) {
-                el.addEventListener('mouseover', function(){ this.style.background='var(--brand-bg)'; });
-                el.addEventListener('mouseout', function(){
-                    this.style.background = this.dataset.leida === '1' ? '#fff' : '#fafaf5';
-                });
-                el.addEventListener('click', function() {
-                    if (this.dataset.leida === '1') return;
-                    var id = parseInt(this.dataset.id);
-                    apiFetch(NOTIF_API, {
-                        method:'POST',
-                        headers:{'Content-Type':'application/json'},
-                        body: JSON.stringify({accion:'marcar_leida', id_notif:id})
-                    }).then(cargarNotifs);
+            list.querySelectorAll('.zpot-ni').forEach(function(el){
+                el.addEventListener('mouseover',function(){ this.style.background='var(--brand-bg)'; });
+                el.addEventListener('mouseout', function(){ this.style.background=this.dataset.r==='1'?'#fff':'#fafaf5'; });
+                el.addEventListener('click',function(){
+                    if(this.dataset.r==='1') return;
+                    apiFetch(NOTIF_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'marcar_leida',id_notif:parseInt(this.dataset.id)})}).then(cargar);
                 });
             });
         }
+        function cargar(){ apiFetch(NOTIF_API).then(function(d){ if(d&&d.success) render(d.notifs,d.no_leidas); }); }
+        function badge_upd(){ apiFetch(NOTIF_API).then(function(d){ if(d&&d.success) badge.hidden=d.no_leidas===0; }); }
 
-        function cargarNotifs() {
-            apiFetch(NOTIF_API).then(function(d) {
-                if (d && d.success) renderNotifs(d.notifs, d.no_leidas);
-            });
-        }
-
-        function actualizarBadge() {
-            apiFetch(NOTIF_API).then(function(d) {
-                if (d && d.success) notifBadge.hidden = d.no_leidas === 0;
-            });
-        }
-
-        // ── Marcar todas ──────────────────────────
-        marcarBtn.addEventListener('click', function(e) {
+        mkAll.addEventListener('click',function(e){
             e.stopPropagation();
-            apiFetch(NOTIF_API, {
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({accion:'marcar_todas'})
-            }).then(cargarNotifs);
+            apiFetch(NOTIF_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'marcar_todas'})}).then(cargar);
         });
-
-        // ── Toggle dropdown ───────────────────────
-        notifBtn.addEventListener('click', function(e) {
+        btn.addEventListener('click',function(e){
             e.stopPropagation();
-            var estaAbierto = notifDropdown.style.display === 'flex';
-            var accDrop = document.getElementById('accountDropdown');
-            if (accDrop) accDrop.hidden = true;
-
-            if (estaAbierto) {
-                notifDropdown.style.display = 'none';
-            } else {
-                notifDropdown.style.display = 'flex';
-                notifDropdown.style.flexDirection = 'column';
-                cargarNotifs();
-            }
+            var open=drop.style.display==='flex';
+            var acc=document.getElementById('accountDropdown'); if(acc) acc.hidden=true;
+            drop.style.display=open?'none':'flex';
+            if(!open){ drop.style.flexDirection='column'; cargar(); }
+        });
+        document.addEventListener('click',function(e){
+            if(drop.style.display==='flex'&&!drop.contains(e.target)&&!btn.contains(e.target)) drop.style.display='none';
         });
 
-        // ── Cerrar al clickar fuera ───────────────
-        document.addEventListener('click', function(e) {
-            if (notifDropdown.style.display === 'flex' &&
-                !notifDropdown.contains(e.target) &&
-                !notifBtn.contains(e.target)) {
-                notifDropdown.style.display = 'none';
-            }
-        });
+        function notifNativa(t,m){ if('Notification'in window&&Notification.permission==='granted') new Notification(t,{body:m,icon:'/frontend/assets/images/Icono.png'}); }
+        function crearNotif(tipo,titulo,msg){
+            apiFetch(NOTIF_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'crear',tipo:tipo,titulo:titulo,mensaje:msg})}).then(badge_upd);
+            notifNativa(titulo,msg);
+        }
 
-        // ── Notificación nativa ───────────────────
-        function notifNativa(titulo, mensaje) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification(titulo, {
-                    body:  mensaje,
-                    icon:  '/frontend/assets/images/Icono.png'
+        var prog={};
+        function programarTimers(rs){ rs.forEach(function(r){ if(prog[r.id]) return; prog[r.id]=true; var now=Date.now(); if(r.ts_entrada>now) setTimeout(function(){ crearNotif('aviso_tiempo','¡Tu reserva ha comenzado!','Tu reserva en '+r.direccion+' acaba de empezar.'); },r.ts_entrada-now); var t15=r.ts_salida-15*60*1000; if(t15>now) setTimeout(function(){ crearNotif('aviso_tiempo','Quedan 15 minutos','Tu reserva en '+r.direccion+' termina pronto.'); },t15-now); var t5=r.ts_salida-5*60*1000; if(t5>now) setTimeout(function(){ crearNotif('aviso_tiempo','¡Quedan 5 minutos!','Recoge tu vehículo en '+r.direccion+'.'); },t5-now); }); }
+        function cargarHoy(){ apiFetch(RES_API).then(function(d){ if(!d||!d.reservas||!d.reservas.length) return; if('Notification'in window&&Notification.permission==='default') Notification.requestPermission(); programarTimers(d.reservas); }); }
+
+        window.zpotNotif={crear:crearNotif};
+        badge_upd(); cargarHoy();
+        setInterval(badge_upd,60000); setInterval(cargarHoy,5*60*1000);
+    })();
+
+    // ════════════════════════════════════════════════
+    // BURBUJA DE CHAT
+    // ════════════════════════════════════════════════
+    (function(){
+        var bubble   = document.getElementById('chatBubble');
+        var panel    = document.getElementById('chatPanel');
+        var overlay  = document.getElementById('chatOverlay');
+        var closeBtn = document.getElementById('chatClose');
+        var listView = document.getElementById('cpListView');
+        var convView = document.getElementById('cpConvView');
+        var cvBack   = document.getElementById('cvBack');
+        var cvAv     = document.getElementById('cvAv');
+        var cvNm     = document.getElementById('cvNm');
+        var cvSb     = document.getElementById('cvSb');
+        var cvAdrTxt = document.getElementById('cvAdrTxt');
+        var cvMsgs   = document.getElementById('cvMsgs');
+        var cvInput  = document.getElementById('cvInput');
+        var cvSend   = document.getElementById('cvSend');
+        var bbadge   = document.getElementById('chatBubbleBadge');
+
+        var curId=null, lastMsgId=0, ulFecha='', pollTmr=null;
+
+        function openPanel(){  panel.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow='hidden'; cargarLista(); }
+        function closePanel(){ panel.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow=''; clearInterval(pollTmr); volverLista(); }
+
+        bubble.addEventListener('click',function(e){ e.stopPropagation(); panel.classList.contains('open')?closePanel():openPanel(); });
+        closeBtn.addEventListener('click',closePanel);
+        overlay.addEventListener('click',closePanel);
+
+        // ── Lista ─────────────────────────────────
+        function skelHTML(n){ var s='<div class="cp-skel"><div class="sk sk-c"></div><div class="sk-r"><div class="sk sk-l"></div><div class="sk sk-l s"></div></div></div>'; var o=''; for(var i=0;i<n;i++) o+=s; return o; }
+
+        function cargarLista(){
+            volverLista();
+            listView.innerHTML = skelHTML(3);
+            // Intenta cargar todas las reservas con ?todas=1 (nuevo parámetro en mis_reservas_api)
+            apiFetch(RES_API+'?todas=1').then(function(d){
+                var rs = d && d.reservas && d.reservas.length ? d.reservas : null;
+                if (rs) { renderLista(rs); return; }
+                // Fallback sin el parámetro
+                apiFetch(RES_API).then(function(d2){
+                    renderLista(d2&&d2.reservas ? d2.reservas : []);
                 });
+            });
+        }
+
+        function renderLista(rs){
+            if (!rs.length){
+                listView.innerHTML='<div class="cp-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Aún no tienes conversaciones.<br>Aparecerán aquí cuando realices una reserva.</p></div>';
+                return;
             }
-        }
-
-        // ── Crear notif en BD + nativa ────────────
-        function crearNotif(tipo, titulo, mensaje) {
-            apiFetch(NOTIF_API, {
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({accion:'crear', tipo:tipo, titulo:titulo, mensaje:mensaje})
-            }).then(actualizarBadge);
-            notifNativa(titulo, mensaje);
-        }
-
-        // ── Timers reservas de hoy ────────────────
-        var timersYaProgramados = {};
-
-        function programarTimers(reservas) {
-            reservas.forEach(function(r) {
-                if (timersYaProgramados[r.id]) return;
-                timersYaProgramados[r.id] = true;
-
-                var ahora = Date.now();
-
-                // Aviso inicio
-                if (r.ts_entrada > ahora) {
-                    setTimeout(function() {
-                        crearNotif('aviso_tiempo','¡Tu reserva ha comenzado!',
-                            'Tu reserva en ' + r.direccion + ' acaba de empezar.');
-                    }, r.ts_entrada - ahora);
-                }
-
-                // 15 min antes del fin
-                var t15 = r.ts_salida - 15*60*1000;
-                if (t15 > ahora) {
-                    setTimeout(function() {
-                        crearNotif('aviso_tiempo','Quedan 15 minutos',
-                            'Tu reserva en ' + r.direccion + ' termina pronto.');
-                    }, t15 - ahora);
-                }
-
-                // 5 min antes del fin
-                var t5 = r.ts_salida - 5*60*1000;
-                if (t5 > ahora) {
-                    setTimeout(function() {
-                        crearNotif('aviso_tiempo','¡Quedan 5 minutos!',
-                            'Recoge tu vehículo en ' + r.direccion + '.');
-                    }, t5 - ahora);
-                }
+            listView.innerHTML = rs.map(function(r){
+                var dir=r.direccion||'Plaza #'+r.id;
+                var ini=dir.charAt(0).toUpperCase();
+                var sub=(r.hora_entrada||'').slice(0,5)+(r.hora_salida?'–'+(r.hora_salida).slice(0,5):'');
+                return '<div class="cp-item" data-id="'+r.id+'" data-dir="'+esc(dir)+'" data-ent="'+esc(r.hora_entrada||'')+'" data-sal="'+esc(r.hora_salida||'')+'">'+
+                    '<div class="cp-av">'+ini+'</div>'+
+                    '<div class="cp-info"><div class="cp-name">'+esc(dir)+'</div><div class="cp-sub">'+esc(sub)+'</div></div>'+
+                '</div>';
+            }).join('');
+            listView.querySelectorAll('.cp-item').forEach(function(el){
+                el.addEventListener('click',function(){ abrirConv(parseInt(this.dataset.id),this.dataset.dir,this.dataset.ent,this.dataset.sal); });
             });
         }
 
-        function cargarReservasHoy() {
-            apiFetch(RES_API).then(function(d) {
-                if (!d || !d.reservas || !d.reservas.length) return;
-                if ('Notification' in window && Notification.permission === 'default') {
-                    Notification.requestPermission();
+        // ── Conversación ──────────────────────────
+        function abrirConv(id,dir,ent,sal){
+            curId=id; lastMsgId=0; ulFecha='';
+            cvAv.textContent=(dir||'P').charAt(0).toUpperCase();
+            cvNm.textContent=dir||'Chat';
+            cvSb.textContent='Reserva #'+id;
+            cvAdrTxt.textContent=dir+(ent?(' · '+ent.slice(0,5)+'–'+sal.slice(0,5)):'');
+            cvMsgs.innerHTML=''; cvInput.value=''; cvSend.disabled=true;
+            listView.style.display='none';
+            convView.classList.add('active');
+            cargarMsgs(true);
+            clearInterval(pollTmr);
+            pollTmr=setInterval(function(){ cargarMsgs(false); },3000);
+        }
+        function volverLista(){ listView.style.display='flex'; convView.classList.remove('active'); curId=null; clearInterval(pollTmr); }
+        cvBack.addEventListener('click',function(){ volverLista(); cargarLista(); });
+
+        function fmtH(s){ var d=new Date(s); return d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); }
+        function fmtFS(s){ var d=new Date(s),h=new Date(); if(d.toDateString()===h.toDateString()) return 'Hoy'; var a=new Date(); a.setDate(a.getDate()-1); if(d.toDateString()===a.toDateString()) return 'Ayer'; return d.toLocaleDateString('es-ES',{day:'2-digit',month:'long'}); }
+
+        function cargarMsgs(scroll){
+            if(!curId) return;
+            apiFetch(CHAT_API+'?id_reserva='+curId).then(function(d){
+                if(!d||!d.success) return;
+                if(!d.mensajes||!d.mensajes.length){
+                    if(!cvMsgs.children.length) cvMsgs.innerHTML='<div style="text-align:center;color:#bbb;font-size:.8rem;padding:2rem 1rem;">Aún no hay mensajes.<br>Sé el primero en escribir.</div>';
+                    return;
                 }
-                programarTimers(d.reservas);
+                var ph=cvMsgs.querySelector('div[style*="text-align:center"]'); if(ph) ph.remove();
+                var nuevos=d.mensajes.filter(function(m){ return m.id>lastMsgId; });
+                if(!nuevos.length) return;
+                nuevos.forEach(function(m){
+                    var fs=fmtFS(m.fecha); if(fs!==ulFecha){ var sep=document.createElement('div'); sep.className='cv-sep'; sep.textContent=fs; cvMsgs.appendChild(sep); ulFecha=fs; }
+                    var w=document.createElement('div'); w.className='cv-w '+(m.es_mio?'mio':'otro');
+                    w.innerHTML='<div class="cv-b">'+esc(m.contenido)+'</div>'+
+                        '<div class="cv-m">'+(!m.es_mio?'<span>'+esc(m.emisor)+'</span>':'')+
+                        '<span>'+fmtH(m.fecha)+'</span>'+
+                        (m.es_mio?(m.leido?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/><polyline points="24 6 13 17 9 13"/></svg>':'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>'):'')+
+                        '</div>';
+                    cvMsgs.appendChild(w);
+                    lastMsgId=Math.max(lastMsgId,m.id);
+                });
+                if(scroll||nuevos.length) cvMsgs.scrollTop=cvMsgs.scrollHeight;
             });
         }
 
-        // ── Exponer para uso externo ──────────────
-        window.zpotNotif = { crear: crearNotif };
+        function enviar(){
+            var txt=cvInput.value.trim(); if(!txt||!curId) return;
+            cvSend.disabled=true;
+            apiFetch(CHAT_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id_reserva:curId,mensaje:txt})}).then(function(d){
+                if(d&&d.success){
+                    cvInput.value=""; cvInput.style.height="auto"; cargarMsgs(true);
+                } else {
+                    var err=document.createElement("div");
+                    err.style.cssText="text-align:center;color:#e74c3c;font-size:.75rem;padding:.5rem;";
+                    err.textContent=(d&&d.error)?d.error:"No se pudo enviar. Inténtalo de nuevo.";
+                    cvMsgs.appendChild(err); cvMsgs.scrollTop=cvMsgs.scrollHeight;
+                    setTimeout(function(){ if(err.parentElement) err.remove(); },4000);
+                }
+                cvSend.disabled=cvInput.value.trim()==="";
+            });
+        }
+        cvInput.addEventListener('input',function(){ cvSend.disabled=this.value.trim()===''; this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,100)+'px'; });
+        cvInput.addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(!cvSend.disabled) enviar(); } });
+        cvSend.addEventListener('click',enviar);
 
-        // ── Arranque ──────────────────────────────
-        actualizarBadge();
-        cargarReservasHoy();
-        setInterval(actualizarBadge, 60000);
-        setInterval(cargarReservasHoy, 5*60*1000);
+        // Badge no-leídos
+        function updBadge(){
+            apiFetch(RES_API).then(function(d){
+                if(!d||!d.reservas||!d.reservas.length){ bbadge.style.display='none'; return; }
+                var total=0,pend=d.reservas.length;
+                d.reservas.forEach(function(r){
+                    apiFetch(CHAT_API+'?id_reserva='+r.id).then(function(cd){
+                        if(cd&&cd.success) total+=(cd.no_leidos||0);
+                        pend--; if(pend===0) bbadge.style.display=total>0?'block':'none';
+                    });
+                });
+            });
+        }
+        updBadge(); setInterval(updBadge,30000);
+    })();
 
+    // ════════════════════════════════════════════════
+    // NOTIFICACIÓN "PENDIENTE DE PAGO"
+    // ════════════════════════════════════════════════
+    window.zpotPendientePago = function(dir){
+        zpotToast('Reserva pendiente de pago','Tu plaza'+(dir?' en '+dir:'')+' está reservada. Completa el pago para confirmarla.','warning',{url:'parking/mis_reservas.php',txt:'Ver mis reservas'});
+        if(window.zpotNotif) window.zpotNotif.crear('reserva_pendiente','Reserva pendiente de pago','Tu reserva'+(dir?' en '+dir:'')+' necesita que completes el pago.');
+    };
+    // Disparar si venimos con ?reserva_creada=1 (desde pago.php tras crear reserva)
+    (function(){
+        var p=new URLSearchParams(window.location.search);
+        if(p.get('reserva_creada')==='1'){
+            setTimeout(function(){ window.zpotPendientePago(decodeURIComponent(p.get('dir')||'')); },500);
+            history.replaceState(null,'',window.location.pathname);
+        }
     })();
     </script>
 </body>
