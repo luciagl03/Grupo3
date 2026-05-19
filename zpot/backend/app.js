@@ -29,8 +29,9 @@
 
     // Build same-origin API paths relative to backend root.
     function apiUrl(path) {
-        var base = window.location.pathname.replace(/\/[^/]*$/, '');
-        return base + path;
+        // Remove leading slash from path to avoid duplication
+        var cleanPath = path.replace(/^\/+/, '');
+        return './' + cleanPath;
     }
 
     // Generic API fetch wrapper:
@@ -373,7 +374,7 @@
     }
 
     function _cargarResenas(idPlaza) {
-        fetch(apiUrl('/reseñas/resenas_api.php?id_plaza=' + idPlaza), { credentials: 'same-origin' })
+        fetch('./reseñas/resenas_api.php?id_plaza=' + idPlaza, { credentials: 'same-origin' })
             .then(function(r) { return r.json(); })
             .then(function(data) { _pintarResenas(idPlaza, data); })
             .catch(function() {
@@ -449,7 +450,7 @@
             return;
         }
 
-        fetch(apiUrl('/resenas/resenas_api.php'), {
+        fetch('./reseñas/resenas_api.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',

@@ -251,15 +251,10 @@
     <script>
     lucide.createIcons();
 
-    // ── Rutas de API (ajustar para InfinityFree con rutas absolutas) ──
-    var _base     = window.location.pathname.replace(/\/[^/]*$/, '');
-    var NOTIF_API = _base + '/notificaciones/notificaciones_api.php';
-    var CHAT_API  = _base + '/chat/chat_api.php';
-    var RES_API   = _base + '/parking/mis_reservas_api.php';
-    // InfinityFree:
-    // var NOTIF_API = '/backend/notificaciones/notificaciones_api.php';
-    // var CHAT_API  = '/backend/chat/chat_api.php';
-    // var RES_API   = '/backend/parking/mis_reservas_api.php';
+    // ── Rutas de API (rutas relativas para evitar duplicación) ──
+    var NOTIF_API = './notificaciones/notificaciones_api.php';
+    var CHAT_API  = './chat/chat_api.php';
+    var RES_API   = './parking/mis_reservas_api.php';
 
     function apiFetch(url, opts) {
         return fetch(url, Object.assign({credentials:'same-origin'}, opts||{}))
