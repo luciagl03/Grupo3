@@ -11,7 +11,7 @@ $id_reserva = isset($_GET['id_reserva']) ? (int)$_GET['id_reserva'] : 0;
 $dni = $_SESSION['dni'] ?? '';
 
 if ($id_reserva <= 0) {
-    header('Location: mis_reservas.php');
+    header('Location: ../parking/mis_reservas.php');
     exit;
 }
 
@@ -33,7 +33,7 @@ $reserva = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 if (!$reserva) {
-    header('Location: mis_reservas.php');
+    header('Location: ../parking/mis_reservas.php');
     exit;
 }
 
@@ -155,7 +155,7 @@ $nombreOtro = $yoSoyInquilino
 
     <!-- Header -->
     <div class="chat-header">
-        <a href="mis_reservas.php" class="chat-back">
+        <a href="../parking/mis_reservas.php" class="chat-back">
             <i data-lucide="arrow-left" width="20" height="20"></i>
         </a>
         <div class="chat-avatar"><?php echo mb_strtoupper(mb_substr($nombreOtro, 0, 1)); ?></div>

@@ -138,12 +138,12 @@ $result = $stmt->get_result();
                     <div class="reserva-footer">
                         <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                             <?php if ($estado === 'confirmada' && !$estaCompletada): ?>
-                                <a href="chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
+                                <a href="../chat/chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
                                     <i data-lucide="message-circle" width="14" height="14"></i> Chat
                                 </a>
                             <?php endif; ?>
                             <?php if ($estaCompletada): ?>
-                                <a href="chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
+                                <a href="../chat/chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
                                     <i data-lucide="message-circle" width="14" height="14"></i> Chat
                                 </a>
                                 <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;color:#065f46;font-weight:600;padding:0.4rem 0;">
