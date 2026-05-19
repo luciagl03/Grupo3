@@ -8,6 +8,11 @@ if (!isset($_SESSION['usuario'])) {
 
 require_once '../sesion/conexion.php';
 
+// ============================================================================
+// DETECTAR SI ES RETOMAR PAGO O FLUJO NORMAL
+// ============================================================================
+$es_retomar_pago = isset($_GET['id_reserva']) && !empty($_GET['id_reserva']);
+
 // Función para mostrar errores con estilo
 function mostrarErrorReserva($titulo, $mensaje, $backUrl = '../index.php') {
     $t = htmlspecialchars($titulo);
@@ -51,132 +56,217 @@ HTML;
     exit;
 }
 
-// DATOS
-$id_plaza = (int) $_POST['id_plaza'];
-$fecha_inicio = $_POST['hora_entrada'];
-$fecha_fin = $_POST['hora_salida'];
-
 $dni = $_SESSION['dni'] ?? '';
 
-// VALIDAR FECHAS
-if (empty($fecha_inicio) || empty($fecha_fin)) {
-    mostrarErrorReserva('Faltan datos', 'Debes indicar la fecha de entrada y salida para continuar.');
-}
-// Margen de 5 minutos (igual que la validación JS)
-if (strtotime($fecha_inicio) < (time() - 5 * 60)) {
-    mostrarErrorReserva('Hora en el pasado', 'La hora de entrada seleccionada ya ha pasado. Por favor, vuelve y elige una hora futura.', 'javascript:history.back()');
-}
-if (strtotime($fecha_fin) <= strtotime($fecha_inicio)) {
-    mostrarErrorReserva('Horas incorrectas', 'La hora de salida debe ser posterior a la de entrada.', 'javascript:history.back()');
-}
-
-$fecha_inicio = str_replace('T', ' ', $_POST['hora_entrada']);
-$fecha_fin = str_replace('T', ' ', $_POST['hora_salida']);
-
-$inicio = new DateTime($fecha_inicio);
-$fin = new DateTime($fecha_fin);
-
-$fecha = $inicio->format('Y-m-d');
-$hora_entrada = $inicio->format('H:i:s');
-$hora_salida = $fin->format('H:i:s');
-
-// DURACIÓN
-$intervalo = $inicio->diff($fin);
-$horas = ($intervalo->days * 24) + $intervalo->h;
-
-if ($horas <= 0) {
-    $horas = 1;
-}
-
-$duracion = $horas;
-
-// PRECIO
-$sql = "SELECT Precio FROM plaza WHERE ID_plaza = ?";
-$stmt = $_conexion->prepare($sql);
-$stmt->bind_param("i", $id_plaza);
-$stmt->execute();
-
-$result = $stmt->get_result();
-
-if ($result->num_rows == 0) {
-    mostrarErrorReserva('Plaza no encontrada', 'No se encontró la plaza solicitada.', '../index.php');
-}
-
-$plaza = $result->fetch_assoc();
-$precio_hora = $plaza['Precio'];
-
-// Aplicar comisión del 20% (precio base × 1.20)
-$precio_con_comision = round($precio_hora * 1.20, 2);
-$comision = round($precio_hora * 0.20, 2);
-$total = $horas * $precio_con_comision;
-
-// COMPROBAR DISPONIBILIDAD (solo reservas confirmadas bloquean la plaza)
-$sql = "SELECT * FROM reserva 
-        WHERE ID_plaza = ? 
-        AND Fecha = ?
-        AND Estado = 'confirmada'
-        AND (Hora_entrada < ? AND Hora_salida > ?)";
-
-$stmt = $_conexion->prepare($sql);
-$stmt->bind_param("isss", $id_plaza, $fecha, $hora_salida, $hora_entrada);
-$stmt->execute();
-
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    mostrarErrorReserva('Plaza no disponible', 'Esta plaza ya está reservada en ese horario. Por favor, elige otro horario.', 'javascript:history.back()');
-}
-
-// EVITAR DUPLICADOS: Comprobar si ya existe una reserva pendiente idéntica
-$sql = "SELECT ID_reserva FROM reserva 
-        WHERE DNI = ? 
-        AND ID_plaza = ? 
-        AND Fecha = ?
-        AND Hora_entrada = ?
-        AND Hora_salida = ?
-        AND Estado = 'pendiente'
-        LIMIT 1";
-
-$stmt = $_conexion->prepare($sql);
-$stmt->bind_param("sisss", $dni, $id_plaza, $fecha, $hora_entrada, $hora_salida);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    // Ya existe una reserva pendiente idéntica, reutilizarla
-    $row = $result->fetch_assoc();
-    $id_reserva = $row['ID_reserva'];
-    $_SESSION['id_reserva_actual'] = $id_reserva;
-} else {
-    // No existe, crear nueva reserva pendiente
-    $sql = "INSERT INTO reserva
-            (DNI, ID_plaza, Precio, Duracion, Hora_entrada, Hora_salida, Fecha, Estado)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente')";
-
+// ============================================================================
+// FLUJO 1: RETOMAR PAGO (desde Mis Reservas)
+// ============================================================================
+if ($es_retomar_pago) {
+    $id_reserva = (int) $_GET['id_reserva'];
+    
+    // Cargar reserva existente de la BD
+    $sql = "SELECT r.*, p.Precio as PrecioPlaza, p.Direccion 
+            FROM RESERVA r 
+            JOIN PLAZA p ON r.ID_plaza = p.ID_plaza
+            WHERE r.ID_reserva = ? AND r.DNI = ? AND r.Estado = 'pendiente'";
+    
     $stmt = $_conexion->prepare($sql);
+    $stmt->bind_param("is", $id_reserva, $dni);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        mostrarErrorReserva(
+            'Reserva no encontrada',
+            'No se encontró la reserva o ya ha sido pagada/cancelada.',
+            'mis_reservas.php'
+        );
+    }
+    
+    $reserva = $result->fetch_assoc();
+    
+    // Extraer datos de la reserva existente
+    $id_plaza = $reserva['ID_plaza'];
+    $fecha = $reserva['Fecha'];
+    $hora_entrada = $reserva['Hora_entrada'];
+    $hora_salida = $reserva['Hora_salida'];
+    $duracion = $reserva['Duracion'];
+    $total = $reserva['Precio'];
+    $precio_hora = $reserva['PrecioPlaza'];
+    $direccion = $reserva['Direccion'];
+    
+    // Calcular comisión (para mostrar en el desglose)
+    $precio_con_comision = round($precio_hora * 1.20, 2);
+    $comision = round($precio_hora * 0.20, 2);
+    
+    // RE-VALIDAR DISPONIBILIDAD (por si otro usuario reservó mientras tanto)
+    $sql_disponibilidad = "SELECT ID_reserva FROM RESERVA 
+                           WHERE ID_plaza = ? 
+                           AND Fecha = ?
+                           AND Estado = 'confirmada'
+                           AND ID_reserva != ?
+                           AND (Hora_entrada < ? AND Hora_salida > ?)
+                           LIMIT 1";
+    
+    $stmt_disp = $_conexion->prepare($sql_disponibilidad);
+    $stmt_disp->bind_param("isiss", $id_plaza, $fecha, $id_reserva, $hora_salida, $hora_entrada);
+    $stmt_disp->execute();
+    $result_disp = $stmt_disp->get_result();
+    
+    if ($result_disp->num_rows > 0) {
+        // Conflicto: otro usuario reservó en el mismo horario
+        // Eliminar la reserva pendiente obsoleta
+        $stmt_delete = $_conexion->prepare("DELETE FROM RESERVA WHERE ID_reserva = ? AND DNI = ?");
+        $stmt_delete->bind_param("is", $id_reserva, $dni);
+        $stmt_delete->execute();
+        $stmt_delete->close();
+        
+        mostrarErrorReserva(
+            'Plaza ya no disponible',
+            'Lo sentimos, esta plaza ya fue reservada por otro usuario en ese horario. Tu reserva pendiente ha sido cancelada automáticamente.',
+            'mis_reservas.php'
+        );
+    }
+    
+    // Actualizar sesión
+    $_SESSION['id_reserva_actual'] = $id_reserva;
+    
+    // NO crear notificación (ya existe de cuando se creó la reserva)
 
-    $stmt->bind_param(
-        "sidisss",
-        $dni,
-        $id_plaza,
-        $total,
-        $duracion,
-        $hora_entrada,
-        $hora_salida,
-        $fecha
-    );
+// ============================================================================
+// FLUJO 2: FLUJO NORMAL (desde formulario de reserva.php)
+// ============================================================================
+} else {
+    // DATOS
+    $id_plaza = (int) $_POST['id_plaza'];
+    $fecha_inicio = $_POST['hora_entrada'];
+    $fecha_fin = $_POST['hora_salida'];
 
+    // VALIDAR FECHAS
+    if (empty($fecha_inicio) || empty($fecha_fin)) {
+        mostrarErrorReserva('Faltan datos', 'Debes indicar la fecha de entrada y salida para continuar.');
+    }
+    // Margen de 5 minutos (igual que la validación JS)
+    if (strtotime($fecha_inicio) < (time() - 5 * 60)) {
+        mostrarErrorReserva('Hora en el pasado', 'La hora de entrada seleccionada ya ha pasado. Por favor, vuelve y elige una hora futura.', 'javascript:history.back()');
+    }
+    if (strtotime($fecha_fin) <= strtotime($fecha_inicio)) {
+        mostrarErrorReserva('Horas incorrectas', 'La hora de salida debe ser posterior a la de entrada.', 'javascript:history.back()');
+    }
+
+    $fecha_inicio = str_replace('T', ' ', $_POST['hora_entrada']);
+    $fecha_fin = str_replace('T', ' ', $_POST['hora_salida']);
+
+    $inicio = new DateTime($fecha_inicio);
+    $fin = new DateTime($fecha_fin);
+
+    $fecha = $inicio->format('Y-m-d');
+    $hora_entrada = $inicio->format('H:i:s');
+    $hora_salida = $fin->format('H:i:s');
+
+    // DURACIÓN
+    $intervalo = $inicio->diff($fin);
+    $horas = ($intervalo->days * 24) + $intervalo->h;
+
+    if ($horas <= 0) {
+        $horas = 1;
+    }
+
+    $duracion = $horas;
+
+    // PRECIO
+    $sql = "SELECT Precio, Direccion FROM plaza WHERE ID_plaza = ?";
+    $stmt = $_conexion->prepare($sql);
+    $stmt->bind_param("i", $id_plaza);
     $stmt->execute();
 
-    $id_reserva = $_conexion->insert_id;
-    $_SESSION['id_reserva_actual'] = $id_reserva;
-    // Marcar que es una reserva nueva para mostrar notificación en el frontend
-    $_SESSION['reserva_recien_creada'] = $direccion ?? '';
+    $result = $stmt->get_result();
 
-    // Crear notificación persistente en BD
-    require_once __DIR__ . '/../notificaciones/notificaciones_helper.php';
-    crearNotificacion($_conexion, $dni, 'reserva_pendiente', 'Reserva pendiente de pago', 'Tu reserva en ' . ($direccion ?? 'tu plaza') . ' está pendiente de pago. Completa el pago para confirmarla.', $id_reserva);
+    if ($result->num_rows == 0) {
+        mostrarErrorReserva('Plaza no encontrada', 'No se encontró la plaza solicitada.', '../index.php');
+    }
+
+    $plaza = $result->fetch_assoc();
+    $precio_hora = $plaza['Precio'];
+    $direccion = $plaza['Direccion'] ?? '';
+
+    // Aplicar comisión del 20% (precio base × 1.20)
+    $precio_con_comision = round($precio_hora * 1.20, 2);
+    $comision = round($precio_hora * 0.20, 2);
+    $total = $horas * $precio_con_comision;
+
+    // COMPROBAR DISPONIBILIDAD (solo reservas confirmadas bloquean la plaza)
+    $sql = "SELECT * FROM reserva 
+            WHERE ID_plaza = ? 
+            AND Fecha = ?
+            AND Estado = 'confirmada'
+            AND (Hora_entrada < ? AND Hora_salida > ?)";
+
+    $stmt = $_conexion->prepare($sql);
+    $stmt->bind_param("isss", $id_plaza, $fecha, $hora_salida, $hora_entrada);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        mostrarErrorReserva('Plaza no disponible', 'Esta plaza ya está reservada en ese horario. Por favor, elige otro horario.', 'javascript:history.back()');
+    }
+
+    // EVITAR DUPLICADOS: Comprobar si ya existe una reserva pendiente idéntica
+    $sql = "SELECT ID_reserva FROM reserva 
+            WHERE DNI = ? 
+            AND ID_plaza = ? 
+            AND Fecha = ?
+            AND Hora_entrada = ?
+            AND Hora_salida = ?
+            AND Estado = 'pendiente'
+            LIMIT 1";
+
+    $stmt = $_conexion->prepare($sql);
+    $stmt->bind_param("sisss", $dni, $id_plaza, $fecha, $hora_entrada, $hora_salida);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Ya existe una reserva pendiente idéntica, reutilizarla
+        $row = $result->fetch_assoc();
+        $id_reserva = $row['ID_reserva'];
+        $_SESSION['id_reserva_actual'] = $id_reserva;
+    } else {
+        // No existe, crear nueva reserva pendiente
+        $sql = "INSERT INTO reserva
+                (DNI, ID_plaza, Precio, Duracion, Hora_entrada, Hora_salida, Fecha, Estado)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente')";
+
+        $stmt = $_conexion->prepare($sql);
+
+        $stmt->bind_param(
+            "sidisss",
+            $dni,
+            $id_plaza,
+            $total,
+            $duracion,
+            $hora_entrada,
+            $hora_salida,
+            $fecha
+        );
+
+        $stmt->execute();
+
+        $id_reserva = $_conexion->insert_id;
+        $_SESSION['id_reserva_actual'] = $id_reserva;
+        // Marcar que es una reserva nueva para mostrar notificación en el frontend
+        $_SESSION['reserva_recien_creada'] = $direccion ?? '';
+
+        // Crear notificación persistente en BD
+        require_once __DIR__ . '/../notificaciones/notificaciones_helper.php';
+        crearNotificacion($_conexion, $dni, 'reserva_pendiente', 'Reserva pendiente de pago', 'Tu reserva en ' . ($direccion ?? 'tu plaza') . ' está pendiente de pago. Completa el pago para confirmarla.', $id_reserva);
+    }
 }
+
+// ============================================================================
+// PÁGINA DE PAGO (COMÚN PARA AMBOS FLUJOS)
+// ============================================================================
 ?>
 
 <!DOCTYPE html>

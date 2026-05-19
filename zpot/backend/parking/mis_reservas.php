@@ -10,6 +10,18 @@ require_once '../sesion/conexion.php';
 
 $dni = $_SESSION['dni'];
 
+// Limpieza automática de reservas pendientes con fecha/hora pasada (más de 1 hora)
+$sql_limpieza = "DELETE FROM RESERVA 
+                 WHERE DNI = ? 
+                 AND Estado = 'pendiente' 
+                 AND CONCAT(Fecha, ' ', Hora_entrada) < DATE_SUB(NOW(), INTERVAL 1 HOUR)";
+$stmt_limpieza = $_conexion->prepare($sql_limpieza);
+if ($stmt_limpieza) {
+    $stmt_limpieza->bind_param("s", $dni);
+    $stmt_limpieza->execute();
+    $stmt_limpieza->close();
+}
+
 $sql = "SELECT r.*, p.Direccion AS PlazaDireccion
         FROM RESERVA r
         LEFT JOIN PLAZA p ON r.ID_plaza = p.ID_plaza
@@ -141,7 +153,7 @@ $result = $stmt->get_result();
                             <?php elseif ($estado === 'cancelada'): ?>
                                 <div style="font-size:0.82rem;color:#c0392b;font-weight:600;padding:0.4rem 0;">Cancelada</div>
                             <?php elseif ($estado === 'pendiente'): ?>
-                                <a href="reserva.php?id_plaza=<?php echo $row['ID_plaza']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;background:var(--brand-yellow);color:var(--brand-dark);border-color:var(--brand-yellow);">
+                                <a href="pago.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;background:var(--brand-yellow);color:var(--brand-dark);border-color:var(--brand-yellow);">
                                     <i data-lucide="credit-card" width="14" height="14"></i> Pagar ahora
                                 </a>
                                 <form method="POST" action="eliminar_reserva.php"
