@@ -175,7 +175,7 @@ if ($es_retomar_pago) {
     $duracion = $horas;
 
     // PRECIO
-    $sql = "SELECT Precio, Direccion FROM plaza WHERE ID_plaza = ?";
+    $sql = "SELECT Precio, Direccion FROM PLAZA WHERE ID_plaza = ?";
     $stmt = $_conexion->prepare($sql);
     $stmt->bind_param("i", $id_plaza);
     $stmt->execute();
@@ -196,8 +196,8 @@ if ($es_retomar_pago) {
     $total = $horas * $precio_con_comision;
 
     // COMPROBAR DISPONIBILIDAD (solo reservas confirmadas bloquean la plaza)
-    $sql = "SELECT * FROM reserva 
-            WHERE ID_plaza = ? 
+    $sql = "SELECT * FROM RESERVA
+            WHERE ID_plaza = ?
             AND Fecha = ?
             AND Estado = 'confirmada'
             AND (Hora_entrada < ? AND Hora_salida > ?)";
@@ -213,9 +213,9 @@ if ($es_retomar_pago) {
     }
 
     // EVITAR DUPLICADOS: Comprobar si ya existe una reserva pendiente idéntica
-    $sql = "SELECT ID_reserva FROM reserva 
-            WHERE DNI = ? 
-            AND ID_plaza = ? 
+    $sql = "SELECT ID_reserva FROM RESERVA
+            WHERE DNI = ?
+            AND ID_plaza = ?
             AND Fecha = ?
             AND Hora_entrada = ?
             AND Hora_salida = ?
@@ -234,7 +234,7 @@ if ($es_retomar_pago) {
         $_SESSION['id_reserva_actual'] = $id_reserva;
     } else {
         // No existe, crear nueva reserva pendiente
-        $sql = "INSERT INTO reserva
+        $sql = "INSERT INTO RESERVA
                 (DNI, ID_plaza, Precio, Duracion, Hora_entrada, Hora_salida, Fecha, Estado)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente')";
 

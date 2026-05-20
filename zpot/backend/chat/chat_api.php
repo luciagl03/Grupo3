@@ -65,6 +65,69 @@ function verificarAcceso($con, $id_reserva, $dni) {
 
 // ── GET → listar mensajes ──────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
+    // ── Modo plaza (chat sin reserva) ──
+    if (isset($_GET['id_plaza'])) {
+        $id_plaza = (int)$_GET['id_plaza'];
+        if ($id_plaza <= 0) respondJson(400, ['success' => false, 'error' => 'ID de plaza inválido']);
+
+        // Cargar datos de la plaza y propietario
+        $stmtP = $_conexion->prepare(
+            "SELECT p.DNI AS dni_propietario, p.Direccion,
+                    u.Nombre AS nombre_propietario, u.Apellidos AS apellidos_propietario
+             FROM PLAZA p JOIN USUARIO u ON p.DNI = u.DNI
+             WHERE p.ID_plaza = ?"
+        );
+        $stmtP->bind_param('i', $id_plaza);
+        $stmtP->execute();
+        $plaza = $stmtP->get_result()->fetch_assoc();
+        $stmtP->close();
+        if (!$plaza) respondJson(404, ['success' => false, 'error' => 'Plaza no encontrada']);
+
+        $es_propietario = ($dni === $plaza['dni_propietario']);
+
+        // El DNI del inquilino viene de la sesión (tenant) o del parámetro 'u' (propietario viendo una conv)
+        if ($es_propietario) {
+            $dni_inquilino = trim($_GET['u'] ?? '');
+            if (empty($dni_inquilino)) respondJson(400, ['success' => false, 'error' => 'Falta u']);
+        } else {
+            $dni_inquilino = $dni;
+        }
+
+        // Marcar como leídos
+        $stmtL = $_conexion->prepare("UPDATE MENSAJE SET Leido=1 WHERE ID_plaza=? AND DNI_inquilino=? AND DNI_emisor!=? AND Leido=0");
+        $stmtL->bind_param('iss', $id_plaza, $dni_inquilino, $dni);
+        $stmtL->execute();
+        $stmtL->close();
+
+        $stmt = $_conexion->prepare(
+            "SELECT m.ID_mensaje, m.DNI_emisor, m.Contenido, m.Leido, m.Fecha,
+                    u.Nombre, u.Apellidos
+             FROM MENSAJE m JOIN USUARIO u ON m.DNI_emisor = u.DNI
+             WHERE m.ID_plaza = ? AND m.DNI_inquilino = ?
+             ORDER BY m.Fecha ASC"
+        );
+        $stmt->bind_param('is', $id_plaza, $dni_inquilino);
+        $stmt->execute();
+        $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+
+        respondJson(200, [
+            'success'  => true,
+            'mensajes' => array_map(function($r) use ($dni) {
+                return [
+                    'id'        => (int) $r['ID_mensaje'],
+                    'es_mio'    => $r['DNI_emisor'] === $dni,
+                    'emisor'    => $r['Nombre'] . ' ' . mb_substr($r['Apellidos'], 0, 1) . '.',
+                    'contenido' => $r['Contenido'],
+                    'leido'     => (bool) $r['Leido'],
+                    'fecha'     => $r['Fecha'],
+                ];
+            }, $rows),
+        ]);
+    }
+
+    // ── Modo reserva (flujo original) ──
     $id_reserva = isset($_GET['id_reserva']) ? (int)$_GET['id_reserva'] : 0;
     if ($id_reserva <= 0) respondJson(400, ['success' => false, 'error' => 'ID inválido']);
 
@@ -116,18 +179,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // ── POST → enviar mensaje ──────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data       = json_decode(file_get_contents('php://input'), true) ?? [];
-    $id_reserva = (int)($data['id_reserva'] ?? 0);
-    $contenido  = trim($data['mensaje'] ?? '');
+    $data      = json_decode(file_get_contents('php://input'), true) ?? [];
+    $contenido = trim($data['mensaje'] ?? '');
 
-    if ($id_reserva <= 0)         respondJson(400, ['success' => false, 'error' => 'ID de reserva inválido']);
-    if ($contenido === '')        respondJson(422, ['success' => false, 'error' => 'El mensaje no puede estar vacío']);
+    if ($contenido === '')             respondJson(422, ['success' => false, 'error' => 'El mensaje no puede estar vacío']);
     if (mb_strlen($contenido) > 1000) respondJson(422, ['success' => false, 'error' => 'Mensaje demasiado largo']);
+
+    // ── Modo plaza ──
+    if (isset($data['id_plaza'])) {
+        $id_plaza = (int)($data['id_plaza'] ?? 0);
+        if ($id_plaza <= 0) respondJson(400, ['success' => false, 'error' => 'ID de plaza inválido']);
+
+        $stmtP = $_conexion->prepare("SELECT DNI AS dni_propietario, Direccion FROM PLAZA WHERE ID_plaza = ?");
+        $stmtP->bind_param('i', $id_plaza);
+        $stmtP->execute();
+        $plaza = $stmtP->get_result()->fetch_assoc();
+        $stmtP->close();
+        if (!$plaza) respondJson(404, ['success' => false, 'error' => 'Plaza no encontrada']);
+
+        $es_propietario = ($dni === $plaza['dni_propietario']);
+
+        if ($es_propietario) {
+            $dni_inquilino = trim($data['u'] ?? '');
+            if (empty($dni_inquilino)) respondJson(400, ['success' => false, 'error' => 'Falta u']);
+            $dni_dest = $dni_inquilino;
+        } else {
+            $dni_inquilino = $dni;
+            $dni_dest = $plaza['dni_propietario'];
+        }
+
+        $stmt = $_conexion->prepare("INSERT INTO MENSAJE (ID_plaza, DNI_inquilino, DNI_emisor, Contenido) VALUES (?,?,?,?)");
+        $stmt->bind_param('isss', $id_plaza, $dni_inquilino, $dni, $contenido);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            respondJson(500, ['success' => false, 'error' => 'Error al guardar el mensaje']);
+        }
+        $stmt->close();
+
+        try {
+            $helperPath = __DIR__ . '/../notificaciones/notificaciones_helper.php';
+            if (file_exists($helperPath)) {
+                require_once $helperPath;
+                crearNotificacion($_conexion, $dni_dest, 'nuevo_mensaje', 'Nueva consulta',
+                    'Tienes un nuevo mensaje sobre la plaza en ' . ($plaza['Direccion'] ?? 'tu plaza') . '.', null);
+            }
+        } catch (Exception $e) {}
+
+        respondJson(201, ['success' => true]);
+    }
+
+    // ── Modo reserva (flujo original) ──
+    $id_reserva = (int)($data['id_reserva'] ?? 0);
+    if ($id_reserva <= 0) respondJson(400, ['success' => false, 'error' => 'ID de reserva inválido']);
 
     $acceso = verificarAcceso($_conexion, $id_reserva, $dni);
     if (!$acceso) respondJson(403, ['success' => false, 'error' => 'Sin acceso a esta reserva']);
 
-    // Guardar mensaje (sin escapar — la BD usa utf8mb4 y prepared statements)
     $stmt = $_conexion->prepare("INSERT INTO MENSAJE (ID_reserva, DNI_emisor, Contenido) VALUES (?,?,?)");
     $stmt->bind_param('iss', $id_reserva, $dni, $contenido);
     if (!$stmt->execute()) {
@@ -136,25 +243,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $stmt->close();
 
-    // Notificar al otro participante (en try/catch para no romper la respuesta si falla)
     try {
-        // PARA INFINITY: $helperPath = __DIR__ . '/../../notificaciones/notificaciones_helper.php';
         $helperPath = __DIR__ . '/../notificaciones/notificaciones_helper.php';
         if (file_exists($helperPath)) {
             require_once $helperPath;
             $dest = ($dni === $acceso['dni_inquilino'])
                 ? $acceso['dni_propietario']
                 : $acceso['dni_inquilino'];
-            crearNotificacion(
-                $_conexion, $dest,
-                'nuevo_mensaje', 'Nuevo mensaje',
-                'Tienes un nuevo mensaje sobre la reserva en ' . ($acceso['Direccion'] ?? 'tu plaza') . '.',
-                $id_reserva
-            );
+            crearNotificacion($_conexion, $dest, 'nuevo_mensaje', 'Nuevo mensaje',
+                'Tienes un nuevo mensaje sobre la reserva en ' . ($acceso['Direccion'] ?? 'tu plaza') . '.', $id_reserva);
         }
-    } catch (Exception $e) {
-        // No interrumpir si falla la notificación
-    }
+    } catch (Exception $e) {}
 
     respondJson(201, ['success' => true]);
 }
