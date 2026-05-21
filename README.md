@@ -18,4 +18,4 @@ mysql -u root -p < database/zpot_bd.sql
 Crea el usuario `admin` (contraseña `admin`), la base `zpot_bd`, las tablas (USUARIO, PLAZA, RESERVA) y datos de ejemplo: un usuario demo y 8 plazas en Málaga para probar el mapa.
 
 ## Estado del proyecto
-Las funcionalidades del proyecto y sus apartados están listos, queda la implementación de la lógica del calendario para mostrar los días y horas no disponibles, añadir responsive del CSS, arreglar fallos de la API de PayPal, añadir modo oscuro, traducción a diferentes idiomas y la posibilidad de subir foto de perfil.
+El proyecto está finalizado, esperamos que les resulte de su agrado nuestra aplicación.
