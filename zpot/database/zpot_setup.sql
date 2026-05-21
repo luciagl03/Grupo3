@@ -1,11 +1,21 @@
--- =============================================================================
--- Zpot: base de datos COMPLETA (limpia + reseñas)
--- Uso: mysql -u root -p zpot_bd < zpot_bd_completo.sql
--- =============================================================================
+-- 
+-- ZPOT - Script de Instalación Completo
+-- 
+-- Este archivo contiene TODA la estructura de base de datos necesaria para
+-- ejecutar Zpot desde cero.
+--
+-- INSTRUCCIONES DE USO:
+-- 1. Crear la base de datos: CREATE DATABASE zpot_bd;
+-- 2. Ejecutar este script: mysql -u root -p zpot_bd < zpot_setup.sql
+--    O desde phpMyAdmin: Importar este archivo
+--
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Eliminar tablas en orden inverso a las FK
+-- Eliminar tablas si existen (para instalación limpia)
+DROP TABLE IF EXISTS MENSAJE;
+DROP TABLE IF EXISTS METODO_PAGO;
+DROP TABLE IF EXISTS NOTIFICACION;
 DROP TABLE IF EXISTS RESENA;
 DROP TABLE IF EXISTS RESERVA;
 DROP TABLE IF EXISTS PLAZA;
@@ -13,16 +23,15 @@ DROP TABLE IF EXISTS USUARIO;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- =============================================================================
--- TABLAS
--- =============================================================================
+-- TABLAS PRINCIPALES
 
+-- Tabla de usuarios (propietarios y conductores)
 CREATE TABLE USUARIO (
     DNI                   VARCHAR(20)  PRIMARY KEY,
     Nombre                VARCHAR(100) NOT NULL,
     Apellidos             VARCHAR(150) NOT NULL,
     Direccion             VARCHAR(200),
-    Foto                  VARCHAR(255),
+    Foto                  MEDIUMTEXT,              -- Soporta URLs y Base64
     Telefono              VARCHAR(20),
     Email                 VARCHAR(100) UNIQUE,
     Contrasena_encriptada VARCHAR(255) NOT NULL,
@@ -31,11 +40,12 @@ CREATE TABLE USUARIO (
     confirmado            TINYINT(1)   NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Tabla de plazas de aparcamiento
 CREATE TABLE PLAZA (
     ID_plaza    INT           AUTO_INCREMENT PRIMARY KEY,
     DNI         VARCHAR(20),
     Direccion   VARCHAR(200),
-    Foto        MEDIUMTEXT,
+    Foto        MEDIUMTEXT,                      -- Soporta URLs y Base64
     Ancho       DECIMAL(5,2),
     Largo       DECIMAL(5,2),
     Descripcion TEXT,
@@ -49,6 +59,7 @@ CREATE TABLE PLAZA (
         FOREIGN KEY (DNI) REFERENCES USUARIO(DNI) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Tabla de reservas
 CREATE TABLE RESERVA (
     ID_reserva   INT           AUTO_INCREMENT PRIMARY KEY,
     DNI          VARCHAR(20),
@@ -65,6 +76,7 @@ CREATE TABLE RESERVA (
         FOREIGN KEY (ID_plaza) REFERENCES PLAZA(ID_plaza) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Tabla de reseñas
 CREATE TABLE RESENA (
     ID_resena  INT          AUTO_INCREMENT PRIMARY KEY,
     ID_plaza   INT          NOT NULL,
@@ -72,22 +84,67 @@ CREATE TABLE RESENA (
     Puntuacion TINYINT      NOT NULL CHECK (Puntuacion BETWEEN 1 AND 5),
     Comentario TEXT,
     Fecha      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
     -- Un usuario solo puede dejar UNA reseña por plaza
     UNIQUE KEY uq_resena_usuario_plaza (ID_plaza, DNI),
-
     CONSTRAINT fk_resena_plaza
         FOREIGN KEY (ID_plaza) REFERENCES PLAZA(ID_plaza) ON DELETE CASCADE,
     CONSTRAINT fk_resena_usuario
         FOREIGN KEY (DNI) REFERENCES USUARIO(DNI) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- =============================================================================
+-- Tabla de notificaciones
+CREATE TABLE NOTIFICACION (
+    ID_notif  INT          AUTO_INCREMENT PRIMARY KEY,
+    DNI       VARCHAR(20)  NOT NULL,
+    Tipo      VARCHAR(40)  NOT NULL,
+    Titulo    VARCHAR(150) NOT NULL,
+    Mensaje   TEXT         NOT NULL,
+    Leida     TINYINT(1)   NOT NULL DEFAULT 0,
+    Fecha     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ID_ref    INT          NULL,
+    CONSTRAINT fk_notif_usuario
+        FOREIGN KEY (DNI) REFERENCES USUARIO(DNI) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabla de mensajes (chat)
+CREATE TABLE MENSAJE (
+    ID_mensaje   INT          AUTO_INCREMENT PRIMARY KEY,
+    ID_reserva   INT          NULL,                -- Nullable para chats sin reserva
+    ID_plaza     INT          NULL,                -- Para chats por plaza
+    DNI_emisor   VARCHAR(20)  NOT NULL,
+    DNI_inquilino VARCHAR(20) NULL,                -- Usuario no-propietario en chat de plaza
+    Contenido    TEXT         NOT NULL,
+    Leido        TINYINT(1)   NOT NULL DEFAULT 0,
+    Fecha        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_msg_reserva
+        FOREIGN KEY (ID_reserva) REFERENCES RESERVA(ID_reserva) ON DELETE CASCADE,
+    CONSTRAINT fk_msg_usuario
+        FOREIGN KEY (DNI_emisor) REFERENCES USUARIO(DNI) ON DELETE CASCADE,
+    CONSTRAINT fk_msg_plaza
+        FOREIGN KEY (ID_plaza) REFERENCES PLAZA(ID_plaza) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabla de métodos de pago
+CREATE TABLE METODO_PAGO (
+    ID_metodo     INT          AUTO_INCREMENT PRIMARY KEY,
+    DNI           VARCHAR(20)  NOT NULL,
+    Tipo          ENUM('paypal','tarjeta') NOT NULL,
+    Alias         VARCHAR(100) NOT NULL,          -- ej: "Mi PayPal", "Visa personal"
+    Ultimos4      CHAR(4)      NULL,              -- solo para tarjetas, ej: "4242"
+    Marca         VARCHAR(20)  NULL,              -- "visa", "mastercard", "amex"
+    Caducidad     CHAR(5)      NULL,              -- "MM/AA", ej: "12/27"
+    Email_paypal  VARCHAR(100) NULL,              -- para cuentas PayPal
+    Es_defecto    TINYINT(1)   NOT NULL DEFAULT 0,
+    Fecha_alta    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_metodo_usuario
+        FOREIGN KEY (DNI) REFERENCES USUARIO(DNI) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- DATOS DE PRUEBA
--- =============================================================================
 
 -- Usuario propietario de las plazas demo
 -- Contraseña: password
+
 INSERT INTO USUARIO (DNI, Nombre, Apellidos, Direccion, Telefono, Email, Contrasena_encriptada, confirmado) VALUES
 ('12345678A', 'Demo',   'Propietario',      'Calle Larios 1, Málaga',       '952123456', 'demo@zpot.local',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1);
 
@@ -138,28 +195,18 @@ INSERT INTO RESENA (ID_plaza, DNI, Puntuacion, Comentario, Fecha) VALUES
 (7, '44332211F', 5, 'Excelente para ir al casco antiguo. Muy fácil de encontrar.',              '2025-03-19 16:00:00'),
 (8, '87654321B', 4, 'Muy céntrica, a un paso de la calle Larios. El vigilante siempre presente.', '2025-03-20 12:00:00');
 
--- =============================================================================
--- Zpot: Migración — Tabla NOTIFICACION
--- Ejecutar en el MySQL de InfinityFree (no toca tablas existentes)
--- =============================================================================
-
-CREATE TABLE IF NOT EXISTS NOTIFICACION (
-    ID_notif  INT          AUTO_INCREMENT PRIMARY KEY,
-    DNI       VARCHAR(20)  NOT NULL,
-    Tipo      VARCHAR(40)  NOT NULL,
-    Titulo    VARCHAR(150) NOT NULL,
-    Mensaje   TEXT         NOT NULL,
-    Leida     TINYINT(1)   NOT NULL DEFAULT 0,
-    Fecha     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    ID_ref    INT          NULL,
-    CONSTRAINT fk_notif_usuario
-        FOREIGN KEY (DNI) REFERENCES USUARIO(DNI) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Datos de prueba para el usuario demo
+-- Notificaciones de prueba para el usuario demo
 INSERT INTO NOTIFICACION (DNI, Tipo, Titulo, Mensaje, Leida, Fecha) VALUES
 ('12345678A', 'reserva_confirmada', '¡Reserva confirmada!',       'Tu reserva en Calle Marqués de Larios 5 el 10/03/2025 ha sido confirmada.',  1, '2025-03-10 13:05:00'),
 ('12345678A', 'nueva_resena',       'Nueva reseña en tu plaza',   'Laura M. dejó 5★ en Calle Marqués de Larios 5.',                              1, '2025-03-10 13:10:00'),
 ('12345678A', 'reserva_confirmada', '¡Reserva confirmada!',       'Tu reserva en Plaza de la Constitución 3 el 12/03/2025 ha sido confirmada.',   0, '2025-03-12 12:05:00'),
 ('12345678A', 'nueva_resena',       'Nueva reseña en tu plaza',   'Ana G. dejó 5★ en Plaza de la Constitución 3.',                               0, '2025-03-12 12:15:00'),
 ('12345678A', 'reserva_cancelada',  'Reserva cancelada',          'Tu reserva en Calle Granada 42 el 14/03/2025 ha sido cancelada.',              0, '2025-03-14 15:00:00');
+
+-- Método de pago de prueba para el usuario demo
+INSERT INTO METODO_PAGO (DNI, Tipo, Alias, Email_paypal, Es_defecto) VALUES
+('12345678A', 'paypal', 'Mi PayPal', 'demo@zpot.local', 1);
+
+
+-- La base de datos está lista para usar.
+-- Usuario de prueba: demo@zpot.local / password
