@@ -155,7 +155,7 @@ $nombreOtro = $yoSoyInquilino
 
     <!-- Header -->
     <div class="chat-header">
-        <a href="../parking/mis_reservas.php" class="chat-back">
+        <a href="javascript:history.back()" class="chat-back">
             <i data-lucide="arrow-left" width="20" height="20"></i>
         </a>
         <div class="chat-avatar"><?php echo mb_strtoupper(mb_substr($nombreOtro, 0, 1)); ?></div>
