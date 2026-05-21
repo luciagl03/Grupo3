@@ -216,6 +216,65 @@ body {
     display: block;
 }
 
+.field-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.4rem;
+    display: block;
+}
+
+/* PASSWORD WRAPPER */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 3rem !important;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    opacity: 0.7;
+}
+
+.toggle-password:hover {
+    color: var(--brand-dark);
+    opacity: 1;
+    background: rgba(207, 204, 196, 0.15);
+}
+
+.toggle-password:focus {
+    outline: none;
+    color: var(--brand-dark);
+    opacity: 1;
+    box-shadow: 0 0 0 2px rgba(244, 221, 73, 0.3);
+}
+
+.toggle-password:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.toggle-password .eye-icon {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.5;
+}
+
 .global-error {
     font-size: 0.9rem;
     color: #fff;
