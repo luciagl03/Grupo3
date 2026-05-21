@@ -10,6 +10,31 @@ require_once '../sesion/conexion.php';
 
 $dni = $_SESSION['dni'];
 
+// Obtener IDs de reservas que tienen notificaciones no leídas (primera vez que se ven)
+$stmtNuevas = $_conexion->prepare(
+    "SELECT ID_ref FROM NOTIFICACION 
+     WHERE DNI = ? AND Tipo = 'nueva_reserva_propietario' AND Leida = 0"
+);
+$stmtNuevas->bind_param('s', $dni);
+$stmtNuevas->execute();
+$resultNuevas = $stmtNuevas->get_result();
+$reservasNuevas = [];
+while ($rowNueva = $resultNuevas->fetch_assoc()) {
+    if ($rowNueva['ID_ref']) {
+        $reservasNuevas[] = (int)$rowNueva['ID_ref'];
+    }
+}
+$stmtNuevas->close();
+
+// Marcar como leídas las notificaciones de nuevas reservas al entrar a esta página
+$stmtMarkRead = $_conexion->prepare(
+    "UPDATE NOTIFICACION SET Leida = 1 
+     WHERE DNI = ? AND Tipo = 'nueva_reserva_propietario' AND Leida = 0"
+);
+$stmtMarkRead->bind_param('s', $dni);
+$stmtMarkRead->execute();
+$stmtMarkRead->close();
+
 // Reservas confirmadas en plazas del propietario, con nombre del inquilino y mensajes no leídos
 $sql = "SELECT r.ID_reserva, r.Fecha, r.Hora_entrada, r.Hora_salida, r.Precio, r.Estado,
                p.ID_plaza, p.Direccion,
@@ -52,6 +77,39 @@ $stmt->close();
     <link rel="stylesheet" href="../styles/mis_reservas.css">
     <style>
         .estado-completada { background:#d1fae5; color:#065f46; }
+
+        /* Animación sutil para reservas nuevas */
+        @keyframes nuevaReservaGlow {
+            0%, 100% { 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 0 0 0 rgba(244, 221, 73, 0);
+            }
+            50% { 
+                box-shadow: 0 6px 20px rgba(0,0,0,0.15), 0 0 0 6px rgba(244, 221, 73, 0.25);
+            }
+        }
+        
+        .reserva-card.nueva {
+            animation: nuevaReservaGlow 2s ease-in-out 3;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef9e7 100%);
+            border: 2px solid rgba(244, 221, 73, 0.5);
+            position: relative;
+        }
+        
+        .reserva-card.nueva::before {
+            content: 'Nueva';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #f4dd49 0%, #f5e642 100%);
+            color: var(--brand-dark);
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            z-index: 1;
+            box-shadow: 0 3px 12px rgba(244, 221, 73, 0.4), 0 0 0 2px #fff;
+            letter-spacing: 0.02em;
+        }
 
         .chat-btn {
             display: inline-flex;
@@ -158,8 +216,11 @@ $stmt->close();
                 $inicialInquilino = mb_strtoupper(mb_substr($row['nombre_inquilino'], 0, 1));
                 $nombreCorto = htmlspecialchars($row['nombre_inquilino'] . ' ' . mb_substr($row['apellidos_inquilino'], 0, 1) . '.');
                 $noLeidos = (int)$row['no_leidos'];
+                
+                // Verificar si es una reserva nueva (recién vista)
+                $esNueva = in_array((int)$row['ID_reserva'], $reservasNuevas);
             ?>
-            <div class="card reserva-card">
+            <div class="card reserva-card<?php echo $esNueva ? ' nueva' : ''; ?>">
                 <div class="reserva-header">
                     <div class="plaza-tag">
                         <?php echo htmlspecialchars($row['Direccion'] ?? 'Plaza #' . $row['ID_plaza']); ?>

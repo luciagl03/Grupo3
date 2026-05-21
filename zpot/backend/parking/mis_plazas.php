@@ -22,6 +22,19 @@ $stmtUnread->execute();
 $totalNoLeidos = (int)$stmtUnread->get_result()->fetch_assoc()['total'];
 $stmtUnread->close();
 
+// Notificaciones no leídas de nuevas reservas recibidas
+$stmtNuevasReservas = $_conexion->prepare(
+    "SELECT COUNT(*) AS total FROM NOTIFICACION
+     WHERE DNI = ? AND Tipo = 'nueva_reserva_propietario' AND Leida = 0"
+);
+$stmtNuevasReservas->bind_param('s', $dni);
+$stmtNuevasReservas->execute();
+$nuevasReservasNoLeidas = (int)$stmtNuevasReservas->get_result()->fetch_assoc()['total'];
+$stmtNuevasReservas->close();
+
+// Total de alertas (mensajes + nuevas reservas)
+$totalAlertas = $totalNoLeidos + $nuevasReservasNoLeidas;
+
 $sql = "SELECT * FROM PLAZA WHERE DNI = ?";
 
 $stmt = $_conexion->prepare($sql);
@@ -66,9 +79,9 @@ $result = $stmt->get_result();
                     <a href="reservas_propietario.php" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.1rem;background:var(--brand-dark);color:var(--brand-yellow);border-radius:999px;text-decoration:none;font-size:0.85rem;font-weight:700;white-space:nowrap;position:relative;flex-shrink:0;">
                         <i data-lucide="calendar-check" width="16" height="16"></i>
                         Reservas recibidas
-                        <?php if ($totalNoLeidos > 0): ?>
+                        <?php if ($totalAlertas > 0): ?>
                             <span style="position:absolute;top:-7px;right:-7px;background:#ef4444;color:#fff;border-radius:999px;font-size:0.65rem;font-weight:700;min-width:19px;height:19px;display:flex;align-items:center;justify-content:center;padding:0 4px;">
-                                <?php echo $totalNoLeidos; ?>
+                                <?php echo $totalAlertas; ?>
                             </span>
                         <?php endif; ?>
                     </a>

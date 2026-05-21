@@ -353,8 +353,13 @@
                         return;
                     }
                     
+                    // Para reserva_cancelada, no redirigir a ningún lugar
+                    if(tipo==='reserva_cancelada') {
+                        return;
+                    }
+                    
                     var url=null;
-                    if(tipo==='reserva_cancelada'||tipo==='reserva_pendiente') url='./parking/mis_reservas.php';
+                    if(tipo==='reserva_pendiente') url='./parking/mis_reservas.php';
                     else if(tipo==='reserva_confirmada') {
                         // Determinar si es propietario o inquilino basado en el contexto
                         // Si la notificación dice "Has recibido" es propietario, sino inquilino
