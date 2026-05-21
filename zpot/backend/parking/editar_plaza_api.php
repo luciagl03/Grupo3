@@ -53,9 +53,22 @@ if ($direccionRaw === '') {
 }
 $direccion = htmlspecialchars($direccionRaw, ENT_QUOTES, 'UTF-8');
 
-$foto = trim((string)($data['foto'] ?? ''));
-$foto = $foto !== '' ? htmlspecialchars($foto, ENT_QUOTES, 'UTF-8') : null;
-if ($foto && !filter_var($foto, FILTER_VALIDATE_URL)) $errors['foto'] = 'URL de foto no válida';
+// Handle Base64 image data or URL
+$foto = null;
+if (isset($data['foto']) && !empty($data['foto'])) {
+    $fotoData = $data['foto'];
+    // Check if it's a Base64 data URI
+    if (preg_match('/^data:image\/(jpeg|jpg|png|gif|webp);base64,/', $fotoData)) {
+        // Validate Base64 format and keep as-is for storage
+        $foto = $fotoData;
+    } else {
+        // If it's a regular URL, clean it
+        $foto = htmlspecialchars(trim($fotoData), ENT_QUOTES, 'UTF-8');
+        if (!filter_var($foto, FILTER_VALIDATE_URL)) {
+            $errors['foto'] = 'URL de foto no válida';
+        }
+    }
+}
 
 $descripcion = trim((string)($data['descripcion'] ?? ''));
 $descripcion = $descripcion !== '' ? htmlspecialchars($descripcion, ENT_QUOTES, 'UTF-8') : null;

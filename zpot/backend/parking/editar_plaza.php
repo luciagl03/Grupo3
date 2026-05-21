@@ -63,10 +63,19 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
                 </div>
 
                 <div class="form-group">
-                    <label for="foto"><i data-lucide="image"></i>URL de la foto</label>
-                    <input type="url" id="foto" name="foto" autocomplete="off" placeholder="https://..."
-                           value="<?php echo htmlspecialchars($plaza['Foto'] ?? ''); ?>">
+                    <label for="foto"><i data-lucide="image"></i> Foto de la plaza</label>
+                    <input type="file" id="foto" name="foto" accept="image/*" class="file-input">
+                    <label for="foto" class="file-label">
+                        <i data-lucide="upload"></i>
+                        <span id="fileLabel">Seleccionar imagen</span>
+                    </label>
                     <span id="fotoError" class="field-error" aria-live="polite"></span>
+                    <div id="imagePreview" class="image-preview" <?php echo !empty($plaza['Foto']) ? '' : 'hidden'; ?>>
+                        <img id="previewImg" src="<?php echo htmlspecialchars($plaza['Foto'] ?? ''); ?>" alt="Vista previa">
+                        <button type="button" class="remove-image" id="removeImage" aria-label="Eliminar imagen">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="row-two">
@@ -143,15 +152,69 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
             var form = document.getElementById('plazaForm');
             var submitBtn = document.getElementById('submitBtn');
             var globalError = document.getElementById('globalError');
+            var fotoInput = document.getElementById('foto');
+            var fileLabel = document.getElementById('fileLabel');
+            var imagePreview = document.getElementById('imagePreview');
+            var previewImg = document.getElementById('previewImg');
+            var removeImageBtn = document.getElementById('removeImage');
+            var selectedFile = null;
+            var keepExistingPhoto = <?php echo !empty($plaza['Foto']) ? 'true' : 'false'; ?>;
+            var existingPhotoUrl = <?php echo !empty($plaza['Foto']) ? json_encode($plaza['Foto']) : 'null'; ?>;
 
             var fields = {
                 direccion:   { el: document.getElementById('direccion'),   err: document.getElementById('direccionError') },
-                foto:        { el: document.getElementById('foto'),        err: document.getElementById('fotoError') },
+                foto:        { el: fotoInput,        err: document.getElementById('fotoError') },
                 ancho:       { el: document.getElementById('ancho'),       err: document.getElementById('anchoError') },
                 largo:       { el: document.getElementById('largo'),       err: document.getElementById('largoError') },
                 descripcion: { el: document.getElementById('descripcion'), err: document.getElementById('descripcionError') },
                 precio:      { el: document.getElementById('precio'),      err: document.getElementById('precioError') }
             };
+
+            // Handle file selection and preview
+            fotoInput.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    setError('foto', 'El archivo debe ser una imagen');
+                    fotoInput.value = '';
+                    return;
+                }
+
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    setError('foto', 'La imagen es demasiado grande (máx. 5MB)');
+                    fotoInput.value = '';
+                    return;
+                }
+
+                setError('foto', '');
+                selectedFile = file;
+                keepExistingPhoto = false;
+                fileLabel.textContent = file.name;
+
+                // Show preview
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.hidden = false;
+                    lucide.createIcons();
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Remove image
+            removeImageBtn.addEventListener('click', function() {
+                fotoInput.value = '';
+                selectedFile = null;
+                keepExistingPhoto = false;
+                fileLabel.textContent = 'Seleccionar imagen';
+                imagePreview.hidden = true;
+                previewImg.src = '';
+                setError('foto', '');
+                lucide.createIcons();
+            });
 
             function getUbicacion() {
                 var checked = document.querySelector('input[name="ubicacion"]:checked');
@@ -182,7 +245,6 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
             function validate() {
                 var valid = true;
                 var direccionVal = (fields.direccion.el.value || '').trim();
-                var fotoVal = (fields.foto.el.value || '').trim();
                 var precioVal = fields.precio.el.value;
 
                 if (!direccionVal) {
@@ -193,13 +255,6 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
                     valid = false;
                 } else {
                     setError('direccion', '');
-                }
-
-                if (fotoVal && !/^https?:\/\/.+/.test(fotoVal)) {
-                    setError('foto', 'Introduce una URL válida');
-                    valid = false;
-                } else {
-                    setError('foto', '');
                 }
 
                 if (precioVal === '' || precioVal === null) {
@@ -221,44 +276,67 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
                 if (!validate()) return;
 
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Guardando…';
+                submitBtn.innerHTML = '<i data-lucide="loader"></i> Guardando…';
+                lucide.createIcons();
 
-                var payload = {
-                    id_plaza: parseInt(document.getElementById('id_plaza').value),
-                    direccion: (fields.direccion.el.value || '').trim(),
-                    foto: (fields.foto.el.value || '').trim() || null,
-                    ancho: fields.ancho.el.value === '' ? null : fields.ancho.el.value,
-                    largo: fields.largo.el.value === '' ? null : fields.largo.el.value,
-                    descripcion: (fields.descripcion.el.value || '').trim() || null,
-                    precio: fields.precio.el.value,
-                    ubicacion: getUbicacion(),
-                    extras: getExtras()
-                };
+                // Convert image to Base64 if selected
+                function processForm(fotoBase64) {
+                    var payload = {
+                        id_plaza: parseInt(document.getElementById('id_plaza').value),
+                        direccion: (fields.direccion.el.value || '').trim(),
+                        foto: fotoBase64 !== undefined ? fotoBase64 : (keepExistingPhoto ? existingPhotoUrl : null),
+                        ancho: fields.ancho.el.value === '' ? null : fields.ancho.el.value,
+                        largo: fields.largo.el.value === '' ? null : fields.largo.el.value,
+                        descripcion: (fields.descripcion.el.value || '').trim() || null,
+                        precio: fields.precio.el.value,
+                        ubicacion: getUbicacion(),
+                        extras: getExtras()
+                    };
 
-                fetch('editar_plaza_api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify(payload)
-                })
-                .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
-                .then(function (ref) {
-                    if (ref.ok && ref.data.success) {
-                        window.location.href = 'mis_plazas.php?updated=1';
-                        return;
-                    }
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Guardar cambios';
-                    if (ref.data.errors) {
-                        Object.keys(ref.data.errors).forEach(function (k) { setError(k, ref.data.errors[k]); });
-                    }
-                    if (ref.data.error) showGlobalError(ref.data.error);
-                })
-                .catch(function () {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Guardar cambios';
-                    showGlobalError('Error de conexión. Inténtalo de nuevo.');
-                });
+                    fetch('editar_plaza_api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(payload)
+                    })
+                    .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+                    .then(function (ref) {
+                        if (ref.ok && ref.data.success) {
+                            window.location.href = 'mis_plazas.php?updated=1';
+                            return;
+                        }
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i data-lucide="save"></i> Guardar cambios';
+                        lucide.createIcons();
+                        if (ref.data.errors) {
+                            Object.keys(ref.data.errors).forEach(function (k) { setError(k, ref.data.errors[k]); });
+                        }
+                        if (ref.data.error) showGlobalError(ref.data.error);
+                    })
+                    .catch(function () {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i data-lucide="save"></i> Guardar cambios';
+                        lucide.createIcons();
+                        showGlobalError('Error de conexión. Inténtalo de nuevo.');
+                    });
+                }
+
+                // If there's a new file, convert to Base64
+                if (selectedFile) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        processForm(e.target.result);
+                    };
+                    reader.onerror = function() {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i data-lucide="save"></i> Guardar cambios';
+                        lucide.createIcons();
+                        showGlobalError('Error al procesar la imagen');
+                    };
+                    reader.readAsDataURL(selectedFile);
+                } else {
+                    processForm(undefined);
+                }
             });
         })();
     </script>
