@@ -44,7 +44,7 @@ if ($order_id !== '' && $reserva['Estado'] === 'pendiente') {
     // Limpiar la sesión de reserva actual
     unset($_SESSION['id_reserva_actual']);
 
-    // Crear notificación ahora que tenemos todos los datos
+    // Crear notificación para el INQUILINO
     $direccion = $reserva['Direccion'] ?? 'Plaza #' . $reserva['ID_plaza'];
     $fecha     = date('d/m/Y', strtotime($reserva['Fecha']));
     crearNotificacion(
@@ -55,6 +55,25 @@ if ($order_id !== '' && $reserva['Estado'] === 'pendiente') {
         'Tu reserva en ' . $direccion . ' el ' . $fecha . ' ha sido confirmada.',
         $id_reserva
     );
+
+    // Crear notificación para el PROPIETARIO
+    $stmtProp = $_conexion->prepare("SELECT DNI FROM PLAZA WHERE ID_plaza = ?");
+    $stmtProp->bind_param("i", $reserva['ID_plaza']);
+    $stmtProp->execute();
+    $propResult = $stmtProp->get_result()->fetch_assoc();
+    $stmtProp->close();
+    
+    if ($propResult) {
+        $dni_propietario = $propResult['DNI'];
+        crearNotificacion(
+            $_conexion,
+            $dni_propietario,
+            'reserva_confirmada',
+            'Nueva reserva confirmada',
+            'Has recibido una reserva confirmada en ' . $direccion . ' para el ' . $fecha . '.',
+            $id_reserva
+        );
+    }
 }
 ?>
 <!DOCTYPE html>

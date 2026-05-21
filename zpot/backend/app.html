@@ -30,9 +30,12 @@
         #chatBubble:hover  { transform: scale(1.08); box-shadow: 0 4px 20px rgba(0,0,0,.16); background: #fafaf5; }
         #chatBubble:active { transform: scale(.95); }
         #chatBubbleBadge {
-            position: absolute; top: 4px; right: 4px;
-            width: 10px; height: 10px; background: #e74c3c;
+            position: absolute; top: 2px; right: 2px;
+            min-width: 18px; height: 18px; background: #e74c3c;
             border-radius: 50%; border: 2px solid #fff; display: none;
+            color: #fff; font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 4px;
         }
         /* ── Panel lateral ── */
         #chatPanel {
@@ -160,7 +163,6 @@
                     <a href="profile/mi_perfil.php" class="account-item" data-i18n="myProfile">Mi perfil</a>
                     <a href="parking/mis_reservas.php" class="account-item" data-i18n="myReservations">Mis reservas</a>
                     <a href="parking/mis_plazas.php" class="account-item" data-i18n="mySpots">Mis plazas</a>
-                    <a href="parking/mis_plazas.php?tab=chats" class="account-item">Mensajes</a>
                     <a href="payment/metodos_pago.php" class="account-item" data-i18n="paymentMethods">Métodos de pago</a>
                     <hr class="account-divider">
                     <a href="settings/ajustes.php" class="account-item" data-i18n="settings">Ajustes</a>
@@ -259,6 +261,7 @@
     // ── Rutas de API (rutas relativas para evitar duplicación) ──
     var NOTIF_API = './notificaciones/notificaciones_api.php';
     var CHAT_API  = './chat/chat_api.php';
+    var CHATS_LIST_API = './chat/chats_list_api.php';
     var RES_API   = './parking/mis_reservas_api.php';
 
     function apiFetch(url, opts) {
@@ -338,7 +341,13 @@
                     drop.style.display='none';
                     var url=null;
                     if(tipo==='nueva_consulta') url='./parking/reserva.php?id_plaza='+ref+'&contactar=1';
-                    else if(tipo==='nuevo_mensaje'||tipo==='reserva_confirmada'||tipo==='reserva_cancelada'||tipo==='reserva_pendiente') url='./parking/mis_reservas.php';
+                    else if(tipo==='nuevo_mensaje'||tipo==='reserva_cancelada'||tipo==='reserva_pendiente') url='./parking/mis_reservas.php';
+                    else if(tipo==='reserva_confirmada') {
+                        // Determinar si es propietario o inquilino basado en el contexto
+                        // Si la notificación dice "Has recibido" es propietario, sino inquilino
+                        var esPropietario = this.querySelector('p:nth-child(2)').textContent.includes('Has recibido');
+                        url = esPropietario ? './parking/reservas_propietario.php' : './parking/mis_reservas.php';
+                    }
                     else if(tipo==='nueva_resena') url='./parking/mis_plazas.php';
                     if(url) window.location.href=url;
                 });
@@ -409,52 +418,67 @@
         // ── Lista ─────────────────────────────────
         function skelHTML(n){ var s='<div class="cp-skel"><div class="sk sk-c"></div><div class="sk-r"><div class="sk sk-l"></div><div class="sk sk-l s"></div></div></div>'; var o=''; for(var i=0;i<n;i++) o+=s; return o; }
 
+        var curChat = null; // {tipo, id_reserva, id_plaza, dni_inquilino}
+
         function cargarLista(){
             volverLista();
             listView.innerHTML = skelHTML(3);
-            // Intenta cargar todas las reservas con ?todas=1 (nuevo parámetro en mis_reservas_api)
-            apiFetch(RES_API+'?todas=1').then(function(d){
-                var rs = d && d.reservas && d.reservas.length ? d.reservas : null;
-                if (rs) { renderLista(rs); return; }
-                // Fallback sin el parámetro
-                apiFetch(RES_API).then(function(d2){
-                    renderLista(d2&&d2.reservas ? d2.reservas : []);
+            apiFetch(CHATS_LIST_API).then(function(d){
+                if(!d || !d.success) {
+                    listView.innerHTML='<div class="cp-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Error al cargar chats.</p></div>';
+                    return;
+                }
+                renderLista(d.chats || []);
+            });
+        }
+
+        function renderLista(chats){
+            if (!chats.length){
+                listView.innerHTML='<div class="cp-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Aún no tienes conversaciones.<br>Aparecerán aquí cuando realices una reserva.</p></div>';
+                return;
+            }
+            listView.innerHTML = chats.map(function(c){
+                var ini = c.nombre.charAt(0).toUpperCase();
+                var badge = c.no_leidos > 0 ? '<span style="min-width:18px;height:18px;background:#e74c3c;color:#fff;border-radius:50%;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;">'+c.no_leidos+'</span>' : '';
+                return '<div class="cp-item" data-tipo="'+c.tipo+'" data-id-reserva="'+(c.id_reserva||0)+'" data-id-plaza="'+(c.id_plaza||0)+'" data-dni-inq="'+(c.dni_inquilino||'')+'" data-nombre="'+esc(c.nombre)+'" data-plaza="'+esc(c.plaza)+'">'+
+                    '<div class="cp-av">'+ini+'</div>'+
+                    '<div class="cp-info"><div class="cp-name">'+esc(c.nombre)+'</div><div class="cp-sub">'+esc(c.plaza)+'</div></div>'+
+                    badge+
+                '</div>';
+            }).join('');
+            listView.querySelectorAll('.cp-item').forEach(function(el){
+                el.addEventListener('click',function(){
+                    var tipo = this.dataset.tipo;
+                    var chat = {
+                        tipo: tipo,
+                        id_reserva: parseInt(this.dataset.idReserva) || 0,
+                        id_plaza: parseInt(this.dataset.idPlaza) || 0,
+                        dni_inquilino: this.dataset.dniInq || '',
+                        nombre: this.dataset.nombre,
+                        plaza: this.dataset.plaza
+                    };
+                    abrirConv(chat);
                 });
             });
         }
 
-        function renderLista(rs){
-            if (!rs.length){
-                listView.innerHTML='<div class="cp-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Aún no tienes conversaciones.<br>Aparecerán aquí cuando realices una reserva.</p></div>';
-                return;
-            }
-            listView.innerHTML = rs.map(function(r){
-                var dir=r.direccion||'Plaza #'+r.id;
-                var ini=dir.charAt(0).toUpperCase();
-                var sub=(r.hora_entrada||'').slice(0,5)+(r.hora_salida?'–'+(r.hora_salida).slice(0,5):'');
-                return '<div class="cp-item" data-id="'+r.id+'" data-dir="'+esc(dir)+'" data-ent="'+esc(r.hora_entrada||'')+'" data-sal="'+esc(r.hora_salida||'')+'">'+
-                    '<div class="cp-av">'+ini+'</div>'+
-                    '<div class="cp-info"><div class="cp-name">'+esc(dir)+'</div><div class="cp-sub">'+esc(sub)+'</div></div>'+
-                '</div>';
-            }).join('');
-            listView.querySelectorAll('.cp-item').forEach(function(el){
-                el.addEventListener('click',function(){ abrirConv(parseInt(this.dataset.id),this.dataset.dir,this.dataset.ent,this.dataset.sal); });
-            });
-        }
-
         // ── Conversación ──────────────────────────
-        function abrirConv(id,dir,ent,sal){
-            curId=id; lastMsgId=0; ulFecha='';
-            cvAv.textContent=(dir||'P').charAt(0).toUpperCase();
-            cvNm.textContent=dir||'Chat';
-            cvSb.textContent='Reserva #'+id;
-            cvAdrTxt.textContent=dir+(ent?(' · '+ent.slice(0,5)+'–'+sal.slice(0,5)):'');
-            cvMsgs.innerHTML=''; cvInput.value=''; cvSend.disabled=true;
-            listView.style.display='none';
+        function abrirConv(chat){
+            curChat = chat;
+            lastMsgId = 0;
+            ulFecha = '';
+            cvAv.textContent = chat.nombre.charAt(0).toUpperCase();
+            cvNm.textContent = chat.nombre;
+            cvSb.textContent = chat.tipo === 'reserva' ? 'Reserva #' + chat.id_reserva : 'Consulta';
+            cvAdrTxt.textContent = chat.plaza;
+            cvMsgs.innerHTML = '';
+            cvInput.value = '';
+            cvSend.disabled = true;
+            listView.style.display = 'none';
             convView.classList.add('active');
             cargarMsgs(true);
             clearInterval(pollTmr);
-            pollTmr=setInterval(function(){ cargarMsgs(false); },3000);
+            pollTmr = setInterval(function(){ cargarMsgs(false); }, 3000);
         }
         function volverLista(){ listView.style.display='flex'; convView.classList.remove('active'); curId=null; clearInterval(pollTmr); }
         cvBack.addEventListener('click',function(){ volverLista(); cargarLista(); });
@@ -463,8 +487,11 @@
         function fmtFS(s){ var d=new Date(s),h=new Date(); if(d.toDateString()===h.toDateString()) return 'Hoy'; var a=new Date(); a.setDate(a.getDate()-1); if(d.toDateString()===a.toDateString()) return 'Ayer'; return d.toLocaleDateString('es-ES',{day:'2-digit',month:'long'}); }
 
         function cargarMsgs(scroll){
-            if(!curId) return;
-            apiFetch(CHAT_API+'?id_reserva='+curId).then(function(d){
+            if(!curChat) return;
+            var url = curChat.tipo === 'reserva' 
+                ? CHAT_API + '?id_reserva=' + curChat.id_reserva
+                : CHAT_API + '?id_plaza=' + curChat.id_plaza + '&u=' + encodeURIComponent(curChat.dni_inquilino);
+            apiFetch(url).then(function(d){
                 if(!d||!d.success) return;
                 if(!d.mensajes||!d.mensajes.length){
                     if(!cvMsgs.children.length) cvMsgs.innerHTML='<div style="text-align:center;color:#bbb;font-size:.8rem;padding:2rem 1rem;">Aún no hay mensajes.<br>Sé el primero en escribir.</div>';
@@ -489,9 +516,13 @@
         }
 
         function enviar(){
-            var txt=cvInput.value.trim(); if(!txt||!curId) return;
-            cvSend.disabled=true;
-            apiFetch(CHAT_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id_reserva:curId,mensaje:txt})}).then(function(d){
+            var txt = cvInput.value.trim();
+            if(!txt || !curChat) return;
+            cvSend.disabled = true;
+            var payload = curChat.tipo === 'reserva'
+                ? {id_reserva: curChat.id_reserva, mensaje: txt}
+                : {id_plaza: curChat.id_plaza, u: curChat.dni_inquilino, mensaje: txt};
+            apiFetch(CHAT_API, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)}).then(function(d){
                 if(d&&d.success){
                     cvInput.value=""; cvInput.style.height="auto"; cargarMsgs(true);
                 } else {
@@ -510,18 +541,17 @@
 
         // Badge no-leídos
         function updBadge(){
-            apiFetch(RES_API).then(function(d){
-                if(!d||!d.reservas||!d.reservas.length){ bbadge.style.display='none'; return; }
-                var total=0,pend=d.reservas.length;
-                d.reservas.forEach(function(r){
-                    apiFetch(CHAT_API+'?id_reserva='+r.id).then(function(cd){
-                        if(cd&&cd.success) total+=(cd.no_leidos||0);
-                        pend--; if(pend===0) bbadge.style.display=total>0?'block':'none';
-                    });
-                });
+            apiFetch(CHATS_LIST_API).then(function(d){
+                if(!d || !d.success || d.total_no_leidos === 0) {
+                    bbadge.style.display = 'none';
+                } else {
+                    bbadge.style.display = 'block';
+                    bbadge.textContent = d.total_no_leidos > 9 ? '9+' : d.total_no_leidos;
+                }
             });
         }
-        updBadge(); setInterval(updBadge,30000);
+        updBadge();
+        setInterval(updBadge, 30000);
     })();
 
     // ════════════════════════════════════════════════

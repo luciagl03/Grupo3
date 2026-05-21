@@ -132,12 +132,12 @@ if ($tab === 'chats') {
     }
 }
 
-// Mensajes no leídos en reservas de las plazas del propietario
+// Mensajes no leídos en reservas CONFIRMADAS de las plazas del propietario
 $stmtUnread = $_conexion->prepare(
     "SELECT COUNT(*) AS total FROM MENSAJE m
      JOIN RESERVA r ON m.ID_reserva = r.ID_reserva
      JOIN PLAZA p ON r.ID_plaza = p.ID_plaza
-     WHERE p.DNI = ? AND m.DNI_emisor != ? AND m.Leido = 0"
+     WHERE p.DNI = ? AND m.DNI_emisor != ? AND m.Leido = 0 AND r.Estado = 'confirmada'"
 );
 $stmtUnread->bind_param('ss', $dni, $dni);
 $stmtUnread->execute();
