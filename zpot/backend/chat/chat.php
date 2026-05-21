@@ -56,14 +56,14 @@ $nombreOtro = $yoSoyInquilino
         * { box-sizing: border-box; }
         body { background: var(--brand-bg); margin:0; font-family:'DM Sans',sans-serif; }
 
-        /* ── Layout chat ── */
+        /*  Layout chat  */
         .chat-layout {
             display:flex; flex-direction:column;
             height: 100dvh; max-width: 640px; margin:0 auto;
             background:#fff; box-shadow: var(--shadow-lg);
         }
 
-        /* ── Header ── */
+        /*  Header  */
         .chat-header {
             display:flex; align-items:center; gap:0.75rem;
             padding:0.875rem 1rem; border-bottom:1px solid var(--border);
@@ -81,7 +81,7 @@ $nombreOtro = $yoSoyInquilino
         .chat-header-name { font-size:0.95rem; font-weight:700; color:var(--brand-dark); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .chat-header-sub  { font-size:0.72rem; color:var(--text-muted); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-        /* ── Mensajes ── */
+        /*  Mensajes  */
         .chat-messages {
             flex:1; overflow-y:auto; padding:1rem;
             display:flex; flex-direction:column; gap:0.5rem;
@@ -116,7 +116,7 @@ $nombreOtro = $yoSoyInquilino
         }
         .chat-empty p { font-size:0.875rem; text-align:center; margin:0; }
 
-        /* ── Input ── */
+        /*  Input  */
         .chat-input-wrap {
             display:flex; align-items:flex-end; gap:0.5rem;
             padding:0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
@@ -220,7 +220,7 @@ function esc(s) {
     return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
 }
 
-// ── Cargar mensajes ──────────────────────────
+//  Cargar mensajes 
 function cargarMensajes(scroll) {
     fetch(API + '?id_reserva=' + ID_RESERVA, { credentials:'same-origin' })
         .then(function(r){ return r.json(); })
@@ -268,7 +268,7 @@ function cargarMensajes(scroll) {
         .catch(function(){});
 }
 
-// ── Enviar mensaje ───────────────────────────
+//  Enviar mensaje 
 function enviarMensaje() {
     var texto = msgInput.value.trim();
     if (!texto) return;
@@ -294,7 +294,7 @@ function enviarMensaje() {
     .finally(function(){ sendBtn.disabled = false; });
 }
 
-// ── Eventos ──────────────────────────────────
+// Eventos 
 msgInput.addEventListener('input', function() {
     sendBtn.disabled = this.value.trim() === '';
     this.style.height = 'auto';
@@ -310,7 +310,6 @@ msgInput.addEventListener('keydown', function(e) {
 
 sendBtn.addEventListener('click', enviarMensaje);
 
-// ── Arranque ─────────────────────────────────
 cargarMensajes(true);
 setInterval(function(){ cargarMensajes(false); }, 3000);
 </script>

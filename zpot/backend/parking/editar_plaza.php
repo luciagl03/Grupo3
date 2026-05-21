@@ -170,19 +170,16 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
                 precio:      { el: document.getElementById('precio'),      err: document.getElementById('precioError') }
             };
 
-            // Handle file selection and preview
             fotoInput.addEventListener('change', function(e) {
                 var file = e.target.files[0];
                 if (!file) return;
 
-                // Validate file type
                 if (!file.type.startsWith('image/')) {
                     setError('foto', 'El archivo debe ser una imagen');
                     fotoInput.value = '';
                     return;
                 }
 
-                // Validate file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     setError('foto', 'La imagen es demasiado grande (máx. 5MB)');
                     fotoInput.value = '';
@@ -194,7 +191,6 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
                 keepExistingPhoto = false;
                 fileLabel.textContent = file.name;
 
-                // Show preview
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     previewImg.src = e.target.result;
@@ -204,7 +200,6 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
                 reader.readAsDataURL(file);
             });
 
-            // Remove image
             removeImageBtn.addEventListener('click', function() {
                 fotoInput.value = '';
                 selectedFile = null;
@@ -279,7 +274,6 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
                 submitBtn.innerHTML = '<i data-lucide="loader"></i> Guardando…';
                 lucide.createIcons();
 
-                // Convert image to Base64 if selected
                 function processForm(fotoBase64) {
                     var payload = {
                         id_plaza: parseInt(document.getElementById('id_plaza').value),
@@ -321,7 +315,6 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
                     });
                 }
 
-                // If there's a new file, convert to Base64
                 if (selectedFile) {
                     var reader = new FileReader();
                     reader.onload = function(e) {

@@ -36,7 +36,6 @@ $stmt->close();
     <link rel="stylesheet" href="../styles/ajustes.css">
     <script src="../dark-mode.js"></script>
     <script src="../translations.js"></script>
-     <!-- AIUDA CON EL CSS SUSI ns si es mejor ponerlo en app.css o q -->
     <style>
    .modal {
         position: fixed;
@@ -567,7 +566,6 @@ $stmt->close();
                                 <p id="supportMsg" class="support-message"></p>
                             </form>
                             
-                            <!-- Quick Actions -->
                             <div class="quick-actions">
                                 <h4 class="quick-actions-title" data-i18n="supportQuickActions">Acciones rápidas</h4>
                                 <div class="quick-actions-buttons">
@@ -638,7 +636,6 @@ $stmt->close();
         //Lucide icons
         lucide.createIcons();
 
-        // Placeholder event listeners (functionality to be implemented later)
         document.getElementById('changePasswordBtn')?.addEventListener('click', function() {
             console.log('Cambiar contraseña - Funcionalidad pendiente');
         });
@@ -647,7 +644,7 @@ $stmt->close();
             console.log('Borrar cuenta - Funcionalidad pendiente');
         });
 
-        // ── Notificaciones push ──────────────────────────────
+        //  Notificaciones push 
         var pushToggle = document.getElementById('pushNotifications');
         var pushDesc   = pushToggle ? pushToggle.closest('.setting-item').querySelector('.setting-description') : null;
 
@@ -817,13 +814,12 @@ $stmt->close();
             }
         }
 
-        // FAQ Accordion functionality
+        // FAQ Accordeon
         function toggleFAQ(button) {
             const faqItem = button.parentElement;
             const answer = faqItem.querySelector('.faq-answer');
             const isOpen = answer.classList.contains('open');
 
-            // Close all other FAQ items
             document.querySelectorAll('.faq-answer').forEach(ans => {
                 ans.classList.remove('open');
             });
@@ -831,17 +827,14 @@ $stmt->close();
                 q.classList.remove('active');
             });
 
-            // Toggle current item
             if (!isOpen) {
                 answer.classList.add('open');
                 button.classList.add('active');
             }
 
-            // Re-initialize Lucide icons for the newly opened content
             lucide.createIcons();
         }
 
-        // ── Support Form Functionality ──────────────────────────────
         const supportForm = document.getElementById('supportForm');
         const supportMsg = document.getElementById('supportMsg');
         const supportSubmitBtn = document.getElementById('supportSubmitBtn');
@@ -853,27 +846,22 @@ $stmt->close();
                 const subject = document.getElementById('supportSubject').value;
                 const message = document.getElementById('supportMessage').value;
 
-                // Get current language for translated messages
+                // Obtener lenguaje actual para traducir los mensajes
                 const currentLang = getCurrentLanguage();
 
-                // Show sending message
                 supportMsg.textContent = t('supportSending', currentLang);
                 supportMsg.className = 'support-message sending';
                 supportSubmitBtn.disabled = true;
 
-                // Simulate sending (2 seconds delay)
+                // Simular enviando (delay de 2 sg)
                 setTimeout(() => {
-                    // Show success message
                     supportMsg.textContent = t('supportSuccess', currentLang);
                     supportMsg.className = 'support-message success';
                     
-                    // Clear form
                     supportForm.reset();
                     
-                    // Re-enable button
                     supportSubmitBtn.disabled = false;
                     
-                    // Clear success message after 5 seconds
                     setTimeout(() => {
                         supportMsg.textContent = '';
                         supportMsg.className = 'support-message';
@@ -882,7 +870,6 @@ $stmt->close();
             });
         }
 
-        // Re-initialize Lucide icons after page load
         setTimeout(() => {
             lucide.createIcons();
         }, 100);

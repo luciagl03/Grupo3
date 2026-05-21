@@ -1,7 +1,5 @@
 (function () {
-    // -----------------------------
-    // App constants and shared state
-    // -----------------------------
+
     var MALAGA = [36.7213, -4.4214];
     var DEFAULT_ZOOM = 14;
 
@@ -28,15 +26,11 @@
     var filtersBtn = document.getElementById('filtersBtn');
     var filtersDropdown = document.getElementById('filtersDropdown');
 
-    // Build same-origin API paths relative to backend root.
     function apiUrl(path) {
-        // Remove leading slash from path to avoid duplication
         var cleanPath = path.replace(/^\/+/, '');
         return './' + cleanPath;
     }
 
-    // Generic API fetch wrapper:
-    // if session is missing, redirect to login and reject.
     function fetchJsonOrRedirect(path) {
         return fetch(apiUrl(path), { credentials: 'same-origin' })
             .then(function (r) {
@@ -48,12 +42,10 @@
             });
     }
 
-    // Validate active session before loading map data.
     function checkAuth() {
         return fetchJsonOrRedirect('/sesion/me_api.php');
     }
 
-    // Load published parking spots used to render markers.
     function loadPlazas() {
         return fetchJsonOrRedirect('/parking/plazas_api.php')
             .then(function (data) {
@@ -63,7 +55,6 @@
             });
     }
 
-    // Returns [lat, lng] from geocoded coords stored in DB, or null if not available.
     function getMarkerPosition(plaza) {
         if (plaza.lat != null && plaza.lng != null) {
             return [plaza.lat, plaza.lng];
@@ -83,7 +74,6 @@
         });
     }
 
-    // Create map, base layer and marker container.
     function initMap(center) {
         map = L.map('map', {
             center: center,
@@ -131,7 +121,6 @@
         }
     }
 
-    // Fill and open right-side detail panel for selected plaza.
     function openDetail(plaza) {
         var currentLang = getCurrentLanguage();
         
@@ -197,12 +186,10 @@
         detailPanel.hidden = false;
     }
 
-    // Hide detail panel.
     function closeDetail() {
         detailPanel.hidden = true;
     }
 
-    // Try user geolocation to center map near current position.
     function tryGeolocation() {
         if (!navigator.geolocation) return Promise.resolve(null);
         return new Promise(function (resolve) {
@@ -216,17 +203,13 @@
         });
     }
 
-    // Shared dropdown toggler for account/filters menus.
     function toggleDropdown(dropdown, btn, open) {
         var isOpen = open !== undefined ? open : dropdown.hidden;
         dropdown.hidden = !isOpen;
         if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     }
 
-    // -----------------------------
-    // UI events
-    // -----------------------------
-    // Filter markers by ubicacion/extras only (does not affect map viewport).
+
     function applyFilters() {
         var ubicaciones = Array.from(document.querySelectorAll('input[name="filter-ubicacion"]:checked')).map(function (cb) { return cb.value; });
         var extras = Array.from(document.querySelectorAll('input[name="filter-extras"]:checked')).map(function (cb) { return cb.value; });
@@ -235,12 +218,10 @@
             var matchExtras = extras.every(function (e) { return p.extras && p.extras.indexOf(e) !== -1; });
             return matchUbic && matchExtras;
         });
-        addMarkers(true); // keep current viewport when filters change
+        addMarkers(true); 
     }
 
-    // Geocode the search query and navigate the map using the result bounding box.
-    // This gives natural zoom levels: a country zooms out to show it all,
-    // a street zooms in to a neighbourhood — without hard-coding zoom levels.
+    
     var searchTimeout = null;
     function geocodeAndFly(query) {
         query = (query || '').trim();
@@ -309,7 +290,6 @@
         toggleDropdown(filtersDropdown, filtersBtn, false);
     });
 
-    // Show one-time banner after creating a plaza (success or geocoding warning).
     (function showPlazaCreatedBannerIfNeeded() {
         var params = new URLSearchParams(window.location.search);
         if (params.get('plaza_created') !== '1') return;
@@ -324,10 +304,7 @@
             window.history.replaceState(null, '', cleanUrl);
         }
     })();
-
-    // -----------------------------
-    // Boot sequence
-    // -----------------------------
+-
     checkAuth()
         .then(function (user) {
             currentUser = user;
@@ -344,11 +321,8 @@
             }, 100);
         })
         .catch(function () {
-            // Intentionally silent: auth redirect or transient API issue.
         });
-    // ─────────────────────────────────────────────────────
     // RESEÑAS
-    // ─────────────────────────────────────────────────────
 
     function initResenas(idPlaza) {
         var container = document.getElementById('resenas-widget');

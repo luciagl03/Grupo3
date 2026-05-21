@@ -1,9 +1,5 @@
 <?php
-/**
- * chats_list_api.php
- * Devuelve la lista de chats para el usuario actual (inquilino o propietario)
- * GET → lista de conversaciones con nombre de persona y plaza
- */
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
@@ -37,7 +33,7 @@ if (empty($dni) && isset($_SESSION['usuario'])) {
 
 $chats = [];
 
-// 1. Chats como INQUILINO (mis reservas activas)
+// 1. Chats como INQUILINO 
 $stmtInq = $_conexion->prepare(
     "SELECT DISTINCT r.ID_reserva, r.ID_plaza, p.Direccion,
             u.Nombre AS nombre_prop, u.Apellidos AS apellidos_prop,
@@ -66,7 +62,7 @@ foreach ($rowsInq as $row) {
     ];
 }
 
-// 2. Chats como PROPIETARIO (reservas en mis plazas - solo si hay mensajes)
+// 2. Chats como PROPIETARIO 
 $stmtProp = $_conexion->prepare(
     "SELECT DISTINCT r.ID_reserva, r.ID_plaza, p.Direccion,
             u.Nombre AS nombre_inq, u.Apellidos AS apellidos_inq,

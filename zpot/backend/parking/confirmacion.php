@@ -17,7 +17,6 @@ if ($id_reserva <= 0) {
     exit;
 }
 
-// Verify reservation belongs to the logged-in user
 $stmt = $_conexion->prepare(
     "SELECT r.*, p.Direccion FROM RESERVA r
      LEFT JOIN PLAZA p ON r.ID_plaza = p.ID_plaza
@@ -33,7 +32,6 @@ if (!$reserva) {
     exit;
 }
 
-// Mark as confirmed when PayPal order_id is present (payment completed)
 if ($order_id !== '' && $reserva['Estado'] === 'pendiente') {
     $upd = $_conexion->prepare("UPDATE RESERVA SET Estado = 'confirmada' WHERE ID_reserva = ? AND DNI = ?");
     $upd->bind_param("is", $id_reserva, $dni);

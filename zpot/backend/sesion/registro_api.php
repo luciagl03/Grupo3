@@ -1,27 +1,19 @@
 <?php
-// ------------------------------------------------------------
-// Registration API:
-// - validates signup payload
-// - creates a non-confirmed user
-// - sends confirmation email with token
-// ------------------------------------------------------------
+
 header('Content-Type: application/json; charset=utf-8');
 
 require 'conexion.php';
 
-// Sends JSON response with status code and stops execution.
 function respondJson($status, $payload) {
     http_response_code($status);
     echo json_encode($payload);
     exit;
 }
 
-// Basic input sanitation for text fields.
 function cleanText($value) {
     return htmlspecialchars(trim((string) $value), ENT_QUOTES, 'UTF-8');
 }
 
-// Handles the confirmation email delivery via Brevo HTTP API.
 function enviarConfirmacion($email, $token) {
     $link = "https://zpot.infinityfreeapp.com/backend/sesion/confirmar.php?token=$token";
 
@@ -80,7 +72,6 @@ if (!$data) {
     respondJson(400, ['success' => false, 'error' => 'Invalid JSON']);
 }
 
-// -------- Input normalization --------
 $dni = cleanText($data['dni'] ?? '');
 $nombre = cleanText($data['nombre'] ?? '');
 $apellidos = cleanText($data['apellidos'] ?? '');
@@ -89,7 +80,6 @@ $contrasena = $data['contrasena'] ?? '';
 
 $errors = [];
 
-// -------- Validation rules --------
 if ($dni === '') $errors['dni'] = 'Inserta un DNI';
 elseif (!preg_match('/^[0-9]{8}[A-Za-z]$/', $dni)) $errors['dni'] = 'Formato de DNI incorrecto (8 dígitos + 1 letra)';
 
@@ -107,7 +97,6 @@ if (!empty($errors)) {
 }
 
 try {
-    // -------- Uniqueness check (email) --------
     $stmt = $_conexion->prepare('SELECT DNI FROM USUARIO WHERE Email = ?');
     $stmt->bind_param('s', $email);
     $stmt->execute();
@@ -122,7 +111,6 @@ try {
     }
     $stmt->close();
 
-    // -------- User creation --------
     $token = bin2hex(random_bytes(32));
     $hash = password_hash($contrasena, PASSWORD_DEFAULT);
 
@@ -135,7 +123,6 @@ try {
     $stmt->execute();
     $stmt->close();
 
-    // -------- Confirmation email --------
     $mailResult = enviarConfirmacion($email, $token);
 
     if (!$mailResult['success']) {
@@ -145,7 +132,6 @@ try {
         ]);
     }
 
-    // -------- Success response --------
     respondJson(201, [
         'success' => true,
         'message' => 'Usuario registrado. Revisa tu email para confirmar la cuenta.'

@@ -13,9 +13,7 @@ function respondJson($status, $payload) {
 require_once __DIR__ . '/../sesion/conexion.php';
 $_conexion->set_charset('utf8mb4');
 
-// ─────────────────────────────────────────────
-// GET → listar reseñas de una plaza
-// ─────────────────────────────────────────────
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $id_plaza = isset($_GET['id_plaza']) ? (int) $_GET['id_plaza'] : 0;
@@ -92,9 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     ]);
 }
 
-// ─────────────────────────────────────────────
-// POST → crear reseña
-// ─────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!isset($_SESSION['usuario'])) {

@@ -80,7 +80,6 @@ $stmt->close();
     <style>
         .estado-completada { background:#d1fae5; color:#065f46; }
 
-        /* Animación sutil para reservas nuevas */
         @keyframes nuevaReservaGlow {
             0%, 100% { 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 0 0 0 rgba(244, 221, 73, 0);

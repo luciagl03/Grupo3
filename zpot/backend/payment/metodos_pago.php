@@ -23,11 +23,11 @@ $dni = $_SESSION['dni'] ?? '';
     <script src="../dark-mode.js"></script>
     <script src="../translations.js"></script>
     <style>
-        /* ── Layout ── */
+        /*  Layout  */
         .payment-page { background: var(--brand-bg); min-height: 100vh; }
         .layout-container { max-width: 600px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 
-        /* ── Header ── */
+        /*  Header  */
         .page-header { margin-bottom: 2rem; }
         .back-link { display:inline-flex; align-items:center; gap:0.4rem; font-size:0.875rem; color:var(--text-muted); text-decoration:none; margin-bottom:1.25rem; transition:color 0.15s; }
         .back-link:hover { color:var(--brand-dark); }
@@ -37,11 +37,11 @@ $dni = $_SESSION['dni'] ?? '';
         .headline { font-size:1.5rem; font-weight:800; color:var(--brand-dark); margin:0 0 0.2rem; }
         .support { font-size:0.875rem; color:var(--text-muted); margin:0; }
 
-        /* ── Sección ── */
+        /*  Sección  */
         .section { margin-bottom:1.5rem; }
         .section-title { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin:0 0 0.6rem 0.25rem; }
 
-        /* ── Tarjetas de método ── */
+        /*  Tarjetas de método  */
         .metodos-list { display:flex; flex-direction:column; gap:0.5rem; }
         .metodo-card {
             background:#fff; border:1.5px solid var(--border); border-radius:14px;
@@ -75,7 +75,7 @@ $dni = $_SESSION['dni'] ?? '';
         .btn-icon:hover { background:var(--brand-bg); border-color:var(--brand-dark); color:var(--brand-dark); }
         .btn-icon.danger:hover { background:#fee2e2; border-color:#c0392b; color:#c0392b; }
 
-        /* ── Botón añadir ── */
+        /*  Botón añadir  */
         .btn-add {
             width:100%; padding:0.85rem; border:1.5px dashed var(--border); border-radius:14px;
             background:transparent; color:var(--text-muted); font-family:inherit;
@@ -85,7 +85,7 @@ $dni = $_SESSION['dni'] ?? '';
         }
         .btn-add:hover { border-color:var(--brand-dark); color:var(--brand-dark); background:#fff; }
 
-        /* ── Info box ── */
+        /*  Info box  */
         .info-box {
             background:#fff; border:1px solid var(--border); border-radius:12px;
             padding:0.9rem 1rem; display:flex; gap:0.75rem; align-items:flex-start;
@@ -93,7 +93,7 @@ $dni = $_SESSION['dni'] ?? '';
         .info-box i { color:var(--text-muted); flex-shrink:0; margin-top:1px; }
         .info-box p { font-size:0.8rem; color:var(--text-muted); margin:0; line-height:1.5; }
 
-        /* ── Empty state ── */
+        /*  Empty state  */
         .empty-state {
             text-align:center; padding:2.5rem 1rem;
             background:#fff; border-radius:14px; border:1px solid var(--border);
@@ -101,7 +101,7 @@ $dni = $_SESSION['dni'] ?? '';
         .empty-state i { color:var(--text-muted); margin-bottom:0.75rem; }
         .empty-state p { font-size:0.875rem; color:var(--text-muted); margin:0; }
 
-        /* ── Modal ── */
+        /*  Modal  */
         .modal-overlay {
             position:fixed; inset:0; background:rgba(58,56,47,0.45);
             backdrop-filter:blur(4px); z-index:2000;
@@ -119,7 +119,7 @@ $dni = $_SESSION['dni'] ?? '';
         .modal-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 1.25rem; }
         .modal-title { font-size:1.1rem; font-weight:800; color:var(--brand-dark); margin:0 0 1.25rem; }
 
-        /* ── Tipo selector ── */
+        /*  Tipo selector  */
         .tipo-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1.25rem; }
         .tipo-btn {
             padding:0.85rem; border:1.5px solid var(--border); border-radius:12px;
@@ -130,7 +130,7 @@ $dni = $_SESSION['dni'] ?? '';
         .tipo-btn.active { border-color:var(--brand-dark); background:var(--brand-bg); }
         .tipo-btn span { font-size:0.8rem; font-weight:600; color:var(--brand-dark); }
 
-        /* ── Formulario ── */
+        /*  Formulario  */
         .form-group { margin-bottom:0.9rem; }
         .form-label { display:block; font-size:0.78rem; font-weight:600; color:var(--text-muted); margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:0.04em; }
         .form-input {
@@ -181,9 +181,7 @@ $dni = $_SESSION['dni'] ?? '';
             color:var(--brand-dark); padding:0.5rem 0 0.25rem;
         }
 
-        /* ═══════════════════════════════════════════════════════
-           DARK MODE
-           ═══════════════════════════════════════════════════════ */
+        /*  MODO OSCURO */
         .dark-mode .payment-page,
         [data-theme="dark"] .payment-page {
             background: #1a1915;
@@ -542,7 +540,7 @@ lucide.createIcons();
 var API = '../payment/metodos_pago_api.php';
 var marcaSeleccionada = '';
 
-// ── Iconos SVG por marca ─────────────────────
+//  Iconos SVG por marca 
 var marcaIconos = {
     visa:       '<svg viewBox="0 0 48 48" width="28" height="18"><rect width="48" height="48" rx="4" fill="#1A1F71"/><text x="50%" y="62%" font-size="18" font-weight="bold" fill="#F7A600" text-anchor="middle" font-family="Arial">VISA</text></svg>',
     mastercard: '<svg viewBox="0 0 48 30" width="32" height="20"><circle cx="18" cy="15" r="12" fill="#EB001B"/><circle cx="30" cy="15" r="12" fill="#F79E1B" opacity="0.85"/></svg>',
@@ -555,7 +553,7 @@ function getMarcaIcon(marca) {
     return marcaIconos[marca] || '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
 }
 
-// ── Cargar métodos ───────────────────────────
+// Cargar métodos 
 function cargarMetodos() {
     fetch(API, { credentials: 'same-origin' })
         .then(function(r){ return r.json(); })
@@ -603,7 +601,7 @@ function renderMetodos(metodos) {
     lucide.createIcons();
 }
 
-// ── Modal ────────────────────────────────────
+// Modal 
 function abrirModal(tipo) {
     document.getElementById('formPaypal').hidden  = tipo !== 'paypal';
     document.getElementById('formTarjeta').hidden = tipo !== 'tarjeta';
@@ -649,7 +647,7 @@ function formatCaducidad(input) {
     input.value = v;
 }
 
-// ── Guardar PayPal ───────────────────────────
+// Guardar PayPal 
 function guardarPaypal() {
     var alias    = document.getElementById('pp_alias').value.trim();
     var email    = document.getElementById('pp_email').value.trim();
@@ -673,7 +671,7 @@ function guardarPaypal() {
     });
 }
 
-// ── Guardar tarjeta ──────────────────────────
+// Guardar tarjeta 
 function guardarTarjeta() {
     var alias     = document.getElementById('tc_alias').value.trim();
     var ultimos4  = document.getElementById('tc_ultimos4').value.trim();
@@ -700,14 +698,14 @@ function guardarTarjeta() {
     });
 }
 
-// ── Establecer defecto ───────────────────────
+// Establecer defecto 
 function setDefecto(id) {
     apiFetch({ accion:'defecto', id_metodo:id }, function(data) {
         if (data && data.success) cargarMetodos();
     });
 }
 
-// ── Eliminar ─────────────────────────────────
+// Eliminar 
 function eliminarMetodo(id, alias) {
     var currentLang = getCurrentLanguage();
     var confirmMsg = t('confirmDeleteMethod', currentLang).replace('{alias}', alias);
@@ -717,7 +715,7 @@ function eliminarMetodo(id, alias) {
     });
 }
 
-// ── Fetch helper ─────────────────────────────
+// Fetch helper 
 function apiFetch(body, cb) {
     fetch(API, {
         method: 'POST',
@@ -731,7 +729,7 @@ function esc(s) {
     return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '';
 }
 
-// ── Arranque ─────────────────────────────────
+// Arranque 
 cargarMetodos();
 </script>
 </body>

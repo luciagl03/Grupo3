@@ -35,7 +35,6 @@ if (!$data) respondJson(400, ['success' => false, 'error' => 'Invalid JSON']);
 $id_plaza = isset($data['id_plaza']) ? (int) $data['id_plaza'] : 0;
 if ($id_plaza <= 0) respondJson(400, ['success' => false, 'error' => 'ID de plaza inválido']);
 
-// Verify ownership
 $stmt = $_conexion->prepare('SELECT Direccion FROM PLAZA WHERE ID_plaza = ? AND DNI = ?');
 $stmt->bind_param('is', $id_plaza, $dni);
 $stmt->execute();
@@ -53,16 +52,12 @@ if ($direccionRaw === '') {
 }
 $direccion = htmlspecialchars($direccionRaw, ENT_QUOTES, 'UTF-8');
 
-// Handle Base64 image data or URL
 $foto = null;
 if (isset($data['foto']) && !empty($data['foto'])) {
     $fotoData = $data['foto'];
-    // Check if it's a Base64 data URI
     if (preg_match('/^data:image\/(jpeg|jpg|png|gif|webp);base64,/', $fotoData)) {
-        // Validate Base64 format and keep as-is for storage
         $foto = $fotoData;
     } else {
-        // If it's a regular URL, clean it
         $foto = htmlspecialchars(trim($fotoData), ENT_QUOTES, 'UTF-8');
         if (!filter_var($foto, FILTER_VALIDATE_URL)) {
             $errors['foto'] = 'URL de foto no válida';
@@ -103,7 +98,6 @@ try {
     $stmt->execute();
     $stmt->close();
 
-    // Re-geocode if address changed
     if ($direccionRaw !== $existing['Direccion']) {
         $coords = geocodeAddress($direccionRaw);
         if ($coords) {

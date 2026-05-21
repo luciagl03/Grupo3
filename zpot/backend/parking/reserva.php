@@ -1,9 +1,5 @@
 <?php
-/**
- * Booking / reservation page.
- * Integration point: connect to existing RESERVA table and flow when ready.
- * For now shows a placeholder and the selected plaza id.
- */
+
 session_start();
 
 if (!isset($_SESSION['usuario'])) {
@@ -78,7 +74,7 @@ if ($id_plaza > 0) {
     <!-- Iconos -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Flatpickr para calendario elegante -->
+    <!-- Flatpickr para calendario -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 
@@ -251,7 +247,7 @@ if ($id_plaza > 0) {
             errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        // Formatea un Date a "YYYY-MM-DD HH:MM" en hora LOCAL (evita el bug UTC de toISOString)
+        // Formatea un Date a "YYYY-MM-DD HH:MM" en hora LOCAL
         function toLocalDT(d) {
             var p = function(n) { return String(n).padStart(2, '0'); };
             return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate())
@@ -329,7 +325,7 @@ if ($id_plaza > 0) {
             var salida = new Date(fechaSalida);
             salida.setHours(parseInt(horaSalida.value), parseInt(minutoSalida.value), 0);
 
-            // Campos ocultos con hora LOCAL (no UTC)
+            // Campos ocultos con hora LOCAL
             hiddenEntrada.value = toLocalDT(entrada);
             hiddenSalida.value  = toLocalDT(salida);
 

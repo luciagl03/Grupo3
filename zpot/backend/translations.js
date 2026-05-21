@@ -1,8 +1,3 @@
-/**
- * Sistema de traducciones para Zpot
- * Archivo de configuración de idiomas
- */
-
 const translations = {
     es: {
         // Básicos

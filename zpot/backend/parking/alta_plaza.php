@@ -1,8 +1,5 @@
 <?php
-/**
- * Add parking spot page.
- * Form to create a PLAZA; ownership (DNI) is set on the server from session.
- */
+
 session_start();
 if (!isset($_SESSION['usuario'])) {
     header('Location: ../sesion/login.php');
@@ -139,19 +136,16 @@ if (!isset($_SESSION['usuario'])) {
                 precio:     { el: document.getElementById('precio'),    err: document.getElementById('precioError') }
             };
 
-            // Handle file selection and preview
             fotoInput.addEventListener('change', function(e) {
                 var file = e.target.files[0];
                 if (!file) return;
 
-                // Validate file type
                 if (!file.type.startsWith('image/')) {
                     setError('foto', t('invalidImageFile'));
                     fotoInput.value = '';
                     return;
                 }
 
-                // Validate file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     setError('foto', t('imageTooLarge'));
                     fotoInput.value = '';
@@ -162,7 +156,6 @@ if (!isset($_SESSION['usuario'])) {
                 selectedFile = file;
                 fileLabel.textContent = file.name;
 
-                // Show preview
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     previewImg.src = e.target.result;
@@ -172,7 +165,6 @@ if (!isset($_SESSION['usuario'])) {
                 reader.readAsDataURL(file);
             });
 
-            // Remove image
             removeImageBtn.addEventListener('click', function() {
                 fotoInput.value = '';
                 selectedFile = null;
@@ -278,7 +270,6 @@ if (!isset($_SESSION['usuario'])) {
                 submitBtn.innerHTML = '<i data-lucide="loader"></i> ' + t('publishing');
                 lucide.createIcons();
 
-                // Convert image to Base64 if selected
                 function processForm(fotoBase64) {
                     var payload = {
                         direccion: (fields.direccion.el.value || '').trim(),
@@ -341,7 +332,6 @@ if (!isset($_SESSION['usuario'])) {
                         });
                 }
 
-                // If there's a file, convert to Base64
                 if (selectedFile) {
                     var reader = new FileReader();
                     reader.onload = function(e) {

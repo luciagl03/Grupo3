@@ -1,11 +1,4 @@
 <?php
-/**
- * chat_api.php
- * Ubicación: backend/chat/chat_api.php
- *
- * GET  ?id_reserva=N          → mensajes de esa reserva
- * POST { id_reserva, mensaje } → enviar mensaje
- */
 // Evitar que errores PHP rompan la respuesta JSON
 error_reporting(0);
 ini_set('display_errors', '0');
@@ -45,7 +38,7 @@ if (empty($dni) && isset($_SESSION['usuario'])) {
     }
 }
 
-// ── Verificar acceso a la reserva (inquilino o propietario) ──
+// Verificar acceso a la reserva (inquilino o propietario) 
 function verificarAcceso($con, $id_reserva, $dni) {
     $stmt = $con->prepare(
         "SELECT r.ID_reserva, r.DNI AS dni_inquilino, p.DNI AS dni_propietario,
@@ -63,10 +56,9 @@ function verificarAcceso($con, $id_reserva, $dni) {
     return $result;
 }
 
-// ── GET → listar mensajes ──────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-    // ── Modo plaza (chat sin reserva) ──
+    // Modo plaza (chat sin reserva) 
     if (isset($_GET['id_plaza'])) {
         $id_plaza = (int)$_GET['id_plaza'];
         if ($id_plaza <= 0) respondJson(400, ['success' => false, 'error' => 'ID de plaza inválido']);
@@ -127,7 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         ]);
     }
 
-    // ── Modo reserva (flujo original) ──
     $id_reserva = isset($_GET['id_reserva']) ? (int)$_GET['id_reserva'] : 0;
     if ($id_reserva <= 0) respondJson(400, ['success' => false, 'error' => 'ID inválido']);
 
@@ -177,7 +168,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     ]);
 }
 
-// ── POST → enviar mensaje ──────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data      = json_decode(file_get_contents('php://input'), true) ?? [];
     $contenido = trim($data['mensaje'] ?? '');
@@ -185,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($contenido === '')             respondJson(422, ['success' => false, 'error' => 'El mensaje no puede estar vacío']);
     if (mb_strlen($contenido) > 1000) respondJson(422, ['success' => false, 'error' => 'Mensaje demasiado largo']);
 
-    // ── Modo plaza ──
+    // Modo plaza 
     if (isset($data['id_plaza'])) {
         $id_plaza = (int)($data['id_plaza'] ?? 0);
         if ($id_plaza <= 0) respondJson(400, ['success' => false, 'error' => 'ID de plaza inválido']);
@@ -228,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         respondJson(201, ['success' => true]);
     }
 
-    // ── Modo reserva (flujo original) ──
+    // Modo reserva 
     $id_reserva = (int)($data['id_reserva'] ?? 0);
     if ($id_reserva <= 0) respondJson(400, ['success' => false, 'error' => 'ID de reserva inválido']);
 

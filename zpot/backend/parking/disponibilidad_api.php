@@ -1,8 +1,4 @@
 <?php
-/**
- * disponibilidad_api.php
- * GET ?id_plaza=N  → reservas confirmadas futuras de esa plaza (para bloquear el calendario)
- */
 error_reporting(0);
 ini_set('display_errors', '0');
 

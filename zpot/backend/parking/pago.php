@@ -8,9 +8,7 @@ if (!isset($_SESSION['usuario'])) {
 
 require_once '../sesion/conexion.php';
 
-// ============================================================================
 // DETECTAR SI ES RETOMAR PAGO O FLUJO NORMAL
-// ============================================================================
 $es_retomar_pago = isset($_GET['id_reserva']) && !empty($_GET['id_reserva']);
 
 // Función para mostrar errores con estilo
@@ -58,9 +56,7 @@ HTML;
 
 $dni = $_SESSION['dni'] ?? '';
 
-// ============================================================================
 // FLUJO 1: RETOMAR PAGO (desde Mis Reservas)
-// ============================================================================
 if ($es_retomar_pago) {
     $id_reserva = (int) $_GET['id_reserva'];
     
@@ -114,7 +110,7 @@ if ($es_retomar_pago) {
     $result_disp = $stmt_disp->get_result();
     
     if ($result_disp->num_rows > 0) {
-        // Conflicto: otro usuario reservó en el mismo horario
+        // En caso de que un usuario reservo en el mismo horario
         // Eliminar la reserva pendiente obsoleta
         $stmt_delete = $_conexion->prepare("DELETE FROM RESERVA WHERE ID_reserva = ? AND DNI = ?");
         $stmt_delete->bind_param("is", $id_reserva, $dni);
@@ -131,11 +127,8 @@ if ($es_retomar_pago) {
     // Actualizar sesión
     $_SESSION['id_reserva_actual'] = $id_reserva;
     
-    // NO crear notificación (ya existe de cuando se creó la reserva)
 
-// ============================================================================
 // FLUJO 2: FLUJO NORMAL (desde formulario de reserva.php)
-// ============================================================================
 } else {
     // DATOS
     $id_plaza = (int) $_POST['id_plaza'];
@@ -264,9 +257,7 @@ if ($es_retomar_pago) {
     }
 }
 
-// ============================================================================
-// PÁGINA DE PAGO (COMÚN PARA AMBOS FLUJOS)
-// ============================================================================
+// PÁGINA DE PAGO (COMÚN PARA AMBOS)
 ?>
 
 <!DOCTYPE html>
@@ -318,10 +309,10 @@ if ($es_retomar_pago) {
 <!-- SDK DE PAYPAL-->
 <script src="https://www.paypal.com/sdk/js?client-id=AY_hkQ1T9mIhXUfY2Eu7TXdORPVLmI-SF6UaaorGnCYcgYsZ6Zt40_KL-fPTzCzE812wHUxd3JCzYWEP&currency=EUR&intent=capture"></script>
 
-<!-- TU JS SEPARADO -->
+<!-- JS SEPARADO -->
 <script src="../../scripts/pago.js"></script>
 <script>
-// Banner de "pendiente de pago" visible en la propia página de pago
+// Banner de "pendiente de pago" 
 (function() {
     var banner = document.createElement('div');
     banner.style.cssText = 'background:#fffbeb;border:1.5px solid #f59e0b;border-radius:12px;padding:0.75rem 1rem;margin:0 0 1rem;display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#92400e;';

@@ -1,9 +1,4 @@
 <?php
-// ------------------------------------------------------------
-// Pagina Ajustes:
-// - Preferencias del usuario y gestion de cuenta
-// - Privacidad, notificaciones, soporte
-// ------------------------------------------------------------
 session_start();
 require_once __DIR__ . "/../sesion/conexion.php";
 

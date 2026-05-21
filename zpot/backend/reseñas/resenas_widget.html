@@ -1,6 +1,6 @@
 
 
-<!-- ── ESTILOS ──────────────────────────────────────────────────────── -->
+<!--  ESTILOS  -->
 <style>
 /* ---- Contenedor principal ---- */
 .resenas-section {
@@ -197,7 +197,7 @@
 
 
 
-<!-- ── JAVASCRIPT ───────────────────────────────────────────────────── -->
+<!-- JAVASCRIPT  -->
 <script>
 
 function initResenas(idPlaza, containerId) {
@@ -236,7 +236,7 @@ function initResenas(idPlaza, containerId) {
     _cargarResenas(idPlaza);
 }
 
-/* ── Carga reseñas desde la API ── */
+/*  Carga reseñas desde la API  */
 function _cargarResenas(idPlaza) {
     fetch('/parking/resenas_api.php?id_plaza=' + idPlaza, { credentials: 'same-origin' })
         .then(function(r) { return r.json(); })
@@ -249,7 +249,7 @@ function _cargarResenas(idPlaza) {
         });
 }
 
-/* ── Pinta la lista de reseñas y el badge de media ── */
+/*  Pinta la lista de reseñas y el badge de media  */
 function _pintarResenas(idPlaza, data) {
     var list  = document.getElementById('rs-list-'  + idPlaza);
     var media = document.getElementById('rs-media-' + idPlaza);
@@ -298,7 +298,7 @@ function _pintarResenas(idPlaza, data) {
     }
 }
 
-/* ── Abre/cierra el formulario ── */
+/*  Abre/cierra el formulario  */
 function abrirFormResena(idPlaza) {
     var form = document.getElementById('rs-form-' + idPlaza);
     var btn  = document.querySelector('#rs-accion-' + idPlaza + ' .btn-resena');
@@ -312,7 +312,7 @@ function cerrarFormResena(idPlaza) {
     if (btn)  btn.style.display = '';
 }
 
-/* ── Star picker interactivo ── */
+/*  Star picker interactivo  */
 function _initStarPicker(idPlaza) {
     var picker = document.getElementById('rs-picker-' + idPlaza);
     if (!picker) return;
@@ -335,7 +335,7 @@ function _initStarPicker(idPlaza) {
     });
 }
 
-/* ── Envía la reseña ── */
+/*  Envía la reseña  */
 function enviarResena(idPlaza) {
     var picker    = document.getElementById('rs-picker-' + idPlaza);
     var textarea  = document.getElementById('rs-comment-' + idPlaza);
@@ -385,7 +385,7 @@ function enviarResena(idPlaza) {
     });
 }
 
-/* ── Utilidades ── */
+/*  Utilidades  */
 function _resetForm(idPlaza) {
     var picker   = document.getElementById('rs-picker-' + idPlaza);
     var textarea = document.getElementById('rs-comment-' + idPlaza);

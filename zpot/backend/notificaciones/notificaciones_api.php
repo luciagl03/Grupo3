@@ -33,9 +33,7 @@ if (empty($dni) && isset($_SESSION['usuario'])) {
     }
 }
 
-// ─────────────────────────────────────────────
-// GET → listar notificaciones
-// ─────────────────────────────────────────────
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $_conexion->prepare(
         "SELECT ID_notif, Tipo, Titulo, Mensaje, Leida, Fecha, ID_ref
@@ -72,9 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     ]);
 }
 
-// ─────────────────────────────────────────────
-// POST → acciones
-// ─────────────────────────────────────────────
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data   = json_decode(file_get_contents('php://input'), true) ?? [];
     $accion = $data['accion'] ?? '';

@@ -1,7 +1,5 @@
 <?php
-/**
- * Returns the current logged-in user from session, or 401.
- */
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 

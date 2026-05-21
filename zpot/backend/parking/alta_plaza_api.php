@@ -1,20 +1,15 @@
 <?php
-/**
- * Create parking spot (PLAZA) for the logged-in user.
- * POST JSON: direccion, foto?, ancho?, largo?, descripcion?, precio?
- * DNI is taken from session (user identified by email); client cannot set owner.
- */
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
-// Sends JSON response and exits.
 function respondJson($status, $payload) {
     http_response_code($status);
     echo json_encode($payload);
     exit;
 }
 
-// Geocodes an address string via Nominatim. Returns [lat, lng] or null on failure.
+
 function geocodeAddress($address) {
     $url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' . urlencode($address);
     $ctx = stream_context_create(['http' => ['header' => "User-Agent: Zpot/1.0\r\n", 'timeout' => 5]]);
@@ -25,13 +20,11 @@ function geocodeAddress($address) {
     return [(float) $results[0]['lat'], (float) $results[0]['lon']];
 }
 
-// Sanitizes optional text fields.
 function cleanNullableText($value) {
     $clean = trim((string) $value);
     return $clean !== '' ? htmlspecialchars($clean, ENT_QUOTES, 'UTF-8') : null;
 }
 
-// Normalizes optional numeric fields with min validation.
 function parseOptionalNumber($value, $fieldName, &$errors) {
     if ($value === null || $value === '') {
         return null;
@@ -62,19 +55,18 @@ if (!$data) {
     respondJson(400, ['success' => false, 'error' => 'Invalid JSON']);
 }
 
-// -------- Input normalization --------
 $direccionRaw = isset($data['direccion']) ? trim((string) $data['direccion']) : '';
 
-// Handle Base64 image data
+
 $foto = null;
 if (isset($data['foto']) && !empty($data['foto'])) {
     $fotoData = $data['foto'];
-    // Check if it's a Base64 data URI
+
     if (preg_match('/^data:image\/(jpeg|jpg|png|gif|webp);base64,/', $fotoData)) {
-        // Validate Base64 format and keep as-is for storage
+  
         $foto = $fotoData;
     } else {
-        // If it's a regular URL, clean it
+  
         $foto = cleanNullableText($fotoData);
     }
 }
@@ -111,7 +103,7 @@ if ($precioRaw === null || $precioRaw === '') {
     }
 }
 
-// Validate foto: skip validation if it's Base64 data URI
+// Validar foto
 if ($foto !== null && $foto !== '') {
     if (!preg_match('/^data:image\/(jpeg|jpg|png|gif|webp);base64,/', $foto) && !filter_var($foto, FILTER_VALIDATE_URL)) {
         $errors['foto'] = 'La URL de la foto no es válida';
@@ -123,7 +115,7 @@ if (!empty($errors)) {
 }
 
 try {
-    // -------- Resolve owner DNI from authenticated email --------
+  
     $stmt = $_conexion->prepare('SELECT DNI FROM USUARIO WHERE Email = ?');
     $stmt->bind_param('s', $email);
     $stmt->execute();
@@ -136,7 +128,6 @@ try {
     $dni = $row['DNI'];
     $stmt->close();
 
-    // -------- Insert parking spot --------
     $stmt = $_conexion->prepare(
         'INSERT INTO PLAZA (DNI, Direccion, Foto, Ancho, Largo, Descripcion, Escritura, Precio, Ubicacion, Extras) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );

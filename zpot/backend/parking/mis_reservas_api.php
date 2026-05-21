@@ -1,9 +1,5 @@
 <?php
-/**
- * mis_reservas_api.php
- * GET ?todas=1  → todas las reservas del usuario (para panel de chat)
- * GET           → reservas de HOY confirmadas (para timers)
- */
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
@@ -40,7 +36,7 @@ $todas = isset($_GET['todas']) && $_GET['todas'] === '1';
 $hoy   = date('Y-m-d');
 
 if ($todas) {
-    // Devuelve TODAS las reservas (pendiente + confirmada) — usadas por el panel de chat
+    // Devuelve TODAS las reservas (pendiente + confirmada) 
     $stmt = $_conexion->prepare(
         "SELECT r.ID_reserva, r.Hora_entrada, r.Hora_salida, r.Fecha, r.Estado,
                 p.Direccion

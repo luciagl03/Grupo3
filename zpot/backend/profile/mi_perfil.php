@@ -1,13 +1,8 @@
 <?php
-// ------------------------------------------------------------
-// Profile page:
-// - loads current user data from session DNI
-// - renders editable form
-// ------------------------------------------------------------
+
 session_start();
 require_once __DIR__ . "/../sesion/conexion.php";
 
-// Guard route if user session is missing.
 if (!isset($_SESSION['dni'])) {
     header("Location: ../sesion/login.php");
     exit;
@@ -15,7 +10,6 @@ if (!isset($_SESSION['dni'])) {
 
 $dni = $_SESSION['dni']; 
 
-// Query full user record to populate form fields.
 $sql = "SELECT * FROM USUARIO WHERE DNI = ?";
 $stmt = $_conexion->prepare($sql);
 $stmt->bind_param("s", $dni);

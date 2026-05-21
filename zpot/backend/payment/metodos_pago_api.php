@@ -18,9 +18,7 @@ $_conexion->set_charset('utf8mb4');
 
 $dni = $_SESSION['dni'] ?? '';
 
-// ─────────────────────────────────────────────
-// GET → listar métodos de pago
-// ─────────────────────────────────────────────
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $stmt = $_conexion->prepare(
         "SELECT ID_metodo, Tipo, Alias, Ultimos4, Marca, Caducidad, Email_paypal, Es_defecto, Fecha_alta
@@ -48,9 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     ]);
 }
 
-// ─────────────────────────────────────────────
-// POST → acciones
-// ─────────────────────────────────────────────
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data   = json_decode(file_get_contents('php://input'), true) ?? [];
     $accion = $data['accion'] ?? '';
@@ -124,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         respondJson(201, ['success' => true, 'id' => $newId]);
     }
 
-    // ── Eliminar método ──────────────────────
+    //  Eliminar método 
     if ($accion === 'eliminar') {
         $id = (int)($data['id_metodo'] ?? 0);
         if ($id <= 0) respondJson(400, ['success' => false, 'error' => 'ID inválido']);
@@ -163,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         respondJson(200, ['success' => true]);
     }
 
-    // ── Establecer defecto ───────────────────
+    //  Establecer defecto 
     if ($accion === 'defecto') {
         $id = (int)($data['id_metodo'] ?? 0);
         if ($id <= 0) respondJson(400, ['success' => false, 'error' => 'ID inválido']);

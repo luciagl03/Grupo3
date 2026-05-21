@@ -1,16 +1,8 @@
-/**
- * ZPOT - Dark Mode Manager
- * Gestiona el modo oscuro de toda la aplicación
- */
-
 (function() {
     'use strict';
 
     const DARK_MODE_KEY = 'zpot_dark_mode';
     
-    /**
-     * Aplica el modo oscuro al documento
-     */
     function applyDarkMode(enabled) {
         if (enabled) {
             document.documentElement.classList.add('dark-mode');
@@ -21,24 +13,15 @@
         }
     }
 
-    /**
-     * Obtiene el estado actual del modo oscuro
-     */
     function getDarkModeState() {
         const stored = localStorage.getItem(DARK_MODE_KEY);
         return stored === 'true';
     }
 
-    /**
-     * Guarda el estado del modo oscuro
-     */
     function saveDarkModeState(enabled) {
         localStorage.setItem(DARK_MODE_KEY, enabled ? 'true' : 'false');
     }
 
-    /**
-     * Inicializa el modo oscuro al cargar la página
-     */
     function initDarkMode() {
         const isDarkMode = getDarkModeState();
         applyDarkMode(isDarkMode);
@@ -50,9 +33,6 @@
         }
     }
 
-    /**
-     * Toggle del modo oscuro
-     */
     function toggleDarkMode(enabled) {
         applyDarkMode(enabled);
         saveDarkModeState(enabled);

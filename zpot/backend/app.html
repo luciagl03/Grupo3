@@ -271,9 +271,7 @@
     }
     function esc(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 
-    // ════════════════════════════════════════════════
-    // TOAST GLOBAL
-    // ════════════════════════════════════════════════
+ 
     function zpotToast(titulo, mensaje, tipo, enlace) {
         var cols = {warning:{bg:'#fffbeb',bd:'#f59e0b',ic:'#f59e0b'},
                     success:{bg:'#f0fdf4',bd:'#22c55e',ic:'#22c55e'},
@@ -297,9 +295,8 @@
     }
     window.zpotToast = zpotToast;
 
-    // ════════════════════════════════════════════════
+
     // CENTRO DE NOTIFICACIONES
-    // ════════════════════════════════════════════════
     (function(){
         var btn   = document.getElementById('notifBtn');
         var drop  = document.getElementById('notifDropdown');
@@ -409,9 +406,7 @@
         setInterval(badge_upd,60000); setInterval(cargarHoy,5*60*1000);
     })();
 
-    // ════════════════════════════════════════════════
     // BURBUJA DE CHAT
-    // ════════════════════════════════════════════════
     (function(){
         var bubble   = document.getElementById('chatBubble');
         var panel    = document.getElementById('chatPanel');
@@ -441,7 +436,7 @@
         closeBtn.addEventListener('click',closePanel);
         overlay.addEventListener('click',closePanel);
 
-        // ── Lista ─────────────────────────────────
+        //  Lista 
         function skelHTML(n){ var s='<div class="cp-skel"><div class="sk sk-c"></div><div class="sk-r"><div class="sk sk-l"></div><div class="sk sk-l s"></div></div></div>'; var o=''; for(var i=0;i<n;i++) o+=s; return o; }
 
         var curChat = null; // {tipo, id_reserva, id_plaza, dni_inquilino}
@@ -503,7 +498,7 @@
             });
         }
 
-        // ── Conversación ──────────────────────────
+        //  Conversación 
         function abrirConv(chat){
             curChat = chat;
             lastMsgId = 0;
@@ -595,9 +590,8 @@
         setInterval(updBadge, 30000);
     })();
 
-    // ════════════════════════════════════════════════
+
     // NOTIFICACIÓN "PENDIENTE DE PAGO"
-    // ════════════════════════════════════════════════
     window.zpotPendientePago = function(dir){
         zpotToast('Reserva pendiente de pago','Tu plaza'+(dir?' en '+dir:'')+' está reservada. Completa el pago para confirmarla.','warning',{url:'parking/mis_reservas.php',txt:'Ver mis reservas'});
         if(window.zpotNotif) window.zpotNotif.crear('reserva_pendiente','Reserva pendiente de pago','Tu reserva'+(dir?' en '+dir:'')+' necesita que completes el pago.');

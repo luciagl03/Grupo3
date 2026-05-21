@@ -23,9 +23,7 @@
     --safe-right:  env(safe-area-inset-right, 0);
 }
 
-/* ═══════════════════════════════════════════════════════
-   DARK MODE
-   ═══════════════════════════════════════════════════════ */
+/* MODO OSCURO */
 .dark-mode,
 [data-theme="dark"] {
     --brand-yellow: #f4dd49;
@@ -241,7 +239,7 @@ body {
     .navbar, .map-container { max-width: none; }
 }
 
-/* ─── NAVBAR ─────────────────────────────────────────── */
+/*  NAVBAR  */
 .navbar {
     position: fixed;
     top: 0;
@@ -288,7 +286,7 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
-/* ─── SEARCH ─────────────────────────────────────────── */
+/*  SEARCH  */
 .search-wrap {
     flex: 1;
     min-width: 0;
@@ -352,7 +350,7 @@ body {
     background: var(--brand-bg);
 }
 
-/* ─── FILTERS DROPDOWN ───────────────────────────────── */
+/*  FILTERS DROPDOWN  */
 .filters-dropdown {
     position: absolute;
     top: calc(100% + 0.625rem);
@@ -438,7 +436,7 @@ body {
 }
 .btn-small:hover { background: #1a1915; }
 
-/* ─── ACCOUNT BUTTON & DROPDOWN ─────────────────────── */
+/*  ACCOUNT BUTTON & DROPDOWN  */
 .nav-right { position: relative; }
 
 .account-btn {
@@ -510,7 +508,7 @@ body {
     margin: 0.4rem 0;
 }
 
-/* ─── BANNERS ────────────────────────────────────────── */
+/*  BANNERS  */
 .success-banner, .warning-banner {
     position: fixed;
     top: calc(var(--navbar-h) + var(--safe-top) + 0.75rem);
@@ -529,7 +527,7 @@ body {
 .success-banner { background: var(--accent); }
 .warning-banner { background: #f97316; color: #fff; }
 
-/* ─── MAP ────────────────────────────────────────────── */
+/*  MAP  */
 .map-container {
     position: fixed;
     top: calc(var(--navbar-h) + var(--safe-top));
@@ -562,7 +560,7 @@ body {
     border: 1px solid var(--border);
 }
 
-/* ─── DETAIL PANEL ───────────────────────────────────── */
+/*  DETAIL PANEL  */
 .detail-panel[hidden] { display: none !important; }
 
 .detail-panel {
@@ -718,7 +716,7 @@ body {
     transform: translateY(-1px);
 }
 
-/* ─── MARKERS ────────────────────────────────────────── */
+/*  MARKERS  */
 .leaflet-marker-pane .zpot-parking-marker {
     background: none !important;
     border: none !important;
@@ -728,7 +726,7 @@ body {
 .map-container .leaflet-marker-pane { z-index: 600; }
 .zpot-parking-marker div:hover { transform: scale(1.12); }
 
-/* ─── MOBILE ─────────────────────────────────────────── */
+/*  MOBILE  */
 @media (max-width: 480px) {
     .navbar-inner { padding: 0 1rem; gap: 0.75rem; }
 
@@ -745,7 +743,7 @@ body {
     .detail-image-wrap { height: 180px; }
 }
 
-/* ─── RESEÑAS ────────────────────────────────────────── */
+/*  RESEÑAS  */
 .resenas-section {
     margin-top: 1.1rem;
     border-top: 1px solid var(--border);
