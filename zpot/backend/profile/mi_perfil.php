@@ -32,7 +32,7 @@ $stmt->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mi perfil — Zpot</title>
+    <title data-i18n="myProfileTitle">Mi perfil</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,13 +42,14 @@ $stmt->close();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/miperfil.css">
+    <script src="../translations.js"></script>
 </head>
 
 <body class="profile-page">
     <div class="layout">
         <div class="layout-container">
             <header class="profile-header">
-                <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> Volver al mapa</a>
+                <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> <span data-i18n="backToMap">Volver al mapa</span></a>
                 
                 <div class="header-content">
                     <div class="profile-avatar">
@@ -58,16 +59,16 @@ $stmt->close();
                         ?>
                     </div>
                     <div class="header-text">
-                        <h1 class="headline">Mi perfil</h1>
-                        <p class="support">Gestiona tu información personal en Zpot</p>
+                        <h1 class="headline" data-i18n="myProfileTitle">Mi perfil</h1>
+                        <p class="support" data-i18n="myProfileSubtitle">Gestiona tu información personal en Zpot</p>
                     </div>
                 </div>
             </header>
 
             <?php if (isset($_GET['updated'])): ?>
-                <div class="success-flash">Cambios guardados correctamente.</div>
+                <div class="success-flash" data-i18n="changesSaved">Cambios guardados correctamente.</div>
             <?php elseif (isset($_GET['error'])): ?>
-                <div class="error-flash">Nombre, apellidos y email son obligatorios.</div>
+                <div class="error-flash" data-i18n="requiredFieldsError">Nombre, apellidos y email son obligatorios.</div>
             <?php endif; ?>
 
             <main class="card profile-card">
@@ -75,34 +76,34 @@ $stmt->close();
                         
                     <div class="form-grid">
                         <div class="form-group">
-                            <label><i data-lucide="user"></i> Nombre *</label>
-                            <input type="text" name="nombre" value="<?= htmlspecialchars($user['Nombre'] ?? '') ?>" placeholder="Tu nombre" required>
+                            <label><i data-lucide="user"></i> <span data-i18n="firstName">Nombre</span> *</label>
+                            <input type="text" name="nombre" value="<?= htmlspecialchars($user['Nombre'] ?? '') ?>" data-i18n="firstNamePlaceholder" placeholder="Tu nombre" required>
                         </div>
 
                         <div class="form-group">
-                            <label><i data-lucide="user"></i> Apellidos *</label>
-                            <input type="text" name="apellidos" value="<?= htmlspecialchars($user['Apellidos'] ?? '') ?>" placeholder="Tus apellidos" required>
+                            <label><i data-lucide="user"></i> <span data-i18n="lastName">Apellidos</span> *</label>
+                            <input type="text" name="apellidos" value="<?= htmlspecialchars($user['Apellidos'] ?? '') ?>" data-i18n="lastNamePlaceholder" placeholder="Tus apellidos" required>
                         </div>
 
                         <div class="form-group full-width">
-                            <label><i data-lucide="mail"></i> Correo electrónico *</label>
-                            <input type="email" name="email" value="<?= htmlspecialchars($user['Email'] ?? '') ?>" placeholder="tu@email.com" required>
+                            <label><i data-lucide="mail"></i> <span data-i18n="email">Correo electrónico</span> *</label>
+                            <input type="email" name="email" value="<?= htmlspecialchars($user['Email'] ?? '') ?>" data-i18n="emailPlaceholder" placeholder="tu@email.com" required>
                         </div>
 
                         <div class="form-group">
-                            <label><i data-lucide="phone"></i> Teléfono</label>
-                            <input type="text" name="telefono" value="<?= htmlspecialchars($user['Telefono'] ?? '') ?>" placeholder="Número de contacto">
+                            <label><i data-lucide="phone"></i> <span data-i18n="phone">Teléfono</span></label>
+                            <input type="text" name="telefono" value="<?= htmlspecialchars($user['Telefono'] ?? '') ?>" data-i18n="phonePlaceholder" placeholder="Número de contacto">
                         </div>
 
                         <div class="form-group">
-                            <label><i data-lucide="map-pin"></i> Dirección</label>
-                            <input type="text" name="direccion" value="<?= htmlspecialchars($user['Direccion'] ?? '') ?>" placeholder="Tu dirección">
+                            <label><i data-lucide="map-pin"></i> <span data-i18n="addressField">Dirección</span></label>
+                            <input type="text" name="direccion" value="<?= htmlspecialchars($user['Direccion'] ?? '') ?>" data-i18n="addressFieldPlaceholder" placeholder="Tu dirección">
                         </div>
                     </div>
 
                     <div class="form-actions">
                         <button type="submit" class="btn-save">
-                            <i data-lucide="save"></i> Guardar cambios
+                            <i data-lucide="save"></i> <span data-i18n="saveChanges">Guardar cambios</span>
                         </button>
                     </div>
                 </form>
@@ -119,7 +120,7 @@ $stmt->close();
           var email = this.email.value.trim();
           if (!nombre || !apellidos || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
               e.preventDefault();
-              alert('Nombre, apellidos y un email válido son obligatorios.');
+              alert(t('validEmailRequired'));
           }
       });
     </script>

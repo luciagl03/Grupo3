@@ -62,6 +62,7 @@ $result = $stmt->get_result();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/mis_plazas.css">
+    <script src="../translations.js"></script>
 </head>
 <body class="my-plazas-page">
 
@@ -69,16 +70,16 @@ $result = $stmt->get_result();
     <div class="layout-container">
         
         <header class="page-header">
-            <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> Volver al mapa</a>
+            <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> <span data-i18n="backToMap">Volver al mapa</span></a>
             <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
                 <div>
-                    <h1 class="headline">Mis plazas publicadas</h1>
-                    <p class="support">Gestiona los anuncios de tus plazas de aparcamiento o añade nuevas.</p>
+                    <h1 class="headline" data-i18n="mySpotsTitle">Mis plazas publicadas</h1>
+                    <p class="support" data-i18n="mySpotsSubtitle">Gestiona los anuncios de tus plazas de aparcamiento o añade nuevas.</p>
                 </div>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                     <a href="reservas_propietario.php" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.1rem;background:var(--brand-dark);color:var(--brand-yellow);border-radius:999px;text-decoration:none;font-size:0.85rem;font-weight:700;white-space:nowrap;position:relative;flex-shrink:0;">
                         <i data-lucide="calendar-check" width="16" height="16"></i>
-                        Reservas recibidas
+                        <span data-i18n="receivedReservations">Reservas recibidas</span>
                         <?php if ($totalAlertas > 0): ?>
                             <span style="position:absolute;top:-7px;right:-7px;background:#ef4444;color:#fff;border-radius:999px;font-size:0.65rem;font-weight:700;min-width:19px;height:19px;display:flex;align-items:center;justify-content:center;padding:0 4px;">
                                 <?php echo $totalAlertas; ?>
@@ -90,14 +91,14 @@ $result = $stmt->get_result();
         </header>
 
         <?php if (isset($_GET['updated'])): ?>
-            <div style="background:#f4dd49;padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-weight:500;">Plaza actualizada correctamente.</div>
+            <div style="background:#f4dd49;padding:0.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-weight:500;" data-i18n="spotUpdatedSuccess">Plaza actualizada correctamente.</div>
         <?php endif; ?>
 
         <?php if ($result->num_rows === 0): ?>
             <div class="empty-state">
                 <i data-lucide="parking-circle"></i>
-                <p>Aún no has publicado ninguna plaza.</p>
-                <a href="../parking/alta_plaza.php" class="btn-primary-link">Publicar mi primera plaza</a>
+                <p data-i18n="noSpotsYet">Aún no has publicado ninguna plaza.</p>
+                <a href="../parking/alta_plaza.php" class="btn-primary-link" data-i18n="publishFirstSpot">Publicar mi primera plaza</a>
             </div>
         <?php else: ?>
 
@@ -118,7 +119,7 @@ $result = $stmt->get_result();
                         <div class="info-row">
                             <i data-lucide="map-pin"></i>
                             <div>
-                                <span>Dirección</span>
+                                <span data-i18n="addressLabel">Dirección</span>
                                 <strong><?php echo htmlspecialchars($row['Direccion']); ?></strong>
                             </div>
                         </div>
@@ -126,7 +127,7 @@ $result = $stmt->get_result();
                         <div class="info-row">
                             <i data-lucide="banknote"></i>
                             <div>
-                                <span>Precio</span>
+                                <span data-i18n="priceLabel">Precio</span>
                                 <strong class="price-text"><?php echo number_format($row['Precio'], 2); ?> € /h</strong>
                             </div>
                         </div>
@@ -134,12 +135,12 @@ $result = $stmt->get_result();
                         <div class="info-row">
                             <i data-lucide="maximize"></i>
                             <div>
-                                <span>Medidas</span>
+                                <span data-i18n="measurementsLabel">Medidas</span>
                                 <strong>
                                     <?php if ($row['Ancho'] && $row['Largo']): ?>
                                         <?php echo $row['Ancho']; ?>m &times; <?php echo $row['Largo']; ?>m
                                     <?php else: ?>
-                                        No especificado
+                                        <span data-i18n="notSpecified">No especificado</span>
                                     <?php endif; ?>
                                 </strong>
                             </div>
@@ -153,13 +154,13 @@ $result = $stmt->get_result();
 
                         <div class="plaza-footer">
                             <a href="editar_plaza.php?id_plaza=<?php echo $row['ID_plaza']; ?>" class="btn-edit">
-                                <i data-lucide="pencil"></i> Editar
+                                <i data-lucide="pencil"></i> <span data-i18n="editButton">Editar</span>
                             </a>
                             <form method="POST" action="eliminar_plaza.php"
-                                  onsubmit="return confirm('¿Estás seguro de que deseas eliminar este anuncio?');">
+                                  onsubmit="return confirmDeleteSpot();">
                                 <input type="hidden" name="id_plaza" value="<?php echo $row['ID_plaza']; ?>">
                                 <button type="submit" class="btn-delete">
-                                    <i data-lucide="trash-2"></i> Eliminar
+                                    <i data-lucide="trash-2"></i> <span data-i18n="deleteButton">Eliminar</span>
                                 </button>
                             </form>
                         </div>
@@ -174,6 +175,13 @@ $result = $stmt->get_result();
 
 <script>
     lucide.createIcons();
+    
+    // Función para confirmar eliminación con traducción
+    function confirmDeleteSpot() {
+        const currentLang = getCurrentLanguage();
+        const message = t('confirmDeleteSpot', currentLang);
+        return confirm(message);
+    }
 </script>
 
 </body>

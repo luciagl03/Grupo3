@@ -133,12 +133,14 @@
 
     // Fill and open right-side detail panel for selected plaza.
     function openDetail(plaza) {
+        var currentLang = getCurrentLanguage();
+        
         detailTitle.textContent = plaza.direccion || 'Plaza #' + plaza.id;
-        detailPrice.textContent = 'Precio: ' + ((plaza.precio != null && plaza.precio > 0)
+        detailPrice.textContent = t('bubblePriceLabel', currentLang) + ': ' + ((plaza.precio != null && plaza.precio > 0)
             ? plaza.precio.toFixed(2) + ' €/h'
-            : 'no especificado');
+            : t('bubblePriceNotSpecified', currentLang));
         detailPrice.hidden = false;
-        detailOwner.textContent = 'Publicado por ' + (plaza.owner || '—');
+        detailOwner.textContent = t('bubblePublishedBy', currentLang) + ' ' + (plaza.owner || '—');
         detailDescription.textContent = plaza.descripcion || '';
         detailSize.textContent = (plaza.ancho != null && plaza.largo != null)
             ? plaza.ancho + ' m × ' + plaza.largo + ' m'
@@ -156,20 +158,28 @@
         var tagsEl = document.getElementById('detailTags');
         if (tagsEl) {
             tagsEl.innerHTML = '';
-            var ubicLabels = { cubierto: 'Cubierto', garaje: 'Garaje', exterior: 'Exterior' };
-            var extraLabels = { ev: 'Carga electrica', vigilado: 'Vigilado', '24h': 'Acceso 24h' };
+            var ubicLabels = { 
+                cubierto: t('bubbleTagCovered', currentLang), 
+                garaje: t('bubbleTagGarage', currentLang), 
+                exterior: t('bubbleTagOutdoor', currentLang) 
+            };
+            var extraLabels = { 
+                ev: t('bubbleTagElectric', currentLang), 
+                vigilado: t('bubbleTagGuarded', currentLang), 
+                '24h': t('bubbleTagAccess24h', currentLang) 
+            };
             if (plaza.ubicacion && ubicLabels[plaza.ubicacion]) {
-                var t = document.createElement('span');
-                t.className = 'detail-tag detail-tag--type';
-                t.textContent = ubicLabels[plaza.ubicacion];
-                tagsEl.appendChild(t);
+                var t_elem = document.createElement('span');
+                t_elem.className = 'detail-tag detail-tag--type';
+                t_elem.textContent = ubicLabels[plaza.ubicacion];
+                tagsEl.appendChild(t_elem);
             }
             (plaza.extras || []).forEach(function (e) {
                 if (!extraLabels[e]) return;
-                var t = document.createElement('span');
-                t.className = 'detail-tag';
-                t.textContent = extraLabels[e];
-                tagsEl.appendChild(t);
+                var t_elem = document.createElement('span');
+                t_elem.className = 'detail-tag';
+                t_elem.textContent = extraLabels[e];
+                tagsEl.appendChild(t_elem);
             });
         }
         // Cargar reseñas en el widget
@@ -181,7 +191,7 @@
         } else {
             detailBook.hidden = false;
             detailBook.href = apiUrl('/parking/reserva.php?id_plaza=' + plaza.id);
-            detailBook.textContent = 'Reservar';
+            detailBook.textContent = t('reserve', currentLang);
             detailBook.dataset.plazaId = plaza.id;
         }
         detailPanel.hidden = false;

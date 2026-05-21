@@ -20,6 +20,7 @@ $dni = $_SESSION['dni'] ?? '';
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="../app.css">
+    <script src="../translations.js"></script>
     <style>
         /* ── Layout ── */
         .payment-page { background: var(--brand-bg); min-height: 100vh; }
@@ -191,39 +192,39 @@ $dni = $_SESSION['dni'] ?? '';
 
         <header class="page-header">
             <a href="../index.php" class="back-link">
-                <i data-lucide="arrow-left"></i> Volver al mapa
+                <i data-lucide="arrow-left"></i> <span data-i18n="backToMap">Volver al mapa</span>
             </a>
             <div class="header-content">
                 <div class="header-icon"><i data-lucide="credit-card" width="22" height="22"></i></div>
                 <div>
-                    <h1 class="headline">Métodos de pago</h1>
-                    <p class="support">Gestiona tus formas de pago para futuras reservas</p>
+                    <h1 class="headline" data-i18n="paymentMethodsTitle">Métodos de pago</h1>
+                    <p class="support" data-i18n="paymentMethodsSubtitle">Gestiona tus formas de pago para futuras reservas</p>
                 </div>
             </div>
         </header>
 
         <!-- Lista de métodos -->
         <div class="section">
-            <p class="section-title">Tus métodos guardados</p>
+            <p class="section-title" data-i18n="savedMethodsTitle">Tus métodos guardados</p>
             <div id="metodosList" class="metodos-list">
                 <div class="empty-state">
                     <i data-lucide="credit-card" width="32" height="32"></i>
-                    <p style="margin-top:0.5rem;">Cargando métodos de pago…</p>
+                    <p style="margin-top:0.5rem;" data-i18n="loadingMethods">Cargando métodos de pago…</p>
                 </div>
             </div>
         </div>
 
         <!-- Botones añadir -->
         <div class="section">
-            <p class="section-title">Añadir método</p>
+            <p class="section-title" data-i18n="addMethodTitle">Añadir método</p>
             <div style="display:flex;flex-direction:column;gap:0.5rem;">
                 <button class="btn-add" onclick="abrirModal('paypal')">
                     <i data-lucide="plus" width="16" height="16"></i>
-                    Añadir cuenta de PayPal
+                    <span data-i18n="addPayPalButton">Añadir cuenta de PayPal</span>
                 </button>
                 <button class="btn-add" onclick="abrirModal('tarjeta')">
                     <i data-lucide="plus" width="16" height="16"></i>
-                    Añadir tarjeta de crédito / débito
+                    <span data-i18n="addCardButton">Añadir tarjeta de crédito / débito</span>
                 </button>
             </div>
         </div>
@@ -232,7 +233,7 @@ $dni = $_SESSION['dni'] ?? '';
         <div class="section">
             <div class="info-box">
                 <i data-lucide="shield-check" width="16" height="16"></i>
-                <p>Tus datos de pago están protegidos. Los números de tarjeta son procesados de forma segura por PayPal y nunca se almacenan en nuestros servidores. Solo guardamos los últimos 4 dígitos como referencia visual.</p>
+                <p data-i18n="securityInfo">Tus datos de pago están protegidos. Los números de tarjeta son procesados de forma segura por PayPal y nunca se almacenan en nuestros servidores. Solo guardamos los últimos 4 dígitos como referencia visual.</p>
             </div>
         </div>
 
@@ -243,28 +244,28 @@ $dni = $_SESSION['dni'] ?? '';
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal-sheet" id="modalSheet">
         <div class="modal-handle"></div>
-        <h2 class="modal-title" id="modalTitle">Añadir método de pago</h2>
+        <h2 class="modal-title" id="modalTitle" data-i18n="addPaymentMethodTitle">Añadir método de pago</h2>
 
         <!-- PayPal form -->
         <div id="formPaypal">
             <div class="form-group">
-                <label class="form-label">Alias (nombre que verás)</label>
-                <input type="text" class="form-input" id="pp_alias" placeholder="Ej: Mi PayPal personal" maxlength="80">
+                <label class="form-label" data-i18n="aliasLabel">Alias (nombre que verás)</label>
+                <input type="text" class="form-input" id="pp_alias" data-i18n="aliasPayPalPlaceholder" placeholder="Ej: Mi PayPal personal" maxlength="80">
             </div>
             <div class="form-group">
-                <label class="form-label">Email de PayPal</label>
-                <input type="email" class="form-input" id="pp_email" placeholder="ejemplo@email.com">
+                <label class="form-label" data-i18n="paypalEmailLabel">Email de PayPal</label>
+                <input type="email" class="form-input" id="pp_email" data-i18n="emailPlaceholder" placeholder="ejemplo@email.com">
             </div>
             <label class="check-row">
                 <input type="checkbox" id="pp_defecto">
-                <span>Establecer como método predeterminado</span>
+                <span data-i18n="setAsDefaultLabel">Establecer como método predeterminado</span>
             </label>
             <p class="form-msg" id="pp_msg"></p>
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-cancel" onclick="cerrarModal()" data-i18n="cancelButton">Cancelar</button>
                 <button class="btn-primary-full" onclick="guardarPaypal()">
                     <i data-lucide="save" width="15" height="15" style="display:inline;vertical-align:middle;margin-right:4px;"></i>
-                    Guardar
+                    <span data-i18n="saveButton">Guardar</span>
                 </button>
             </div>
         </div>
@@ -272,31 +273,31 @@ $dni = $_SESSION['dni'] ?? '';
         <!-- Tarjeta form -->
         <div id="formTarjeta" hidden>
             <div class="form-group">
-                <label class="form-label">Alias (nombre que verás)</label>
-                <input type="text" class="form-input" id="tc_alias" placeholder="Ej: Visa personal" maxlength="80">
+                <label class="form-label" data-i18n="aliasLabel">Alias (nombre que verás)</label>
+                <input type="text" class="form-input" id="tc_alias" data-i18n="aliasCardPlaceholder" placeholder="Ej: Visa personal" maxlength="80">
             </div>
 
             <div class="form-group">
-                <label class="form-label">Marca de la tarjeta</label>
+                <label class="form-label" data-i18n="cardBrandLabel">Marca de la tarjeta</label>
                 <div class="marca-grid">
                     <button class="marca-btn" data-marca="visa"       onclick="seleccionarMarca(this)">Visa</button>
                     <button class="marca-btn" data-marca="mastercard" onclick="seleccionarMarca(this)">Mastercard</button>
                     <button class="marca-btn" data-marca="amex"       onclick="seleccionarMarca(this)">Amex</button>
-                    <button class="marca-btn" data-marca="otra"       onclick="seleccionarMarca(this)">Otra</button>
+                    <button class="marca-btn" data-marca="otra"       onclick="seleccionarMarca(this)" data-i18n="otherBrandButton">Otra</button>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Últimos 4 dígitos</label>
+                <label class="form-label" data-i18n="last4DigitsLabel">Últimos 4 dígitos</label>
                 <input type="text" class="form-input" id="tc_ultimos4" placeholder="•••• •••• •••• 0000"
                        maxlength="4" inputmode="numeric" pattern="\d{4}"
                        oninput="this.value=this.value.replace(/\D/g,'')">
-                <p style="font-size:0.72rem;color:var(--text-muted);margin:0.3rem 0 0;">Solo los últimos 4 dígitos — nunca almacenamos el número completo.</p>
+                <p style="font-size:0.72rem;color:var(--text-muted);margin:0.3rem 0 0;" data-i18n="last4DigitsHint">Solo los últimos 4 dígitos — nunca almacenamos el número completo.</p>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">Caducidad</label>
+                    <label class="form-label" data-i18n="expiryLabel">Caducidad</label>
                     <input type="text" class="form-input" id="tc_caducidad" placeholder="MM/AA"
                            maxlength="5" inputmode="numeric"
                            oninput="formatCaducidad(this)">
@@ -305,14 +306,14 @@ $dni = $_SESSION['dni'] ?? '';
 
             <label class="check-row">
                 <input type="checkbox" id="tc_defecto">
-                <span>Establecer como método predeterminado</span>
+                <span data-i18n="setAsDefaultLabel">Establecer como método predeterminado</span>
             </label>
             <p class="form-msg" id="tc_msg"></p>
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-cancel" onclick="cerrarModal()" data-i18n="cancelButton">Cancelar</button>
                 <button class="btn-primary-full" onclick="guardarTarjeta()">
                     <i data-lucide="save" width="15" height="15" style="display:inline;vertical-align:middle;margin-right:4px;"></i>
-                    Guardar
+                    <span data-i18n="saveButton">Guardar</span>
                 </button>
             </div>
         </div>
@@ -352,7 +353,9 @@ function cargarMetodos() {
 function renderMetodos(metodos) {
     var list = document.getElementById('metodosList');
     if (!metodos || metodos.length === 0) {
-        list.innerHTML = '<div class="empty-state"><i data-lucide="credit-card" width="32" height="32"></i><p style="margin-top:0.5rem;">No tienes métodos de pago guardados.<br>Añade uno para agilizar tus reservas.</p></div>';
+        var currentLang = getCurrentLanguage();
+        var emptyMsg = t('noPaymentMethods', currentLang);
+        list.innerHTML = '<div class="empty-state"><i data-lucide="credit-card" width="32" height="32"></i><p style="margin-top:0.5rem;">' + emptyMsg + '</p></div>';
         lucide.createIcons();
         return;
     }
@@ -363,16 +366,21 @@ function renderMetodos(metodos) {
             ? m.email_paypal
             : (m.marca ? m.marca.charAt(0).toUpperCase() + m.marca.slice(1) : 'Tarjeta') + ' •••• ' + (m.ultimos4 || '????') + (m.caducidad ? ' · ' + m.caducidad : '');
 
+        var currentLang = getCurrentLanguage();
+        var defaultBadge = t('defaultBadge', currentLang);
+        var setDefaultTitle = t('setAsDefaultTitle', currentLang);
+        var deleteTitle = t('deleteTitle', currentLang);
+        
         return '<div class="metodo-card' + (m.es_defecto ? ' defecto' : '') + '">' +
             '<div class="metodo-icon">' + icono + '</div>' +
             '<div class="metodo-info">' +
                 '<p class="metodo-alias">' + esc(m.alias) + '</p>' +
                 '<p class="metodo-detalle">' + esc(detalle) + '</p>' +
             '</div>' +
-            (m.es_defecto ? '<span class="defecto-badge">Predeterminado</span>' : '') +
+            (m.es_defecto ? '<span class="defecto-badge">' + defaultBadge + '</span>' : '') +
             '<div class="metodo-actions">' +
-                (!m.es_defecto ? '<button class="btn-icon" title="Establecer como predeterminado" onclick="setDefecto(' + m.id + ')"><i data-lucide="star" width="14" height="14"></i></button>' : '') +
-                '<button class="btn-icon danger" title="Eliminar" onclick="eliminarMetodo(' + m.id + ', \'' + esc(m.alias) + '\')"><i data-lucide="trash-2" width="14" height="14"></i></button>' +
+                (!m.es_defecto ? '<button class="btn-icon" title="' + setDefaultTitle + '" onclick="setDefecto(' + m.id + ')"><i data-lucide="star" width="14" height="14"></i></button>' : '') +
+                '<button class="btn-icon danger" title="' + deleteTitle + '" onclick="eliminarMetodo(' + m.id + ', \'' + esc(m.alias) + '\')"><i data-lucide="trash-2" width="14" height="14"></i></button>' +
             '</div>' +
         '</div>';
     }).join('');
@@ -383,7 +391,9 @@ function renderMetodos(metodos) {
 function abrirModal(tipo) {
     document.getElementById('formPaypal').hidden  = tipo !== 'paypal';
     document.getElementById('formTarjeta').hidden = tipo !== 'tarjeta';
-    document.getElementById('modalTitle').textContent = tipo === 'paypal' ? 'Añadir cuenta PayPal' : 'Añadir tarjeta';
+    var currentLang = getCurrentLanguage();
+    var title = tipo === 'paypal' ? t('addPayPalTitle', currentLang) : t('addCardTitle', currentLang);
+    document.getElementById('modalTitle').textContent = title;
     limpiarForm();
     document.getElementById('modalOverlay').classList.add('open');
 }
@@ -429,10 +439,11 @@ function guardarPaypal() {
     var email    = document.getElementById('pp_email').value.trim();
     var defecto  = document.getElementById('pp_defecto').checked;
     var msg      = document.getElementById('pp_msg');
+    var currentLang = getCurrentLanguage();
 
     msg.className = 'form-msg';
-    if (!alias)  { msg.textContent = 'Introduce un alias.';          msg.className = 'form-msg error'; return; }
-    if (!email)  { msg.textContent = 'Introduce el email de PayPal.'; msg.className = 'form-msg error'; return; }
+    if (!alias)  { msg.textContent = t('errorEnterAlias', currentLang);          msg.className = 'form-msg error'; return; }
+    if (!email)  { msg.textContent = t('errorEnterPayPalEmail', currentLang); msg.className = 'form-msg error'; return; }
 
     apiFetch({ accion:'añadir', tipo:'paypal', alias:alias, email_paypal:email, es_defecto:defecto }, function(data) {
         if (data && data.success) {
@@ -453,12 +464,13 @@ function guardarTarjeta() {
     var caducidad = document.getElementById('tc_caducidad').value.trim();
     var defecto   = document.getElementById('tc_defecto').checked;
     var msg       = document.getElementById('tc_msg');
+    var currentLang = getCurrentLanguage();
 
     msg.className = 'form-msg';
-    if (!alias)                 { msg.textContent = 'Introduce un alias.';            msg.className = 'form-msg error'; return; }
-    if (!marcaSeleccionada)     { msg.textContent = 'Selecciona la marca.';           msg.className = 'form-msg error'; return; }
-    if (!/^\d{4}$/.test(ultimos4)) { msg.textContent = 'Introduce los últimos 4 dígitos.'; msg.className = 'form-msg error'; return; }
-    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(caducidad)) { msg.textContent = 'Fecha inválida (MM/AA).'; msg.className = 'form-msg error'; return; }
+    if (!alias)                 { msg.textContent = t('errorEnterAlias', currentLang);            msg.className = 'form-msg error'; return; }
+    if (!marcaSeleccionada)     { msg.textContent = t('errorSelectBrand', currentLang);           msg.className = 'form-msg error'; return; }
+    if (!/^\d{4}$/.test(ultimos4)) { msg.textContent = t('errorEnterLast4', currentLang); msg.className = 'form-msg error'; return; }
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(caducidad)) { msg.textContent = t('errorInvalidExpiry', currentLang); msg.className = 'form-msg error'; return; }
 
     apiFetch({ accion:'añadir', tipo:'tarjeta', alias:alias, marca:marcaSeleccionada, ultimos4:ultimos4, caducidad:caducidad, es_defecto:defecto }, function(data) {
         if (data && data.success) {
@@ -481,7 +493,9 @@ function setDefecto(id) {
 
 // ── Eliminar ─────────────────────────────────
 function eliminarMetodo(id, alias) {
-    if (!confirm('¿Eliminar "' + alias + '"?')) return;
+    var currentLang = getCurrentLanguage();
+    var confirmMsg = t('confirmDeleteMethod', currentLang).replace('{alias}', alias);
+    if (!confirm(confirmMsg)) return;
     apiFetch({ accion:'eliminar', id_metodo:id }, function(data) {
         if (data && data.success) cargarMetodos();
     });

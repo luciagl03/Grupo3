@@ -52,6 +52,7 @@ $result = $stmt->get_result();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/mis_reservas.css">
+    <script src="../translations.js"></script>
     
 <style>
     .estado-completada { background:#d1fae5; color:#065f46; }
@@ -63,16 +64,16 @@ $result = $stmt->get_result();
     <div class="layout-container">
         
         <header class="page-header">
-            <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> Volver al mapa</a>
-            <h1 class="headline">Mis reservas</h1>
-            <p class="support">Gestiona tus próximas estancias y revisa tu historial.</p>
+            <a href="../index.php" class="back-link"><i data-lucide="arrow-left"></i> <span data-i18n="backToMap">Volver al mapa</span></a>
+            <h1 class="headline" data-i18n="myReservationsTitle">Mis reservas</h1>
+            <p class="support" data-i18n="myReservationsSubtitle">Gestiona tus próximas estancias y revisa tu historial.</p>
         </header>
 
         <?php if ($result->num_rows === 0): ?>
             <div class="empty-state">
                 <i data-lucide="calendar-off"></i>
-                <p>Aún no has realizado ninguna reserva.</p>
-                <a href="../app.html" class="btn-primary-link">Buscar una plaza</a>
+                <p data-i18n="noReservationsYet">Aún no has realizado ninguna reserva.</p>
+                <a href="../app.html" class="btn-primary-link" data-i18n="searchSpot">Buscar una plaza</a>
             </div>
         <?php else: ?>
 
@@ -85,11 +86,12 @@ $result = $stmt->get_result();
                     $fechaReserva = strtotime($row['Fecha'] . ' ' . $row['Hora_salida']);
                     $estaCompletada = ($estado === 'confirmada' && $fechaReserva < time());
                     $estadoMostrado = $estaCompletada ? 'completada' : $estado;
-                    $estadoLabel = [
-                        'confirmada'  => 'Confirmada',
-                        'pendiente'   => 'Pendiente de pago',
-                        'cancelada'   => 'Cancelada',
-                        'completada'  => 'Completada',
+                    // Etiquetas de estado traducibles
+                    $estadoLabelKeys = [
+                        'confirmada'  => 'statusConfirmed',
+                        'pendiente'   => 'statusPending',
+                        'cancelada'   => 'statusCancelled',
+                        'completada'  => 'statusCompleted',
                     ];
                     $estadoClass = [
                         'confirmada'  => 'estado-confirmada',
@@ -105,15 +107,23 @@ $result = $stmt->get_result();
                         </div>
                         <div class="price-tag"><?php echo number_format($row['Precio'], 2); ?> €</div>
                     </div>
-                    <div class="estado-badge <?php echo $estadoClass[$estadoMostrado] ?? 'estado-pendiente'; ?>">
-                        <?php echo $estadoLabel[$estadoMostrado] ?? $estadoMostrado;?>
+                    <div class="estado-badge <?php echo $estadoClass[$estadoMostrado] ?? 'estado-pendiente'; ?>" data-i18n="<?php echo $estadoLabelKeys[$estadoMostrado] ?? ''; ?>">
+                        <?php 
+                        $defaultLabels = [
+                            'confirmada'  => 'Confirmada',
+                            'pendiente'   => 'Pendiente de pago',
+                            'cancelada'   => 'Cancelada',
+                            'completada'  => 'Completada',
+                        ];
+                        echo $defaultLabels[$estadoMostrado] ?? $estadoMostrado;
+                        ?>
                     </div>
 
                     <div class="reserva-body">
                         <div class="info-row">
                             <i data-lucide="calendar"></i>
                             <div>
-                                <span>Fecha</span>
+                                <span data-i18n="dateLabel">Fecha</span>
                                 <strong><?php echo date("d/m/Y", strtotime($row['Fecha'])); ?></strong>
                             </div>
                         </div>
@@ -121,7 +131,7 @@ $result = $stmt->get_result();
                         <div class="info-row">
                             <i data-lucide="clock"></i>
                             <div>
-                                <span>Horario</span>
+                                <span data-i18n="scheduleLabel">Horario</span>
                                 <strong><?php echo substr($row['Hora_entrada'], 0, 5); ?> - <?php echo substr($row['Hora_salida'], 0, 5); ?></strong>
                             </div>
                         </div>
@@ -129,8 +139,8 @@ $result = $stmt->get_result();
                         <div class="info-row">
                             <i data-lucide="timer"></i>
                             <div>
-                                <span>Duración</span>
-                                <strong><?php echo $row['Duracion']; ?> horas</strong>
+                                <span data-i18n="durationLabel">Duración</span>
+                                <strong><?php echo $row['Duracion']; ?> <span data-i18n="hoursLabel">horas</span></strong>
                             </div>
                         </div>
                     </div>
@@ -139,36 +149,36 @@ $result = $stmt->get_result();
                         <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                             <?php if ($estado === 'confirmada' && !$estaCompletada): ?>
                                 <a href="../chat/chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
-                                    <i data-lucide="message-circle" width="14" height="14"></i> Chat
+                                    <i data-lucide="message-circle" width="14" height="14"></i> <span data-i18n="chatButton">Chat</span>
                                 </a>
                             <?php endif; ?>
                             <?php if ($estaCompletada): ?>
                                 <a href="../chat/chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
-                                    <i data-lucide="message-circle" width="14" height="14"></i> Chat
+                                    <i data-lucide="message-circle" width="14" height="14"></i> <span data-i18n="chatButton">Chat</span>
                                 </a>
                                 <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;color:#065f46;font-weight:600;padding:0.4rem 0;">
                                     <i data-lucide="check-circle-2" width="15" height="15"></i>
-                                    Completada
+                                    <span data-i18n="statusCompleted">Completada</span>
                                 </div>
                             <?php elseif ($estado === 'cancelada'): ?>
-                                <div style="font-size:0.82rem;color:#c0392b;font-weight:600;padding:0.4rem 0;">Cancelada</div>
+                                <div style="font-size:0.82rem;color:#c0392b;font-weight:600;padding:0.4rem 0;" data-i18n="statusCancelled">Cancelada</div>
                             <?php elseif ($estado === 'pendiente'): ?>
                                 <a href="pago.php?id_reserva=<?php echo $row['ID_reserva']; ?>" class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;background:var(--brand-yellow);color:var(--brand-dark);border-color:var(--brand-yellow);">
-                                    <i data-lucide="credit-card" width="14" height="14"></i> Pagar ahora
+                                    <i data-lucide="credit-card" width="14" height="14"></i> <span data-i18n="payNowButton">Pagar ahora</span>
                                 </a>
                                 <form method="POST" action="eliminar_reserva.php"
-                                      onsubmit="return confirm('¿Seguro que quieres cancelar esta reserva?');">
+                                      onsubmit="return confirmCancel();">
                                     <input type="hidden" name="id_reserva" value="<?php echo $row['ID_reserva']; ?>">
                                     <button type="submit" class="btn-cancel">
-                                        <i data-lucide="trash-2"></i> Cancelar
+                                        <i data-lucide="trash-2"></i> <span data-i18n="cancelButton">Cancelar</span>
                                     </button>
                                 </form>
                             <?php else: ?>
                                 <form method="POST" action="eliminar_reserva.php"
-                                      onsubmit="return confirm('¿Seguro que quieres cancelar esta reserva?');">
+                                      onsubmit="return confirmCancel();">
                                     <input type="hidden" name="id_reserva" value="<?php echo $row['ID_reserva']; ?>">
                                     <button type="submit" class="btn-cancel">
-                                        <i data-lucide="trash-2"></i> Cancelar
+                                        <i data-lucide="trash-2"></i> <span data-i18n="cancelButton">Cancelar</span>
                                     </button>
                                 </form>
                             <?php endif; ?>
@@ -185,6 +195,13 @@ $result = $stmt->get_result();
 
 <script>
     lucide.createIcons();
+    
+    // Función para confirmar cancelación con traducción
+    function confirmCancel() {
+        const currentLang = getCurrentLanguage();
+        const message = t('confirmCancelReservation', currentLang);
+        return confirm(message);
+    }
 </script>
 
 </body>

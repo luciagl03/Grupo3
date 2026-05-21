@@ -75,6 +75,7 @@ $stmt->close();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/mis_reservas.css">
+    <script src="../translations.js"></script>
     <style>
         .estado-completada { background:#d1fae5; color:#065f46; }
 
@@ -96,7 +97,7 @@ $stmt->close();
         }
         
         .reserva-card.nueva::before {
-            content: 'Nueva';
+            content: attr(data-new-label);
             position: absolute;
             top: 12px;
             right: 12px;
@@ -181,17 +182,17 @@ $stmt->close();
 
         <header class="page-header">
             <a href="mis_plazas.php" class="back-link">
-                <i data-lucide="arrow-left"></i> Volver a mis plazas
+                <i data-lucide="arrow-left"></i> <span data-i18n="backToMySpots">Volver a mis plazas</span>
             </a>
-            <h1 class="headline">Reservas en mis plazas</h1>
-            <p class="support">Gestiona las reservas que han hecho otros usuarios en tus plazas y chatea con ellos.</p>
+            <h1 class="headline" data-i18n="receivedReservationsTitle">Reservas en mis plazas</h1>
+            <p class="support" data-i18n="receivedReservationsSubtitle">Gestiona las reservas que han hecho otros usuarios en tus plazas y chatea con ellos.</p>
         </header>
 
         <?php if (empty($reservas)): ?>
             <div class="empty-state">
                 <i data-lucide="calendar-off"></i>
-                <p>Aún no hay reservas confirmadas en tus plazas.</p>
-                <a href="mis_plazas.php" class="btn-primary-link">Ver mis plazas</a>
+                <p data-i18n="noReceivedReservations">Aún no hay reservas confirmadas en tus plazas.</p>
+                <a href="mis_plazas.php" class="btn-primary-link" data-i18n="viewMySpots">Ver mis plazas</a>
             </div>
         <?php else: ?>
 
@@ -202,10 +203,11 @@ $stmt->close();
                 $estaCompletada = ($estado === 'confirmada' && $fechaReserva < time());
                 $estadoMostrado = $estaCompletada ? 'completada' : $estado;
 
-                $estadoLabel = [
-                    'confirmada'  => 'Confirmada',
-                    'cancelada'   => 'Cancelada',
-                    'completada'  => 'Completada',
+                // Etiquetas de estado traducibles
+                $estadoLabelKeys = [
+                    'confirmada'  => 'statusConfirmed',
+                    'cancelada'   => 'statusCancelled',
+                    'completada'  => 'statusCompleted',
                 ];
                 $estadoClass = [
                     'confirmada'  => 'estado-confirmada',
@@ -220,7 +222,7 @@ $stmt->close();
                 // Verificar si es una reserva nueva (recién vista)
                 $esNueva = in_array((int)$row['ID_reserva'], $reservasNuevas);
             ?>
-            <div class="card reserva-card<?php echo $esNueva ? ' nueva' : ''; ?>">
+            <div class="card reserva-card<?php echo $esNueva ? ' nueva' : ''; ?>" <?php if ($esNueva): ?>data-new-label="<?php echo htmlspecialchars('Nueva'); ?>"<?php endif; ?>>
                 <div class="reserva-header">
                     <div class="plaza-tag">
                         <?php echo htmlspecialchars($row['Direccion'] ?? 'Plaza #' . $row['ID_plaza']); ?>
@@ -228,8 +230,15 @@ $stmt->close();
                     <div class="price-tag"><?php echo number_format($row['Precio'], 2); ?> €</div>
                 </div>
 
-                <div class="estado-badge <?php echo $estadoClass[$estadoMostrado] ?? 'estado-confirmada'; ?>">
-                    <?php echo $estadoLabel[$estadoMostrado] ?? $estadoMostrado; ?>
+                <div class="estado-badge <?php echo $estadoClass[$estadoMostrado] ?? 'estado-confirmada'; ?>" data-i18n="<?php echo $estadoLabelKeys[$estadoMostrado] ?? ''; ?>">
+                    <?php 
+                    $defaultLabels = [
+                        'confirmada'  => 'Confirmada',
+                        'cancelada'   => 'Cancelada',
+                        'completada'  => 'Completada',
+                    ];
+                    echo $defaultLabels[$estadoMostrado] ?? $estadoMostrado;
+                    ?>
                 </div>
 
                 <div class="reserva-body">
@@ -237,14 +246,14 @@ $stmt->close();
                         <div class="inquilino-avatar"><?php echo $inicialInquilino; ?></div>
                         <div>
                             <div class="inquilino-nombre"><?php echo $nombreCorto; ?></div>
-                            <div class="inquilino-label">Inquilino</div>
+                            <div class="inquilino-label" data-i18n="tenantLabel">Inquilino</div>
                         </div>
                     </div>
 
                     <div class="info-row">
                         <i data-lucide="calendar"></i>
                         <div>
-                            <span>Fecha</span>
+                            <span data-i18n="dateLabel">Fecha</span>
                             <strong><?php echo date('d/m/Y', strtotime($row['Fecha'])); ?></strong>
                         </div>
                     </div>
@@ -252,7 +261,7 @@ $stmt->close();
                     <div class="info-row">
                         <i data-lucide="clock"></i>
                         <div>
-                            <span>Horario</span>
+                            <span data-i18n="scheduleLabel">Horario</span>
                             <strong>
                                 <?php echo substr($row['Hora_entrada'], 0, 5); ?> –
                                 <?php echo substr($row['Hora_salida'],  0, 5); ?>
@@ -266,13 +275,13 @@ $stmt->close();
                         <a href="../chat/chat.php?id_reserva=<?php echo $row['ID_reserva']; ?>"
                            class="chat-btn">
                             <i data-lucide="message-circle" width="14" height="14"></i>
-                            Chat
+                            <span data-i18n="chatButton">Chat</span>
                             <?php if ($noLeidos > 0): ?>
                                 <span class="badge-unread"><?php echo $noLeidos; ?></span>
                             <?php endif; ?>
                         </a>
                     <?php else: ?>
-                        <span style="font-size:0.82rem;color:#c0392b;font-weight:600;">Cancelada</span>
+                        <span style="font-size:0.82rem;color:#c0392b;font-weight:600;" data-i18n="statusCancelled">Cancelada</span>
                     <?php endif; ?>
                 </div>
             </div>
@@ -283,6 +292,26 @@ $stmt->close();
     </div>
 </div>
 
-<script>lucide.createIcons();</script>
+<script>
+    lucide.createIcons();
+    
+    // Actualizar el atributo data-new-label cuando cambie el idioma
+    window.addEventListener('languageChanged', function() {
+        const currentLang = getCurrentLanguage();
+        const newLabel = t('newReservationBadge', currentLang);
+        document.querySelectorAll('.reserva-card.nueva').forEach(card => {
+            card.setAttribute('data-new-label', newLabel);
+        });
+    });
+    
+    // Inicializar el label al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentLang = getCurrentLanguage();
+        const newLabel = t('newReservationBadge', currentLang);
+        document.querySelectorAll('.reserva-card.nueva').forEach(card => {
+            card.setAttribute('data-new-label', newLabel);
+        });
+    });
+</script>
 </body>
 </html>
