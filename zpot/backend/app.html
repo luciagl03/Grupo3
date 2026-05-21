@@ -197,10 +197,6 @@
                 <p id="detailOwner" class="detail-owner"></p>
                 <div id="resenas-widget"></div>
                 <a href="#" class="btn btn-primary detail-book" id="detailBook">Reservar</a>
-                <a href="#" class="btn detail-contact" id="detailContact"
-                   style="display:none;margin-top:0.5rem;width:100%;text-align:center;padding:0.7rem;border:1.5px solid var(--brand-dark);background:transparent;color:var(--brand-dark);border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;box-sizing:border-box;">
-                    💬 Contactar propietario
-                </a>
             </div>
         </aside>
     </main>
@@ -358,8 +354,7 @@
                     }
                     
                     var url=null;
-                    if(tipo==='nueva_consulta') url='./parking/reserva.php?id_plaza='+ref+'&contactar=1';
-                    else if(tipo==='reserva_cancelada'||tipo==='reserva_pendiente') url='./parking/mis_reservas.php';
+                    if(tipo==='reserva_cancelada'||tipo==='reserva_pendiente') url='./parking/mis_reservas.php';
                     else if(tipo==='reserva_confirmada') {
                         // Determinar si es propietario o inquilino basado en el contexto
                         // Si la notificación dice "Has recibido" es propietario, sino inquilino

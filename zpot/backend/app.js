@@ -178,16 +178,11 @@
         var isOwner = currentUser && plaza.owner_dni && plaza.owner_dni === currentUser.dni;
         if (isOwner) {
             detailBook.hidden = true;
-            if (detailContact) detailContact.style.display = 'none';
         } else {
             detailBook.hidden = false;
             detailBook.href = apiUrl('/parking/reserva.php?id_plaza=' + plaza.id);
             detailBook.textContent = 'Reservar';
             detailBook.dataset.plazaId = plaza.id;
-            if (detailContact) {
-                detailContact.href = apiUrl('/parking/reserva.php?id_plaza=' + plaza.id + '&contactar=1');
-                detailContact.style.display = currentUser ? 'block' : 'none';
-            }
         }
         detailPanel.hidden = false;
     }
