@@ -339,9 +339,27 @@
                     var tipo=this.dataset.tipo, ref=parseInt(this.dataset.ref)||0;
                     if(this.dataset.r!=='1') apiFetch(NOTIF_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'marcar_leida',id_notif:parseInt(this.dataset.id)})});
                     drop.style.display='none';
+                    
+                    // Para nuevo_mensaje, abrir la burbuja de chat directamente
+                    if(tipo==='nuevo_mensaje') {
+                        if(ref > 0) {
+                            // Tiene id_reserva, abrir chat de reserva
+                            window.abrirChatPanel();
+                            // Buscar y abrir la conversación específica
+                            setTimeout(function(){
+                                var items = document.querySelectorAll('.cp-item[data-id-reserva="'+ref+'"]');
+                                if(items.length > 0) items[0].click();
+                            }, 300);
+                        } else {
+                            // Sin id_reserva, solo abrir el panel de mensajes
+                            window.abrirChatPanel();
+                        }
+                        return;
+                    }
+                    
                     var url=null;
                     if(tipo==='nueva_consulta') url='./parking/reserva.php?id_plaza='+ref+'&contactar=1';
-                    else if(tipo==='nuevo_mensaje'||tipo==='reserva_cancelada'||tipo==='reserva_pendiente') url='./parking/mis_reservas.php';
+                    else if(tipo==='reserva_cancelada'||tipo==='reserva_pendiente') url='./parking/mis_reservas.php';
                     else if(tipo==='reserva_confirmada') {
                         // Determinar si es propietario o inquilino basado en el contexto
                         // Si la notificación dice "Has recibido" es propietario, sino inquilino
@@ -411,6 +429,9 @@
         function openPanel(){  panel.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow='hidden'; cargarLista(); }
         function closePanel(){ panel.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow=''; clearInterval(pollTmr); volverLista(); }
 
+        // Exponer openPanel globalmente para que las notificaciones puedan usarlo
+        window.abrirChatPanel = openPanel;
+
         bubble.addEventListener('click',function(e){ e.stopPropagation(); panel.classList.contains('open')?closePanel():openPanel(); });
         closeBtn.addEventListener('click',closePanel);
         overlay.addEventListener('click',closePanel);
@@ -439,11 +460,26 @@
             }
             listView.innerHTML = chats.map(function(c){
                 var ini = c.nombre.charAt(0).toUpperCase();
-                var badge = c.no_leidos > 0 ? '<span style="min-width:18px;height:18px;background:#e74c3c;color:#fff;border-radius:50%;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;">'+c.no_leidos+'</span>' : '';
-                return '<div class="cp-item" data-tipo="'+c.tipo+'" data-id-reserva="'+(c.id_reserva||0)+'" data-id-plaza="'+(c.id_plaza||0)+'" data-dni-inq="'+(c.dni_inquilino||'')+'" data-nombre="'+esc(c.nombre)+'" data-plaza="'+esc(c.plaza)+'">'+
+                var badgeUnread = c.no_leidos > 0 ? '<span style="min-width:18px;height:18px;background:#e74c3c;color:#fff;border-radius:50%;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;">'+c.no_leidos+'</span>' : '';
+                
+                // Badge de rol con colores sutiles de la app
+                var rolBadge = '';
+                if (c.rol === 'propietario') {
+                    rolBadge = '<span style="font-size:.65rem;font-weight:600;color:#065f46;background:#d1fae5;padding:.15rem .45rem;border-radius:8px;white-space:nowrap;">Propietario</span>';
+                } else if (c.rol === 'inquilino') {
+                    rolBadge = '<span style="font-size:.65rem;font-weight:600;color:#1e40af;background:#dbeafe;padding:.15rem .45rem;border-radius:8px;white-space:nowrap;">Inquilino</span>';
+                }
+                
+                return '<div class="cp-item" data-tipo="'+c.tipo+'" data-id-reserva="'+(c.id_reserva||0)+'" data-id-plaza="'+(c.id_plaza||0)+'" data-dni-inq="'+(c.dni_inquilino||'')+'" data-nombre="'+esc(c.nombre)+'" data-plaza="'+esc(c.plaza)+'" data-rol="'+c.rol+'">'+
                     '<div class="cp-av">'+ini+'</div>'+
-                    '<div class="cp-info"><div class="cp-name">'+esc(c.nombre)+'</div><div class="cp-sub">'+esc(c.plaza)+'</div></div>'+
-                    badge+
+                    '<div class="cp-info">'+
+                        '<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.15rem;">'+
+                            '<div class="cp-name" style="margin:0;">'+esc(c.nombre)+'</div>'+
+                            rolBadge+
+                        '</div>'+
+                        '<div class="cp-sub">'+esc(c.plaza)+'</div>'+
+                    '</div>'+
+                    badgeUnread+
                 '</div>';
             }).join('');
             listView.querySelectorAll('.cp-item').forEach(function(el){
@@ -481,7 +517,7 @@
             pollTmr = setInterval(function(){ cargarMsgs(false); }, 3000);
         }
         function volverLista(){ listView.style.display='flex'; convView.classList.remove('active'); curId=null; clearInterval(pollTmr); }
-        cvBack.addEventListener('click',function(){ volverLista(); cargarLista(); });
+        cvBack.addEventListener('click',function(){ volverLista(); cargarLista(); updBadge(); });
 
         function fmtH(s){ var d=new Date(s); return d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}); }
         function fmtFS(s){ var d=new Date(s),h=new Date(); if(d.toDateString()===h.toDateString()) return 'Hoy'; var a=new Date(); a.setDate(a.getDate()-1); if(d.toDateString()===a.toDateString()) return 'Ayer'; return d.toLocaleDateString('es-ES',{day:'2-digit',month:'long'}); }
