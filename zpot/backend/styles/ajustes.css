@@ -13,6 +13,198 @@
     --danger-red-hover: #c0392b;
 }
 
+/* ═══════════════════════════════════════════════════════
+   DARK MODE - Ajustes
+   ═══════════════════════════════════════════════════════ */
+.dark-mode,
+[data-theme="dark"] {
+    --brand-yellow: #f4dd49;
+    --brand-dark: #e8e6e0;
+    --brand-grey: #4a4840;
+    --brand-bg: #1a1915;
+    --text-muted: #a8a49d;
+    --danger-red: #ef4444;
+    --danger-red-hover: #dc2626;
+}
+
+.dark-mode body.settings-page,
+[data-theme="dark"] body.settings-page {
+    background-color: #1a1915;
+}
+
+.dark-mode .settings-header,
+[data-theme="dark"] .settings-header {
+    background-color: #1a1915;
+}
+
+.dark-mode .settings-card,
+[data-theme="dark"] .settings-card {
+    background: #252320;
+    border-color: #3a3830;
+}
+
+.dark-mode .setting-item-link:hover,
+[data-theme="dark"] .setting-item-link:hover {
+    background-color: #2a2825;
+}
+
+.dark-mode .setting-divider,
+[data-theme="dark"] .setting-divider {
+    background-color: #3a3830;
+}
+
+.dark-mode .btn-action:hover,
+[data-theme="dark"] .btn-action:hover {
+    background-color: #1a1915;
+}
+
+.dark-mode .btn-action-danger:hover,
+[data-theme="dark"] .btn-action-danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.dark-mode .language-select,
+[data-theme="dark"] .language-select {
+    background-color: #1a1915;
+    border-color: #3a3830;
+    color: #e8e6e0;
+}
+
+.dark-mode .language-select:hover,
+[data-theme="dark"] .language-select:hover {
+    background-color: #252320;
+    border-color: #4a4840;
+}
+
+.dark-mode .language-select:focus,
+[data-theme="dark"] .language-select:focus {
+    background-color: #252320;
+    border-color: #f4dd49;
+}
+
+.dark-mode .faq-question:hover,
+[data-theme="dark"] .faq-question:hover {
+    background-color: #2a2825;
+}
+
+.dark-mode .faq-item,
+[data-theme="dark"] .faq-item {
+    border-bottom-color: #3a3830;
+}
+
+.dark-mode .faq-header,
+[data-theme="dark"] .faq-header {
+    border-bottom-color: #3a3830;
+}
+
+.dark-mode .form-input,
+.dark-mode .form-textarea,
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-textarea {
+    background-color: #1a1915;
+    border-color: #3a3830;
+    color: #e8e6e0;
+}
+
+.dark-mode .form-input:focus,
+.dark-mode .form-textarea:focus,
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .form-textarea:focus {
+    background-color: #252320;
+    border-color: #f4dd49;
+}
+
+.dark-mode .btn-quick-action,
+[data-theme="dark"] .btn-quick-action {
+    background: #1a1915;
+    border-color: #3a3830;
+    color: #e8e6e0;
+}
+
+.dark-mode .btn-quick-action:hover,
+[data-theme="dark"] .btn-quick-action:hover {
+    background: #252320;
+    border-color: #f4dd49;
+}
+
+.dark-mode .quick-actions,
+[data-theme="dark"] .quick-actions {
+    border-top-color: #3a3830;
+}
+
+.dark-mode .modal,
+[data-theme="dark"] .modal {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.dark-mode .modal-content,
+[data-theme="dark"] .modal-content {
+    background: #252320;
+    border-color: #3a3830;
+}
+
+.dark-mode .modal-content h3,
+[data-theme="dark"] .modal-content h3 {
+    color: #e8e6e0;
+}
+
+.dark-mode .modal-content input,
+[data-theme="dark"] .modal-content input {
+    background: #1a1915;
+    border-color: #3a3830;
+    color: #e8e6e0;
+}
+
+.dark-mode .modal-content input:focus,
+[data-theme="dark"] .modal-content input:focus {
+    border-color: #f4dd49;
+}
+
+.dark-mode #cancelDelete,
+[data-theme="dark"] #cancelDelete {
+    background: #1a1915;
+    color: #e8e6e0;
+}
+
+.dark-mode #cancelDelete:hover,
+[data-theme="dark"] #cancelDelete:hover {
+    background: #3a3830;
+}
+
+.dark-mode .ajuste-content input,
+[data-theme="dark"] .ajuste-content input {
+    background: #1a1915;
+    border-color: #3a3830;
+    color: #e8e6e0;
+}
+
+.dark-mode .ajuste-content input:focus,
+[data-theme="dark"] .ajuste-content input:focus {
+    border-color: #f4dd49;
+}
+
+.dark-mode .toggle-password:hover,
+[data-theme="dark"] .toggle-password:hover {
+    background: rgba(244, 221, 73, 0.1);
+}
+
+.dark-mode .slider,
+[data-theme="dark"] .slider {
+    background-color: #3a3830;
+}
+
+@media (max-width: 767px) {
+    .dark-mode body.settings-page,
+    [data-theme="dark"] body.settings-page {
+        background-color: #252320;
+    }
+    
+    .dark-mode .settings-header,
+    [data-theme="dark"] .settings-header {
+        background-color: #1a1915;
+    }
+}
+
 body.settings-page {
     margin: 0;
     padding: 0;

@@ -62,6 +62,7 @@ $result = $stmt->get_result();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/mis_plazas.css">
+    <script src="../dark-mode.js"></script>
     <script src="../translations.js"></script>
 </head>
 <body class="my-plazas-page">
@@ -77,7 +78,7 @@ $result = $stmt->get_result();
                     <p class="support" data-i18n="mySpotsSubtitle">Gestiona los anuncios de tus plazas de aparcamiento o añade nuevas.</p>
                 </div>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                    <a href="reservas_propietario.php" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.1rem;background:var(--brand-dark);color:var(--brand-yellow);border-radius:999px;text-decoration:none;font-size:0.85rem;font-weight:700;white-space:nowrap;position:relative;flex-shrink:0;">
+                    <a href="reservas_propietario.php" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.1rem;background:var(--brand-yellow);color:#1a1915;border-radius:999px;text-decoration:none;font-size:0.85rem;font-weight:700;white-space:nowrap;position:relative;flex-shrink:0;">
                         <i data-lucide="calendar-check" width="16" height="16"></i>
                         <span data-i18n="receivedReservations">Reservas recibidas</span>
                         <?php if ($totalAlertas > 0): ?>

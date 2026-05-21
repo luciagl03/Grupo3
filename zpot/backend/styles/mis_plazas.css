@@ -1,3 +1,138 @@
+:root {
+    --brand-yellow: #f4dd49;
+    --brand-dark: #3a382f;
+    --brand-grey: #cfccc4;
+    --brand-bg: #f1f0ea;
+    --text-muted: #706e66;
+    --radius: 12px;
+    
+    --bg: #ffffff;
+    --text: var(--brand-dark);
+    --border: #e8e5df;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════ */
+.dark-mode,
+[data-theme="dark"] {
+    --brand-yellow: #f4dd49;
+    --brand-dark: #e8e6e0;
+    --brand-grey: #4a4840;
+    --brand-bg: #1a1915;
+    --text-muted: #a8a49d;
+    
+    --bg: #2d2a26;
+    --text: #e8e6e0;
+    --border: #3a3830;
+}
+
+.dark-mode body.my-plazas-page,
+[data-theme="dark"] body.my-plazas-page {
+    background-color: #1a1915;
+    color: var(--text);
+}
+
+.dark-mode .headline,
+[data-theme="dark"] .headline {
+    color: var(--text);
+}
+
+.dark-mode .support,
+[data-theme="dark"] .support {
+    color: var(--text-muted);
+}
+
+.dark-mode .back-link,
+[data-theme="dark"] .back-link {
+    color: var(--text-muted);
+}
+
+.dark-mode .back-link:hover,
+[data-theme="dark"] .back-link:hover {
+    color: var(--text);
+}
+
+.dark-mode .plaza-card,
+[data-theme="dark"] .plaza-card {
+    background: var(--bg);
+    border-color: var(--border);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.dark-mode .plaza-card:hover,
+[data-theme="dark"] .plaza-card:hover {
+    box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+}
+
+.dark-mode .plaza-content h3,
+[data-theme="dark"] .plaza-content h3 {
+    color: var(--text);
+}
+
+.dark-mode .info-row strong,
+[data-theme="dark"] .info-row strong {
+    color: var(--text);
+}
+
+.dark-mode .plaza-description,
+[data-theme="dark"] .plaza-description {
+    color: var(--text-muted);
+}
+
+.dark-mode .btn-edit,
+[data-theme="dark"] .btn-edit {
+    background: var(--brand-yellow);
+    color: #1a1915;
+    border-color: var(--brand-yellow);
+}
+
+.dark-mode .btn-edit:hover,
+[data-theme="dark"] .btn-edit:hover {
+    background: #e0c93a;
+}
+
+.dark-mode .btn-delete,
+[data-theme="dark"] .btn-delete {
+    background: var(--brand-bg);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.dark-mode .btn-delete:hover,
+[data-theme="dark"] .btn-delete:hover {
+    background: var(--border);
+}
+
+.dark-mode .btn-primary-link,
+[data-theme="dark"] .btn-primary-link {
+    background: var(--brand-yellow);
+    color: #1a1915;
+}
+
+.dark-mode .btn-primary-link:hover,
+[data-theme="dark"] .btn-primary-link:hover {
+    background: #e0c93a;
+}
+
+.dark-mode .empty-state,
+[data-theme="dark"] .empty-state {
+    background: var(--bg);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+
+.dark-mode .plaza-footer,
+[data-theme="dark"] .plaza-footer {
+    border-top-color: var(--border);
+    background: var(--brand-bg);
+}
+
+.dark-mode .no-image,
+[data-theme="dark"] .no-image {
+    background: var(--brand-bg);
+    color: var(--text-muted);
+}
 
 body.my-plazas-page {
     background-color: var(--brand-bg);
@@ -52,20 +187,19 @@ body.my-plazas-page {
 .plazas-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 2rem;
+    gap: 1.75rem;
 }
 
 /* CARD */
 .plaza-card {
-    background: white;
+    background: var(--bg);
     border-radius: 24px;
     overflow: hidden;
+    box-shadow: 0 4px 20px rgba(58, 56, 47, 0.08);
+    border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 20px rgba(58, 56, 47, 0.08);
-    border: 1px solid rgba(207, 204, 196, 0.25);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
-    position: relative;
 }
 
 .plaza-card:hover {
@@ -73,24 +207,19 @@ body.my-plazas-page {
     box-shadow: 0 12px 32px rgba(58, 56, 47, 0.15);
 }
 
-/* IMAGEN */
 .plaza-image-wrap {
     width: 100%;
     height: 200px;
-    background: linear-gradient(135deg, #f1f0ea 0%, #e8e6dc 100%);
-    position: relative;
+    background: var(--brand-bg);
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .plaza-image-wrap img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.plaza-card:hover .plaza-image-wrap img {
-    transform: scale(1.05);
+    display: block;
 }
 
 .no-image {
@@ -99,35 +228,35 @@ body.my-plazas-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #cfccc4;
+    background: var(--brand-bg);
+    color: var(--text-muted);
 }
 
 .no-image svg {
     width: 48px;
     height: 48px;
+    opacity: 0.3;
 }
 
-/* CONTENIDO*/
 .plaza-content {
     padding: 1.75rem;
     display: flex;
     flex-direction: column;
+    gap: 1.25rem;
     flex: 1;
 }
 
-.plaza-content h3 { 
-    margin: 0 0 1.5rem 0; 
-    color: var(--brand-dark); 
-    font-size: 1.3rem; 
+.plaza-content h3 {
+    font-size: 1.1rem;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    color: var(--brand-dark);
+    margin: 0;
 }
 
 .info-row {
     display: flex;
     align-items: center;
     gap: 14px;
-    margin-bottom: 1.1rem;
 }
 
 .info-row svg {
@@ -159,108 +288,81 @@ body.my-plazas-page {
     font-weight: 600;
 }
 
-.price-text { 
-    color: var(--brand-dark) !important; 
-    font-weight: 800 !important; 
-    font-size: 1.1rem !important;
+.price-text {
+    color: var(--brand-yellow);
+    font-weight: 800;
 }
 
 .plaza-description {
     font-size: 0.9rem;
-    color: var(--text-muted);
+    color: #666;
     line-height: 1.5;
-    margin: 1rem 0 1.5rem 0;
-    padding: 1rem;
-    background: rgba(241, 240, 234, 0.4);
-    border-radius: 12px;
-    border-left: 3px solid var(--brand-yellow);
-    
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;   
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin: 0;
 }
 
-/* FOOTER Y BOTONES*/
-.plaza-footer { 
-    margin-top: auto; 
-    padding-top: 1.25rem; 
-    border-top: 1px solid rgba(207, 204, 196, 0.2); 
-    display: flex; 
-    gap: 0.75rem; 
+/* FOOTER */
+.plaza-footer {
+    margin-top: auto;
+    border-top: 1px solid rgba(207, 204, 196, 0.2);
+    padding: 1.25rem 1.75rem;
+    background: rgba(241, 240, 234, 0.3);
+    display: flex;
+    gap: 0.75rem;
 }
 
-.plaza-footer form { 
-    flex: 1; 
-}
-
-.btn-edit {
+.btn-edit, .btn-delete {
     flex: 1;
-    background: var(--brand-yellow);
-    border: 1.5px solid #e0c93a;
-    padding: 12px;
-    border-radius: 12px;
-    color: var(--brand-dark);
     font-family: inherit;
     font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 0.9rem;
+    padding: 12px;
+    border-radius: 12px;
     transition: all 0.2s ease;
+    text-decoration: none;
 }
 
-.btn-edit svg {
-    width: 16px;
-    height: 16px;
+.btn-edit {
+    background: var(--brand-dark);
+    color: white;
+    border: 1.5px solid var(--brand-dark);
 }
 
-.btn-edit:hover { 
-    background: #edd93a; 
+.btn-edit:hover {
+    background: #1a1915;
     transform: translateY(-1px);
 }
 
 .btn-delete {
-    width: 100%;
     background: white;
     border: 1.5px solid rgba(204, 0, 0, 0.2);
-    padding: 12px;
-    border-radius: 12px;
     color: #cc0000;
-    font-family: inherit;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
 }
 
-.btn-delete svg {
-    width: 16px;
-    height: 16px;
-}
-
-.btn-delete:hover { 
-    background: #fff5f5; 
+.btn-delete:hover {
+    background: #fff5f5;
     border-color: #cc0000;
     transform: translateY(-1px);
+}
+
+.btn-edit svg, .btn-delete svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* EMPTY STATE */
 .empty-state {
     text-align: center;
-    background: white;
+    background: var(--bg);
     padding: 5rem 2rem;
     border-radius: 24px;
     color: var(--text-muted);
     box-shadow: 0 4px 20px rgba(58, 56, 47, 0.08);
+    border: 1px solid var(--border);
 }
 
 .empty-state svg { 
@@ -295,7 +397,6 @@ body.my-plazas-page {
 
 /* RESPONSIVE - MOBILE */
 @media (max-width: 767px) {
-
     body.my-plazas-page {
         background-color: #ffffff;
     }
@@ -311,25 +412,20 @@ body.my-plazas-page {
     .page-header {
         padding: 2rem 1.5rem 1rem 1.5rem;
         margin-bottom: 1.5rem;
-        text-align: center;
     }
 
     .back-link {
-        justify-content: center;
         margin-bottom: 1.5rem;
     }
 
     .headline {
         font-size: 1.8rem;
-        text-align: center;
     }
 
     .support {
         font-size: 0.9rem;
-        text-align: center;
     }
 
-    /* Grid en móvil: 1 columna completa */
     .plazas-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
@@ -338,7 +434,6 @@ body.my-plazas-page {
 
     .plaza-card {
         border-radius: 20px;
-        box-shadow: 0 4px 16px rgba(58, 56, 47, 0.1);
     }
 
     .plaza-image-wrap {
@@ -347,68 +442,37 @@ body.my-plazas-page {
 
     .plaza-content {
         padding: 1.5rem;
-        text-align: center;
-    }
-
-    .plaza-content h3 {
-        font-size: 1.2rem;
-        margin-bottom: 1.25rem;
-        text-align: center;
-    }
-
-    .info-row {
-        flex-direction: column;
-        text-align: center;
-        gap: 8px;
-        margin-bottom: 1rem;
-    }
-
-    .info-row svg {
-        width: 20px;
-        height: 20px;
-        margin: 0 auto;
-    }
-
-    .info-row > div {
-        text-align: center;
-    }
-
-    .info-row span {
-        text-align: center;
-    }
-
-    .info-row strong {
-        font-size: 1rem;
-        text-align: center;
-    }
-
-    .price-text {
-        font-size: 1.1rem !important;
-        text-align: center;
-    }
-
-    .plaza-description {
-        font-size: 0.85rem;
-        padding: 0.875rem;
-        margin: 0.875rem 0 1.25rem 0;
-        text-align: left;
+        gap: 1rem;
     }
 
     .plaza-footer {
-        padding-top: 1rem;
+        padding: 1.25rem 1.5rem;
         flex-direction: column;
-        gap: 0.75rem;
     }
 
-    .btn-edit,
-    .btn-delete {
-        font-size: 0.9rem;
-        padding: 12px;
+    .btn-edit, .btn-delete {
+        width: 100%;
     }
 
     .empty-state {
         padding: 4rem 1.5rem;
         margin: 0 1.5rem;
         border-radius: 20px;
+    }
+}
+
+/* RESPONSIVE - TABLET */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .plazas-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+/* RESPONSIVE - DESKTOP GRANDE */
+@media (min-width: 1200px) {
+    .plazas-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
     }
 }

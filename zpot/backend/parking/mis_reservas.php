@@ -52,6 +52,7 @@ $result = $stmt->get_result();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/mis_reservas.css">
+    <script src="../dark-mode.js"></script>
     <script src="../translations.js"></script>
     
 <style>

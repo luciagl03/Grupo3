@@ -6,6 +6,113 @@
     --brand-bg: #f1f0ea;
     --text-muted: #706e66;
     --radius: 12px;
+    
+    --bg: #ffffff;
+    --text: var(--brand-dark);
+    --border: #e8e5df;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════ */
+.dark-mode,
+[data-theme="dark"] {
+    --brand-yellow: #f4dd49;
+    --brand-dark: #e8e6e0;
+    --brand-grey: #4a4840;
+    --brand-bg: #1a1915;
+    --text-muted: #a8a49d;
+    
+    --bg: #252320;
+    --text: #e8e6e0;
+    --border: #3a3830;
+}
+
+.dark-mode body.profile-page,
+[data-theme="dark"] body.profile-page {
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.dark-mode .card,
+[data-theme="dark"] .card {
+    background: var(--bg);
+    border-color: var(--border);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4);
+}
+
+.dark-mode .headline,
+[data-theme="dark"] .headline {
+    color: var(--text);
+}
+
+.dark-mode .support,
+[data-theme="dark"] .support {
+    color: var(--text-muted);
+}
+
+.dark-mode .back-link,
+[data-theme="dark"] .back-link {
+    color: var(--text-muted);
+}
+
+.dark-mode .back-link:hover,
+[data-theme="dark"] .back-link:hover {
+    color: var(--text);
+}
+
+.dark-mode .form-group label,
+[data-theme="dark"] .form-group label {
+    color: var(--text-muted);
+}
+
+.dark-mode .form-group input,
+[data-theme="dark"] .form-group input {
+    background-color: var(--brand-bg);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.dark-mode .form-group input:focus,
+[data-theme="dark"] .form-group input:focus {
+    background-color: var(--bg);
+    border-color: var(--brand-yellow);
+}
+
+.dark-mode .form-actions,
+[data-theme="dark"] .form-actions {
+    border-top-color: var(--border);
+}
+
+.dark-mode .btn-save,
+[data-theme="dark"] .btn-save {
+    background-color: var(--brand-yellow);
+    color: #1a1915;
+}
+
+.dark-mode .btn-save:hover,
+[data-theme="dark"] .btn-save:hover {
+    background-color: #e0c93a;
+}
+
+.dark-mode .profile-avatar,
+[data-theme="dark"] .profile-avatar {
+    background-color: var(--brand-yellow);
+    color: #1a1915;
+    border-color: var(--bg);
+}
+
+.dark-mode .success-flash,
+[data-theme="dark"] .success-flash {
+    background: var(--brand-yellow);
+    color: #1a1915;
+}
+
+.dark-mode .error-flash,
+[data-theme="dark"] .error-flash {
+    background: #7f1d1d;
+    color: #fecaca;
+    border-color: #991b1b;
 }
 
 body.profile-page {

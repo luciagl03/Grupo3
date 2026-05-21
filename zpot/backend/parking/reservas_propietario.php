@@ -75,6 +75,7 @@ $stmt->close();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/mis_reservas.css">
+    <script src="../dark-mode.js"></script>
     <script src="../translations.js"></script>
     <style>
         .estado-completada { background:#d1fae5; color:#065f46; }
@@ -117,8 +118,8 @@ $stmt->close();
             align-items: center;
             gap: 0.4rem;
             padding: 0.45rem 0.9rem;
-            background: var(--brand-dark);
-            color: var(--brand-yellow);
+            background: var(--brand-yellow);
+            color: #1a1915;
             border-radius: 999px;
             text-decoration: none;
             font-size: 0.8rem;
@@ -126,7 +127,7 @@ $stmt->close();
             transition: background 0.15s;
             position: relative;
         }
-        .chat-btn:hover { background: #1a1915; }
+        .chat-btn:hover { background: #e0c93a; }
 
         .badge-unread {
             position: absolute;

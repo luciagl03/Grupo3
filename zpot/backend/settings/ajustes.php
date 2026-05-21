@@ -34,6 +34,7 @@ $stmt->close();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/ajustes.css">
+    <script src="../dark-mode.js"></script>
     <script src="../translations.js"></script>
      <!-- AIUDA CON EL CSS SUSI ns si es mejor ponerlo en app.css o q -->
     <style>
@@ -713,9 +714,6 @@ $stmt->close();
             });
         }
 
-        document.getElementById('darkMode')?.addEventListener('change', function() {
-            console.log('Dark mode:', this.checked);
-        });
 
         document.getElementById('languageSelect')?.addEventListener('change', function() {
             changeLanguage(this.value);

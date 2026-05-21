@@ -39,6 +39,7 @@ $extras = !empty($plaza['Extras']) ? explode(',', $plaza['Extras']) : [];
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="../styles/alta_plaza.css">
+    <script src="../dark-mode.js"></script>
 </head>
 <body class="auth-page">
     <div class="layout">

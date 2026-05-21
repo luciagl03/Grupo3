@@ -1,3 +1,126 @@
+:root {
+    --brand-yellow: #f4dd49;
+    --brand-dark: #3a382f;
+    --brand-grey: #cfccc4;
+    --brand-bg: #f1f0ea;
+    --text-muted: #706e66;
+    --radius: 12px;
+    
+    --bg: #ffffff;
+    --text: var(--brand-dark);
+    --border: #e8e5df;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════ */
+.dark-mode,
+[data-theme="dark"] {
+    --brand-yellow: #f4dd49;
+    --brand-dark: #e8e6e0;
+    --brand-grey: #4a4840;
+    --brand-bg: #1a1915;
+    --text-muted: #a8a49d;
+    
+    --bg: #2d2a26;
+    --text: #e8e6e0;
+    --border: #3a3830;
+}
+
+.dark-mode body.my-reservations-page,
+[data-theme="dark"] body.my-reservations-page {
+    background-color: #1a1915;
+}
+
+.dark-mode body.my-reservations-page,
+[data-theme="dark"] body.my-reservations-page {
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.dark-mode .headline,
+[data-theme="dark"] .headline {
+    color: var(--text);
+}
+
+.dark-mode .support,
+[data-theme="dark"] .support {
+    color: var(--text-muted);
+}
+
+.dark-mode .back-link,
+[data-theme="dark"] .back-link {
+    color: var(--text-muted);
+}
+
+.dark-mode .back-link:hover,
+[data-theme="dark"] .back-link:hover {
+    color: var(--text);
+}
+
+.dark-mode .reserva-card,
+[data-theme="dark"] .reserva-card {
+    background: var(--bg);
+    border-color: var(--border);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.dark-mode .reserva-card:hover,
+[data-theme="dark"] .reserva-card:hover {
+    box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+}
+
+.dark-mode .plaza-tag,
+[data-theme="dark"] .plaza-tag {
+    background: var(--brand-bg);
+    color: var(--text);
+}
+
+.dark-mode .price-tag,
+[data-theme="dark"] .price-tag {
+    background: var(--brand-yellow);
+    color: #1a1915;
+}
+
+.dark-mode .info-row strong,
+[data-theme="dark"] .info-row strong {
+    color: var(--text);
+}
+
+.dark-mode .btn-cancel,
+[data-theme="dark"] .btn-cancel {
+    background: var(--brand-bg);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.dark-mode .btn-cancel:hover,
+[data-theme="dark"] .btn-cancel:hover {
+    background: var(--border);
+}
+
+.dark-mode .btn-primary-link,
+[data-theme="dark"] .btn-primary-link {
+    background: var(--brand-yellow);
+    color: #1a1915;
+}
+
+.dark-mode .btn-primary-link:hover,
+[data-theme="dark"] .btn-primary-link:hover {
+    background: #e0c93a;
+}
+
+.dark-mode .empty-state,
+[data-theme="dark"] .empty-state {
+    background: var(--bg);
+    color: var(--text-muted);
+}
+
+.dark-mode .reserva-footer,
+[data-theme="dark"] .reserva-footer {
+    border-top-color: var(--border);
+    background: var(--brand-bg);
+}
 
 body.my-reservations-page {
     background-color: var(--brand-bg);
@@ -57,11 +180,11 @@ body.my-reservations-page {
 
 /* CARD */
 .reserva-card {
-    background: white;
+    background: var(--bg);
     border-radius: 24px;
     padding: 0;
     box-shadow: 0 4px 20px rgba(58, 56, 47, 0.08);
-    border: 1px solid rgba(207, 204, 196, 0.25);
+    border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -218,11 +341,12 @@ body.my-reservations-page {
 /* EMPTY STATE */
 .empty-state {
     text-align: center;
-    background: white;
+    background: var(--bg);
     padding: 5rem 2rem;
     border-radius: 24px;
     color: var(--text-muted);
     box-shadow: 0 4px 20px rgba(58, 56, 47, 0.08);
+    border: 1px solid var(--border);
 }
 
 .empty-state svg { 

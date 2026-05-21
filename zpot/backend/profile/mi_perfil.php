@@ -42,6 +42,7 @@ $stmt->close();
 
     <link rel="stylesheet" href="../app.css">
     <link rel="stylesheet" href="../styles/miperfil.css">
+    <script src="../dark-mode.js"></script>
     <script src="../translations.js"></script>
 </head>
 

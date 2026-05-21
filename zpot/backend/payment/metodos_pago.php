@@ -20,6 +20,7 @@ $dni = $_SESSION['dni'] ?? '';
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="../app.css">
+    <script src="../dark-mode.js"></script>
     <script src="../translations.js"></script>
     <style>
         /* ── Layout ── */
@@ -178,6 +179,221 @@ $dni = $_SESSION['dni'] ?? '';
         .card-number-preview {
             font-size:1.1rem; font-weight:700; letter-spacing:0.15em;
             color:var(--brand-dark); padding:0.5rem 0 0.25rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           DARK MODE
+           ═══════════════════════════════════════════════════════ */
+        .dark-mode .payment-page,
+        [data-theme="dark"] .payment-page {
+            background: #1a1915;
+        }
+
+        .dark-mode .headline,
+        [data-theme="dark"] .headline {
+            color: #e8e6e0;
+        }
+
+        .dark-mode .support,
+        [data-theme="dark"] .support {
+            color: #a8a49d;
+        }
+
+        .dark-mode .back-link,
+        [data-theme="dark"] .back-link {
+            color: #a8a49d;
+        }
+
+        .dark-mode .back-link:hover,
+        [data-theme="dark"] .back-link:hover {
+            color: #e8e6e0;
+        }
+
+        .dark-mode .section-title,
+        [data-theme="dark"] .section-title {
+            color: #a8a49d;
+        }
+
+        .dark-mode .metodo-card,
+        [data-theme="dark"] .metodo-card {
+            background: #2d2a26;
+            border-color: #3a3830;
+        }
+
+        .dark-mode .metodo-card.defecto,
+        [data-theme="dark"] .metodo-card.defecto {
+            border-color: #f4dd49;
+            box-shadow: 0 0 0 3px rgba(244, 221, 73, 0.15);
+        }
+
+        .dark-mode .metodo-icon,
+        [data-theme="dark"] .metodo-icon {
+            background: #1a1915;
+        }
+
+        .dark-mode .metodo-alias,
+        [data-theme="dark"] .metodo-alias {
+            color: #e8e6e0;
+        }
+
+        .dark-mode .metodo-detalle,
+        [data-theme="dark"] .metodo-detalle {
+            color: #a8a49d;
+        }
+
+        .dark-mode .btn-icon,
+        [data-theme="dark"] .btn-icon {
+            background: #1a1915;
+            border-color: #3a3830;
+            color: #a8a49d;
+        }
+
+        .dark-mode .btn-icon:hover,
+        [data-theme="dark"] .btn-icon:hover {
+            background: #3a3830;
+            border-color: #f4dd49;
+            color: #e8e6e0;
+        }
+
+        .dark-mode .btn-add,
+        [data-theme="dark"] .btn-add {
+            border-color: #3a3830;
+            color: #a8a49d;
+        }
+
+        .dark-mode .btn-add:hover,
+        [data-theme="dark"] .btn-add:hover {
+            border-color: #f4dd49;
+            color: #e8e6e0;
+            background: #2d2a26;
+        }
+
+        .dark-mode .info-box,
+        [data-theme="dark"] .info-box {
+            background: #2d2a26;
+            border-color: #3a3830;
+        }
+
+        .dark-mode .info-box i,
+        [data-theme="dark"] .info-box i {
+            color: #a8a49d;
+        }
+
+        .dark-mode .info-box p,
+        [data-theme="dark"] .info-box p {
+            color: #a8a49d;
+        }
+
+        .dark-mode .empty-state,
+        [data-theme="dark"] .empty-state {
+            background: #2d2a26;
+            border-color: #3a3830;
+        }
+
+        .dark-mode .empty-state i,
+        [data-theme="dark"] .empty-state i {
+            color: #a8a49d;
+        }
+
+        .dark-mode .empty-state p,
+        [data-theme="dark"] .empty-state p {
+            color: #a8a49d;
+        }
+
+        .dark-mode .modal-sheet,
+        [data-theme="dark"] .modal-sheet {
+            background: #2d2a26;
+        }
+
+        .dark-mode .modal-handle,
+        [data-theme="dark"] .modal-handle {
+            background: #3a3830;
+        }
+
+        .dark-mode .modal-title,
+        [data-theme="dark"] .modal-title {
+            color: #e8e6e0;
+        }
+
+        .dark-mode .tipo-btn,
+        [data-theme="dark"] .tipo-btn {
+            background: #1a1915;
+            border-color: #3a3830;
+        }
+
+        .dark-mode .tipo-btn.active,
+        [data-theme="dark"] .tipo-btn.active {
+            border-color: #f4dd49;
+            background: #3a3830;
+        }
+
+        .dark-mode .tipo-btn span,
+        [data-theme="dark"] .tipo-btn span {
+            color: #e8e6e0;
+        }
+
+        .dark-mode .form-label,
+        [data-theme="dark"] .form-label {
+            color: #a8a49d;
+        }
+
+        .dark-mode .form-input,
+        [data-theme="dark"] .form-input {
+            background: #1a1915;
+            border-color: #3a3830;
+            color: #e8e6e0;
+        }
+
+        .dark-mode .form-input:focus,
+        [data-theme="dark"] .form-input:focus {
+            border-color: #f4dd49;
+        }
+
+        .dark-mode .marca-btn,
+        [data-theme="dark"] .marca-btn {
+            background: #1a1915;
+            border-color: #3a3830;
+            color: #a8a49d;
+        }
+
+        .dark-mode .marca-btn.active,
+        [data-theme="dark"] .marca-btn.active {
+            border-color: #f4dd49;
+            background: #f4dd49;
+            color: #1a1915;
+        }
+
+        .dark-mode .check-row span,
+        [data-theme="dark"] .check-row span {
+            color: #e8e6e0;
+        }
+
+        .dark-mode .btn-primary-full,
+        [data-theme="dark"] .btn-primary-full {
+            background: #f4dd49;
+            color: #1a1915;
+        }
+
+        .dark-mode .btn-primary-full:hover,
+        [data-theme="dark"] .btn-primary-full:hover {
+            background: #e0c93a;
+        }
+
+        .dark-mode .btn-cancel,
+        [data-theme="dark"] .btn-cancel {
+            background: #1a1915;
+            border-color: #3a3830;
+            color: #e8e6e0;
+        }
+
+        .dark-mode .btn-cancel:hover,
+        [data-theme="dark"] .btn-cancel:hover {
+            background: #3a3830;
+        }
+
+        .dark-mode .card-number-preview,
+        [data-theme="dark"] .card-number-preview {
+            color: #e8e6e0;
         }
 
         @media (min-width:480px) {
